@@ -1,6 +1,6 @@
 <?php
 
-namespace EFaturacimPhp\Util;
+namespace Efaturacim\Util;
 
 class StrUtil{
     public function test(): int
