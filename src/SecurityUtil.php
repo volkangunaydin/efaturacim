@@ -1,12 +1,12 @@
 <?php
 namespace Efaturacim\Util;
 class SecurityUtil{
-    public static function getClientKey(){
+    public static function getClientKey(){        
         return CookieUtil::getCookie("SECURE_CLIENT_KEY",function(){
             return SecurityUtil::getGUID();
         });   
     }
-    public static function getGUID(){
+    public static function getGUID(){        
             if (function_exists('com_create_guid') === true){
                 return  trim(com_create_guid(), '{}'); 
             }else{
