@@ -3,6 +3,7 @@ namespace Efaturacim\Util;
 
 
 class RestApiClient{
+    public static $DEFAULT_BEARER_TOKEN = null;
     public static function getResult($baseApiUrl,$relPath,$postVars=null,$options=null){        
         $r = new RestApiResult();
         if(StrUtil::notEmpty($baseApiUrl) && StrUtil::notEmpty($relPath) && Options::ensureParam($options) && $options instanceof Options){
@@ -34,6 +35,7 @@ class RestApiClient{
                     }
                     //                    
                     $val = curl_exec($ch);
+                    //echo "".$val."";die("");
                     $info = curl_getinfo($ch);
                     $r->setAttribute("content_type","".@$info["content_type"]);
                     $r->setAttribute("http_code","".@$info["http_code"]);
@@ -57,14 +59,24 @@ class RestApiClient{
         }
         return $r;
     }    
-    public static function getJsonResult($baseApiUrl,$relPath,$postVars=null,$options=null){        
+    public static function getJsonResult($baseApiUrl,$relPath,$postParams=null,$options=null){        
+        $postVars  = array();
+        if($postParams && is_array($postParams)){
+            foreach($postParams as $k=>$v){ $postVars[$k] = $v;  }
+        }
+        $postVars["clientSecret"] = SecurityUtil::getClientKey();
+        $postVars["clientInfo"]   = SecurityUtil::getUserAgent();
+        $postVars["ip"]           = SecurityUtil::getIp();
+        if(self::$DEFAULT_BEARER_TOKEN && strlen("".self::$DEFAULT_BEARER_TOKEN)>0){
+            $postVars["bearer"] = self::$DEFAULT_BEARER_TOKEN;
+        }
         $resResult = self::getResult($baseApiUrl,$relPath,$postVars,$options);
-        $r = new RestApiResult();
+        $r = new RestApiResult();        
         if($resResult->isOK()){
-            $jsonString = $resResult->value;
+            $jsonString = $resResult->value;                        
             $ct         = $resResult->getAttribute("content_type","");
-            if(strlen("".$jsonString)>0 && StrUtil::isJson($jsonString)){                
-                $jsonArray = @json_decode($resResult->value,true);                
+            if(strlen("".$jsonString)>0 && StrUtil::isJson($jsonString)){                                
+                $jsonArray = @json_decode($resResult->value,true);                                                
                 $r->value = $jsonArray;
                 $r->__isok     = CastUtil::getAs(@$jsonArray["isok"],false,CastUtil::$DATA_BOOL);
                 $r->attributes = CastUtil::getAs(@$jsonArray["attributes"],array(),CastUtil::$DATA_ARRAY);
@@ -76,5 +88,21 @@ class RestApiClient{
         }
         return $r;
     }
+    public static function getLogin($baseApiUrl,$relPath,$postParams=null,$options=null){        
+        $r = new RestApiResult();
+        $res = self::getJsonResult($baseApiUrl,$relPath,$postParams,$options);
+        if($res->isOK()){
+            $bearer  =  $res->getAttribute("bearer");
+            $userRef =  $res->getAttribute("user_reference",0,"int");
+            if($userRef>0 && strlen("".$bearer)>0){
+                self::$DEFAULT_BEARER_TOKEN = $bearer;
+                return $res;
+            }            
+            $res->setIsOk(false);
+            $res->statusCode = 401;
+        }   
+        $r->addError("Kullanıcı doğrulanamadı.");     
+        return $r;
+    }   
 }
 ?>
