@@ -1,10 +1,11 @@
 {
-    "name": "efaturacim/util",
+    "name": "efaturacim\/util",
     "description": "EFATURACIM UTILITY FUNCTIONS",
     "type": "library",
+    "version": "1.0.8",
     "autoload": {
         "psr-4": {
-            "Efaturacim\\Util\\": "src/"
+            "Efaturacim\\Util\\": "src\/"
         }
     },
     "authors": [

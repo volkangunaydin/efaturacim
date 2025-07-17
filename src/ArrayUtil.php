@@ -18,5 +18,11 @@ class ArrayUtil{
         $keyToReturn = null;
         return $defVal;
     }    
+    public static function notEmpty($arr){
+        if(!is_null($arr) && is_array($arr) && count($arr)>0){
+            return true;
+        }
+        return false;
+    }
 }
 ?>
