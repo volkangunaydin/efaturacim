@@ -104,5 +104,8 @@ class RestApiClient{
         $r->addError("Kullanıcı doğrulanamadı.");     
         return $r;
     }   
+    public static function setBearer($bearer){
+        self::$DEFAULT_BEARER_TOKEN = $bearer;
+    }
 }
 ?>
