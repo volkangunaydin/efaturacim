@@ -2,7 +2,7 @@
     "name": "efaturacim\/util",
     "description": "EFATURACIM UTILITY FUNCTIONS",
     "type": "library",
-    "version": "1.0.8",
+    "version": "1.0.10",
     "autoload": {
         "psr-4": {
             "Efaturacim\\Util\\": "src\/"
@@ -15,5 +15,5 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": []
 }
