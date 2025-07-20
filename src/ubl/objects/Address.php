@@ -14,6 +14,10 @@ class Address extends UblDataType
     public ?string $postalZone = null;
     public ?String $citySubdivisionName = null;
     public ?Country $country = null;
+    public function __construct($options = null){
+        parent::__construct($options);
+        $this->country = new Country();        
+    }
 
     public function setPropertyFromOptions($k,$v,$options){
         if(in_array($k,array("sokak")) && StrUtil::notEmpty($v)){
@@ -39,8 +43,9 @@ class Address extends UblDataType
         $this->appendElement($document, $element, 'cbc:CitySubdivisionName', $this->citySubdivisionName);                
         $this->appendElement($document, $element, 'cbc:CityName', $this->cityName);
         $this->appendElement($document, $element, 'cbc:PostalZone', $this->postalZone);
-        if ($this->country) {
-            $element->appendChild($this->country->toDOMElement($document));
+        //\Vulcan\V::dump($this->country);
+        if($this->country) {                        
+            $this->appendChild($element,$this->country->toDOMElement($document));
         }
 
         return $element;

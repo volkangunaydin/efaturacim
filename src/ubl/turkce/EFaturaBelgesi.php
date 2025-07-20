@@ -45,5 +45,10 @@ class EFaturaBelgesi{
         $xmlString = $this->ubl->toJson();        
         return PreviewUtil::previewJson($xmlString,showOutput: $showOutput);        
     }    
+    public static function fromJson($jsonString){        
+        $a = new static();
+        $a->ubl->loadSmart($jsonString,"json");
+        return $a;        
+    }    
 }
 ?>

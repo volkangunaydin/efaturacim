@@ -13,6 +13,7 @@ use Efaturacim\Util\Options;
  * that represent a part of a UBL document, such as Party, Address, or InvoiceLine.
  */
 abstract class UblDataType{
+    use UblDataTrait;    
     /**
      * Summary of options
      * @var Options
@@ -93,4 +94,5 @@ abstract class UblDataType{
             }
         }
     }
+    
 }

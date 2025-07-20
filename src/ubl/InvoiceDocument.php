@@ -12,6 +12,7 @@ use Efaturacim\Util\Ubl\Objects\Party;
  * structure and logic required for generating a UBL Invoice XML.
  */
 class InvoiceDocument extends UblDocument{
+    
     /**
      * Invoice type code. e.g., "SATIS", "IADE"
      * @var string|null

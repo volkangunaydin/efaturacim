@@ -29,4 +29,8 @@ class PartyIdentification extends UblDataType
         $this->appendElement($document, $element, 'cbc:ID', $this->id, ['schemeID' => $this->schemeID]);
         return $element;
     }
+    public function isEmpty(){
+        
+        return false;
+    }
 }

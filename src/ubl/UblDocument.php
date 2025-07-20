@@ -6,6 +6,7 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Ubl\Objects\UblDataTrait;
 
 /**
  * Abstract base class for Turkish UBL documents.
@@ -15,6 +16,7 @@ use Efaturacim\Util\StrUtil;
  * for subclasses to implement their specific XML generation and parsing logic.
  */
 abstract class UblDocument{
+    use UblDataTrait;    
     /**
      * Summary of options
      * @var Options

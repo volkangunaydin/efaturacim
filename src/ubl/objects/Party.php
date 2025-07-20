@@ -14,7 +14,7 @@ class Party extends UblDataType
     public ?Address $postalAddress = null;
     public ?PartyIdentification $partyIdentification = null;
     public ?PartyTaxScheme $partyTaxScheme = null;
-    // TODO: Add Contact etc.
+    public ?Contact $contact = null;
 
     public function __construct($options=null)
     {
@@ -23,6 +23,7 @@ class Party extends UblDataType
         $this->postalAddress       = new Address();
         $this->partyIdentification = new PartyIdentification();
         $this->partyTaxScheme      = new PartyTaxScheme();
+        $this->contact             = new Contact();
         if(!is_null($this->options)){
             $this->loadFromOptions($this->options);
         }        
@@ -42,13 +43,19 @@ class Party extends UblDataType
             return $this->partyTaxScheme->setPropertyFromOptions($k, $v, $options);
         }else if(in_array($k,array("sokak","bina","ilce","il","ulke")) && StrUtil::notEmpty($v)){
             return $this->postalAddress->setPropertyFromOptions($k, $v, $options);
+        }else if(in_array($k,array("telefon","tel", "fax", "email", "eposta")) && StrUtil::notEmpty($v)){
+            return $this->contact->setPropertyFromOptions($k, $v, $options);
+        }else if(in_array($k,array("web","www","url")) && StrUtil::notEmpty($v)){
+            $this->websiteURI = $v;
+            return true;
         }else{
-            //\Vulcan\V::dump($options);
+            //\Vulcan\V::dump(array($k,$v,$options));
         }
         return false;
     }
 
     public function toDOMElement(DOMDocument $document)    {
+        if($this->isEmpty()){ return null;  }        
         $element = $document->createElement('cac:Party');        
         if(StrUtil::notEmpty($this->websiteURI)){
             $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
@@ -60,6 +67,14 @@ class Party extends UblDataType
         $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
         $this->appendChild($element,$this->postalAddress->toDOMElement($document));
         $this->appendChild($element,$this->partyTaxScheme->toDOMElement($document));
+        $this->appendChild($element,$this->contact->toDOMElement($document));
         return $element;
+    }
+    public function isEmpty(){
+        \Vulcan\V::dump($this->partyIdentification->isEmpty());
+        if(is_null($this->partyIdentification) || $this->partyIdentification->isEmpty() ){
+            return true;
+        }
+        return false;
     }
 }
