@@ -4,6 +4,8 @@ namespace Efaturacim\Util\Ubl;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\Options;
+use Efaturacim\Util\StrUtil;
 
 /**
  * Abstract base class for Turkish UBL documents.
@@ -12,8 +14,12 @@ use DOMElement;
  * used in the Turkish e-Invoice (e-Fatura) system. It establishes a contract
  * for subclasses to implement their specific XML generation and parsing logic.
  */
-abstract class UblDocument
-{
+abstract class UblDocument{
+    /**
+     * Summary of options
+     * @var Options
+     */
+    public $options = null;
     /**
      * The underlying XML document.
      * @var DOMDocument
@@ -72,16 +78,23 @@ abstract class UblDocument
      * The root XML element name for an Invoice.
      * @var string
      */
-    protected string $rootElementName = 'Invoice';    
+    protected string $rootElementName = 'Invoice';
+
+    /**
+     * Document Currency Code. e.g., "TRY", "USD", "EUR"
+     * @var string
+     */
+    protected string $documentCurrencyCode = 'TRY';
 
     /**
      * Constructor.
      * Initializes the DOMDocument.
      */
-    public function __construct()
+    public function __construct($options=null)
     {
         $this->document = new DOMDocument('1.0', 'UTF-8');
         $this->document->formatOutput = true;
+        $this->options = new Options($options);
         $this->initMe();
     }
     abstract public function initMe();
@@ -115,8 +128,10 @@ abstract class UblDocument
      * @param string $uuid
      * @return static
      */
-    public function setUuid(string $uuid): static
-    {
+    public function setUuid($uuid=null): static{
+        if(is_null($uuid)){
+            $uuid = StrUtil::getGUID();
+        }
         $this->uuid = $uuid;
         return $this;
     }
@@ -127,7 +142,7 @@ abstract class UblDocument
      * @param string $date (Y-m-d format)
      * @return static
      */
-    public function setIssueDate(string $date): static
+    public function setIssueDate($date): static
     {
         $this->issueDate = $date;
         return $this;
@@ -146,21 +161,36 @@ abstract class UblDocument
     }
 
     /**
+     * Sets the document currency code.
+     *
+     * @param string $currencyCode (ISO 4217 format)
+     * @return static
+     */
+    public function setDocumentCurrencyCode(string $currencyCode): static
+    {
+        $this->documentCurrencyCode = $currencyCode;
+        return $this;
+    }
+
+    /**
      * Generates the XML representation of the UBL document.
      *
      * @return string The generated XML string.
      */
-    abstract public function toXml(): string;
-    abstract public function toJson(): string;
+    abstract public function toXml(): string;    
     abstract public function loadFromXml($xmlString);
 
         /**
      * Helper to create and append a new element if the value is not null.
      */
-    protected function appendElement(string $name, ?string $value, ?DOMElement $parent = null): void
+    protected function appendElement($name,  $value,$parent = null): void
     {
         if ($value !== null) {
-            ($parent ?? $this->root)->appendChild($this->document->createElement($name, $value));
+            if($value && $value instanceof DOMElement){
+                ($parent ?? $this->root)->appendChild($value);
+            }else if (is_scalar($value)){
+                ($parent ?? $this->root)->appendChild($this->document->createElement($name, $value));
+            }            
         }
     }
 
@@ -180,17 +210,38 @@ abstract class UblDocument
         return null;
     }
     /**
+     * Generates a JSON representation of the document's data.
+     *
+     * @return string
+     */
+    public function toJson(): string
+    {                
+        return json_encode($this->toArrayOrObject(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }    
+    /**
      * Appends common UBL elements to the root node.
      */
-    protected function appendCommonElements(): void
-    {
+    protected function appendCommonElements(): void{
         $this->appendElement('cbc:UBLVersionID', $this->ublVersionId);
         $this->appendElement('cbc:CustomizationID', $this->customizationId);
         $this->appendElement('cbc:ProfileID', $this->profileId);
         $this->appendElement('cbc:ID', $this->id);
         $this->appendElement('cbc:UUID', $this->uuid);
         $this->appendElement('cbc:IssueDate', $this->issueDate);
-        $this->appendElement('cbc:IssueTime', $this->issueTime);
+        $this->appendElement('cbc:IssueTime', $this->issueTime);        
+        $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);        
     }
+    public function appendSignature(){
 
+    }
+    public function toArrayOrObject(){        
+        $data = get_object_vars($this);
+        unset($data["options"],$data["document"],$data["root"]); 
+         foreach ($data as $key => &$value) {
+            if (is_object($value) && method_exists($value, 'toArrayOrObject')) {
+                $value = $value->toArrayOrObject();
+            }
+        }
+        return (object)$data;
+    }
 }

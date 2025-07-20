@@ -5,7 +5,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 use DOMDocument;
 use DOMElement;
 
-class Country extends UblObject
+class Country extends UblDataType
 {
     public ?string $identificationCode = null; // e.g., "TR"
     public ?string $name = null;               // e.g., "Türkiye"

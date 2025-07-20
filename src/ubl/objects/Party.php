@@ -4,34 +4,62 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\Options;
+use Efaturacim\Util\StrUtil;
 
-class Party extends UblObject
+class Party extends UblDataType
 {
     public ?string $websiteURI = null;
     public ?string $partyName = null;
     public ?Address $postalAddress = null;
     public ?PartyIdentification $partyIdentification = null;
-    // TODO: Add PartyTaxScheme, Contact etc.
+    public ?PartyTaxScheme $partyTaxScheme = null;
+    // TODO: Add Contact etc.
 
-    public function __construct()
+    public function __construct($options=null)
     {
         // Initialize composed objects
-        $this->postalAddress = new Address();
+        parent::__construct($options);
+        $this->postalAddress       = new Address();
         $this->partyIdentification = new PartyIdentification();
+        $this->partyTaxScheme      = new PartyTaxScheme();
+        if(!is_null($this->options)){
+            $this->loadFromOptions($this->options);
+        }        
+    }
+    public function setPropertyFromOptions($k,$v,$options){
+        if(in_array($k,array("name","unvan","cari_adi")) && StrUtil::notEmpty($v)){
+            $this->partyName = $v;
+            return true;
+        }else if(in_array($k,array("vkn","tckn","tc","vergino","vergi_no")) && StrUtil::notEmpty($v)){
+            if(strlen($v)==11){
+                $this->partyIdentification->setValue("".$v,"TCKN");
+            }else{
+                $this->partyIdentification->setValue("".$v,"VKN");
+            }
+            return true;
+        }else if(in_array($k,array("vergi_dairesi","vergidairesi")) && StrUtil::notEmpty($v)){
+            return $this->partyTaxScheme->setPropertyFromOptions($k, $v, $options);
+        }else if(in_array($k,array("sokak","bina","ilce","il","ulke")) && StrUtil::notEmpty($v)){
+            return $this->postalAddress->setPropertyFromOptions($k, $v, $options);
+        }else{
+            //\Vulcan\V::dump($options);
+        }
+        return false;
     }
 
-    public function toDOMElement(DOMDocument $document): DOMElement
-    {
-        $element = $document->createElement('cac:Party');
-
-        $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
-
+    public function toDOMElement(DOMDocument $document)    {
+        $element = $document->createElement('cac:Party');        
+        if(StrUtil::notEmpty($this->websiteURI)){
+            $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
+        }        
         $partyNameElement = $this->appendElement($document, $element, 'cac:PartyName', null);
-        $this->appendElement($document, $partyNameElement, 'cbc:Name', $this->partyName);
-
-        $element->appendChild($this->postalAddress->toDOMElement($document));
-        $element->appendChild($this->partyIdentification->toDOMElement($document));
-
+        if(StrUtil::notEmpty($this->partyName)){
+            $this->appendElement($document, $partyNameElement, 'cbc:Name', $this->partyName);
+        }        
+        $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
+        $this->appendChild($element,$this->postalAddress->toDOMElement($document));
+        $this->appendChild($element,$this->partyTaxScheme->toDOMElement($document));
         return $element;
     }
 }

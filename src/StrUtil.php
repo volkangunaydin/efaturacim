@@ -3,12 +3,14 @@
 namespace Efaturacim\Util;
 
 class StrUtil{
-    public static function test(): int
-    {
-        die("TEST IS OK ");
-    }
     public static function notEmpty($str){
         return !is_null($str) && is_scalar($str) && strlen("".$str)>0;
+    }
+    public static function isEmpty($str){
+        if(is_null($str) || $str==="" || (is_string($str) && trim($str)==="") || !is_scalar($str) ){
+            return true;
+        }
+        return false;
     }
     public static function isJson($string,$softCheck=false) {
         $string = trim("".$string);
@@ -88,7 +90,21 @@ class StrUtil{
             }
             return $return;
         }
-
+        public static function getGUID($lower=true){
+            $guid = self::_getGUID();
+            if($lower){
+                $guid = strtolower($guid);
+            }
+            return $guid;
+        }
+        protected static function _getGUID(){
+            if (function_exists('com_create_guid') === true){
+                return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
+                // return trim(com_create_guid(), '{}');
+            }else{
+                return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
+            }
+        }
         public static function coalesce($arg1=null){
             $args = func_get_args();
             foreach ($args as $v){

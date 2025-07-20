@@ -90,7 +90,7 @@ class Options{
         public function getAsBool($name,$defVal=false){
             return self::getAs($name,$defVal,CastUtil::$DATA_BOOL);
         }
-        public function getAsString($name,$defVal=false){
+        public function getAsString($name,$defVal=null){
             return self::getAs($name,$defVal,CastUtil::$DATA_STRING);
         }        
     }  

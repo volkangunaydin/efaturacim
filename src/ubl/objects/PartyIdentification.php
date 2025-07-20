@@ -5,7 +5,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 use DOMDocument;
 use DOMElement;
 
-class PartyIdentification extends UblObject
+class PartyIdentification extends UblDataType
 {
     public ?string $id = null;
     public ?string $schemeID = null; // e.g., "VKN" or "TCKN"
@@ -15,7 +15,14 @@ class PartyIdentification extends UblObject
         $this->id = $id;
         $this->schemeID = $schemeID;
     }
-
+    public function setValue($value,$schemeID=null){
+        $this->id = $value;
+        $this->schemeID = $schemeID;
+        return $this;
+    }
+    public function setPropertyFromOptions($k,$v,$options){
+        return false;
+    }
     public function toDOMElement(DOMDocument $document): DOMElement
     {
         $element = $document->createElement('cac:PartyIdentification');

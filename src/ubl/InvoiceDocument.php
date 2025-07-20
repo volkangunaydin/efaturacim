@@ -3,6 +3,7 @@
 namespace Efaturacim\Util\Ubl;
 
 use DOMElement;
+use Efaturacim\Util\Ubl\Objects\Party;
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.
@@ -10,15 +11,22 @@ use DOMElement;
  * This class extends the base UblDocument and implements the specific
  * structure and logic required for generating a UBL Invoice XML.
  */
-class InvoiceDocument extends UblDocument
-{
-
-
+class InvoiceDocument extends UblDocument{
     /**
      * Invoice type code. e.g., "SATIS", "IADE"
      * @var string|null
      */
     public ?string $invoiceTypeCode = 'SATIS';
+
+    /**
+     * @var Party
+     */
+    public $accountingCustomerParty = null;
+    /**
+     * @var Party
+     */
+    public $accountingSupplierParty = null;
+
 
     // TODO: Add properties for invoice lines, parties, totals etc.
     // public array $invoiceLines = [];
@@ -34,9 +42,20 @@ class InvoiceDocument extends UblDocument
     {
         parent::__construct();
         // Default profile for a commercial invoice. Can be overridden for "TEMELFATURA".
-        $this->profileId = 'TICARIFATURA';
+        
     }
-
+    public function initMe(){
+        $this->rootElementName = 'Invoice';
+        $this->setProfileId('TICARIFATURA');
+        $this->setIssueDate(date('Y-m-d'));
+        $this->setIssueTime(date('H:i:s'));     
+        $this->setDocumentCurrencyCode("TRY");        
+        $this->accountingCustomerParty = new Party();
+        $this->accountingSupplierParty = new Party();
+    }
+    public function setLineCount(){
+        
+    }
     /**
      * Generates the XML representation of the UBL Invoice.
      *
@@ -46,35 +65,27 @@ class InvoiceDocument extends UblDocument
     {
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
-
         $this->setNamespaces();
         $this->appendCommonElements();
-
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
 
         // TODO: Implement and call methods to append other required sections:
-        // $this->appendSignature();
-        // $this->appendAccountingSupplierParty();
-        // $this->appendAccountingCustomerParty();
+        $this->appendSignature();
+        $this->appendAccountingSupplierParty();
+        $this->appendAccountingCustomerParty();
         // $this->appendTaxTotal();
         // $this->appendLegalMonetaryTotal();
         // $this->appendInvoiceLines();
 
         return $this->document->saveXML();
     }
-
-    /**
-     * Generates a JSON representation of the document's data.
-     *
-     * @return string
-     */
-    public function toJson(): string
-    {
-        $data = get_object_vars($this);
-        unset($data['document'], $data['root']); // Exclude DOM objects
-
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    public function appendAccountingSupplierParty(){
+        $this->appendElement('cac:AccountingSupplierParty',$this->accountingSupplierParty->toDOMElement($this->document));
     }
+    public function appendAccountingCustomerParty(){
+        $this->appendElement('cac:AccountingCustomerParty',$this->accountingCustomerParty->toDOMElement($this->document));
+    }
+   
 
     /**
      * Loads document properties from an XML string.
@@ -107,6 +118,7 @@ class InvoiceDocument extends UblDocument
         $this->uuid            = $this->getValueFromXpath($xpath, '/Invoice/cbc:UUID');
         $this->issueDate       = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueDate');
         $this->issueTime       = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueTime');
+        $this->documentCurrencyCode = $this->getValueFromXpath($xpath, '/Invoice/cbc:DocumentCurrencyCode');
 
         // Populate Invoice-specific properties
         $this->invoiceTypeCode = $this->getValueFromXpath($xpath, '/Invoice/cbc:InvoiceTypeCode');
