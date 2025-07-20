@@ -7,6 +7,11 @@
             "Efaturacim\\Util\\": "src\/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Efaturacim\\Util\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "volkangunaydin",
@@ -14,5 +19,8 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": { }
+    "require": { },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
 }

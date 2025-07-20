@@ -90,7 +90,7 @@ class RestApiClient{
     }
     public static function getLogin($baseApiUrl,$relPath,$postParams=null,$options=null){        
         $r = new RestApiResult();
-        $res = self::getJsonResult($baseApiUrl,$relPath,$postParams,$options);
+        $res = static::getJsonResult($baseApiUrl,$relPath,$postParams,$options);
         if($res->isOK()){
             $bearer  =  $res->getAttribute("bearer");
             $userRef =  $res->getAttribute("user_reference",0,"int");

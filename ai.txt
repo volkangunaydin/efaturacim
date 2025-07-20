@@ -1,0 +1,2 @@
+This is a PHP library that is distributed by a composer package. The composer package base class is "Efaturacim\Util".
+The PHP source files are under src folder. 

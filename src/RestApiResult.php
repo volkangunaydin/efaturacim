@@ -1,5 +1,8 @@
 <?php
 namespace Efaturacim\Util;
+
+use Efaturacim\Util\Results\ResultUtil;
+
 class RestApiResult extends SimpleResult{
         public $statusCode = 200;
         public $lines      = array();
@@ -10,6 +13,9 @@ class RestApiResult extends SimpleResult{
         public $debugEnabled = true;
         public function __construct(){            
 
+        }
+        public static function newFromJson($jsonStringOrArray){
+            return ResultUtil::newFromJson($jsonStringOrArray,self::class);
         }
 }
 ?>
