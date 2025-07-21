@@ -13,12 +13,18 @@ class UblDataTypeList{
         }
         return false;
     }
-    public function add($obj,$key=null){
+    public function add($obj,$key=null,$callback=null){
+        if(!is_null($callback) && is_callable($callback)){
+            call_user_func_array($callback,array(&$obj));
+        }
         if(is_null($key)){
             $this->list[] = $obj;
         }else{
             $this->list[$key] = $obj;
         }
+    }
+    public function getCount(){
+        return count($this->list);
     }
 }
 ?>

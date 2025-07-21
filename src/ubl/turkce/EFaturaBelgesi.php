@@ -40,7 +40,10 @@ class EFaturaBelgesi{
         $this->ubl->addToDespatchList($irsKodu,$tarih);
         return $this;
     }
-    
+    public function ekleNot($noteStr){
+        $this->ubl->addNote($noteStr);
+        return $this;
+    }
     public function showAsXml($showOutput=true){
         $xmlString = $this->ubl->toXml();        
         return PreviewUtil::previewXml($xmlString,showOutput: $showOutput);        
@@ -61,5 +64,12 @@ class EFaturaBelgesi{
         $a->ubl->loadSmart($strOrObject,$type);
         return $a;        
     }    
+    public function ekleSatir($name,$quantity=1,$price=0,$kdv=20){        
+        return $this->ekleSatirFromArray(array("name" => $name,"quantity" => $quantity,"price" => $price,"kdv" => $kdv));
+    }   
+    public function ekleSatirFromArray($arrProps){        
+        $this->ubl->addLineFromArray($arrProps);
+        return $this;
+    }
 }
 ?>

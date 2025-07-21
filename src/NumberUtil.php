@@ -289,6 +289,13 @@ class NumberUtil{
     public static function isNumber($str){
         return is_int($str) || is_float($str) || (filter_var($str, FILTER_VALIDATE_FLOAT) !== false);
     }    
+    public static function isPositiveNumber($str){
+        if(self::isNumber($str)){
+            $a = self::asNumber($str);
+            return $a>0;
+        }
+        return false;
+    }
 }
 
 ?>

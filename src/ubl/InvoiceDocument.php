@@ -3,11 +3,17 @@
 namespace Efaturacim\Util\Ubl;
 
 use DOMElement;
+use Efaturacim\Util\ArrayUtil;
 use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
+use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
 use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
+use Efaturacim\Util\Ubl\Objects\InvoiceLine;
+use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
+use V_UBL_AccountingSupplierParty;
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.
@@ -24,11 +30,11 @@ class InvoiceDocument extends UblDocument{
     public ?string $invoiceTypeCode = 'SATIS';
 
     /**
-     * @var Party
+     * @var AccountingCustomerParty
      */
     public $accountingCustomerParty = null;
     /**
-     * @var Party
+     * @var AccountingSupplierParty
      */
     public $accountingSupplierParty = null;
     /**     
@@ -39,7 +45,14 @@ class InvoiceDocument extends UblDocument{
      * @var UblDataTypeList
      */
     public $despatchDocumentReference = null;
-
+    /**     
+     * @var UblDataTypeList
+     */
+    public $note = null;
+    /**
+     * @var UblDataTypeList
+     */
+    public $invoiceLine = null;
 
     // TODO: Add properties for invoice lines, parties, totals etc.
     // public array $invoiceLines = [];
@@ -63,10 +76,12 @@ class InvoiceDocument extends UblDocument{
         $this->setIssueDate(date('Y-m-d'));
         $this->setIssueTime(date('H:i:s'));     
         $this->setDocumentCurrencyCode("TRY");        
-        $this->accountingCustomerParty = new Party();
-        $this->accountingSupplierParty = new Party();
+        $this->accountingCustomerParty = new AccountingCustomerParty();
+        $this->accountingSupplierParty = new AccountingSupplierParty();
         $this->orderReference = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
+        $this->note = new UblDataTypeList(Note::class);
+        $this->invoiceLine = new UblDataTypeList(InvoiceLine::class);        
     }
     public function setLineCount(){
         
@@ -87,10 +102,11 @@ class InvoiceDocument extends UblDocument{
         // TODO: Implement and call methods to append other required sections:
         $this->appendSignature();
         $this->appendElementList($this->orderReference);
-        $this->appendElementList($this->despatchDocumentReference);
+        $this->appendElementList($this->despatchDocumentReference);        
+        $this->appendElementList($this->note);
         $this->appendAccountingSupplierParty();
-        $this->appendAccountingCustomerParty();
-
+        $this->appendAccountingCustomerParty();        
+        $this->appendElementList($this->invoiceLine);
         // $this->appendTaxTotal();
         // $this->appendLegalMonetaryTotal();
         // $this->appendInvoiceLines();
@@ -113,6 +129,10 @@ class InvoiceDocument extends UblDocument{
             return "accountingSupplierParty";
         }else if(in_array($k,array("alici","musteri"))){
             return "accountingCustomerParty";
+        }else if(in_array($k,array("notlar","notes"))){            
+            return "note";
+        }else if(in_array($k,array("lines","satirlar"))){              
+            return "invoiceLine";
         }
         return null;
     }
@@ -122,6 +142,16 @@ class InvoiceDocument extends UblDocument{
     public function setPropertyFromOptions($k,$v,$options){
         if(in_array($k,array("fatura_no","faturano","belgeno")) && StrUtil::notEmpty($v)){
             $this->id = $v;
+            return true;
+        }else if(in_array($k,array("note","notes")) && ArrayUtil::notEmpty($v)){    
+            foreach($v as $vv){ $this->note->add(Note::newNote($vv)); }
+            return true;
+        }else if(in_array($k,array("invoiceLine","satirlar","lines")) && ArrayUtil::notEmpty($v)){        
+            foreach($v as $vv){ $this->invoiceLine->add(InvoiceLine::newLine($vv)); }
+            return true;
+        }else if(in_array($k,array("note","notes")) && StrUtil::notEmpty($v)){
+            $this->note->add(Note::newNote($v));            
+            return true;
         }
         //\Vulcan\V::dump(array($k,$v,$options));
         return false;
@@ -192,5 +222,16 @@ class InvoiceDocument extends UblDocument{
         if(StrUtil::notEmpty($code)){
             $this->despatchDocumentReference->add(new DespatchDocumentReference(array("id"=>$code,"date"=>$date)));
         }
+    }
+    public function addNote($noteStr){
+        $this->note->add(Note::newNote($noteStr));
+    }
+    public function addLineFromArray($props){
+        $currentCount = $this->invoiceLine->getCount();
+        $this->invoiceLine->add(InvoiceLine::newLine($props),null,function(&$obj)use($currentCount){
+            if($obj instanceof InvoiceLine && is_null($obj->id)){
+                $obj->id = $currentCount+1;
+            }
+        });
     }
 }

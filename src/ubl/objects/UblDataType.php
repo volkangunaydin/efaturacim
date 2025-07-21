@@ -56,6 +56,13 @@ abstract class UblDataType{
         $parent->appendChild($element);
         return $element;
     }
+    protected function appendElementList($document,$list,$parent=null): void{
+        if(!is_null($list) && $list instanceof UblDataTypeList && !$list->isEmpty()){
+            foreach($list->list as $item){
+                ($parent ?? $document->root)->appendChild($item->toDOMElement($document));
+            }
+        }
+    }    
     protected function appendChild(&$el,$child){
         if($el && $el instanceof DOMElement && !is_null($child)){
             $el->appendChild($child);

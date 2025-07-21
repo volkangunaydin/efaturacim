@@ -78,6 +78,12 @@ class EFaturaSamples{
             "profileId"=>"TEMELFATURA"
             ,"fatura_no"=>"ARR2025000000002"
             ,"satici"=>array("unvan"=>"G YAZILIM LTD","vkn"=>"3880628557","il"=>"ANKARA","ilce"=>"CANKAYA","sokak"=>"Halit Ziya Cad ","bina"=>"19")
+            ,"alici"=>array("unvan"=>"VOLKAN GUNAYDIN","vkn"=>"65401211066","il"=>"ANKARA","ilce"=>"CANKAYA","sokak"=>"Halit Ziya Cad ","bina"=>"19")
+            ,"notlar"=>array("Not 1","Not 2","Not 3")
+            ,"satirlar"=>array(
+                array("ad"=>"Urun 1","miktar"=>1,"birim"=>"C62","kdv"=>20,"fiyat"=>100)
+                ,array("ad"=>"Urun 2","miktar"=>4,"birim"=>"C62","kdv"=>20,"fiyat"=>125)
+            )
         );
     }
 }

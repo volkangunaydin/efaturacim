@@ -4,17 +4,21 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\StrUtil;
 
 class InvoiceLine extends UblDataType
 {
-    public ?string $id = null;
-    public ?string $note = null;
+    public ?string $id = null;    
     public ?float $invoicedQuantity = null;
     public ?string $invoicedQuantityUnitCode = 'C62'; // Default to "unit"
     public ?float $lineExtensionAmount = null;
     public ?string $lineExtensionAmountCurrencyID = 'TRY';
 
+    /**     
+     * @var UblDataTypeList
+     */
+    public $note = null;    
     /**
      * @var UblDataTypeList
      */
@@ -31,6 +35,7 @@ class InvoiceLine extends UblDataType
         $this->taxTotal = new TaxTotal();
         $this->item = new Item();
         $this->price = new Price();
+        $this->note  = new UblDataTypeList(Note::class);
 
         if (!is_null($this->options)) {
             $this->loadFromOptions($this->options);
@@ -49,8 +54,12 @@ class InvoiceLine extends UblDataType
             $this->id = $v;
             return true;
         }
+        if (in_array($k, ['price', 'fiyat', 'birim_fiyat']) && NumberUtil::isPositiveNumber($v)) {
+            $this->price = new Price(array('priceAmount'));
+            return true;
+        }
         if (in_array($k, ['note', 'not']) && StrUtil::notEmpty($v)) {
-            $this->note = $v;
+            $this->note->add(Note::newNote($v));
             return true;
         }
         if (in_array($k, ['invoicedQuantity', 'quantity', 'miktar']) && is_numeric($v)) {
@@ -97,7 +106,7 @@ class InvoiceLine extends UblDataType
     public function isEmpty(): bool
     {
         // An invoice line must have an ID, a quantity, an amount, and an item.
-        return StrUtil::isEmpty($this->id) || is_null($this->invoicedQuantity) || is_null($this->lineExtensionAmount) || $this->item->isEmpty();
+        return StrUtil::isEmpty($this->id) || is_null($this->invoicedQuantity)  || $this->item->isEmpty();
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
@@ -109,11 +118,11 @@ class InvoiceLine extends UblDataType
         $element = $document->createElement('cac:InvoiceLine');
 
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
-        $this->appendElement($document, $element, 'cbc:Note', $this->note);
+        //$this->appendElementList($document,$this->note);
 
         $this->appendElement($document, $element, 'cbc:InvoicedQuantity', number_format($this->invoicedQuantity, 2, '.', ''), ['unitCode' => $this->invoicedQuantityUnitCode]);
 
-        $this->appendElement($document, $element, 'cbc:LineExtensionAmount', number_format($this->lineExtensionAmount, 2, '.', ''), ['currencyID' => $this->lineExtensionAmountCurrencyID]);
+        $this->appendElement($document, $element, 'cbc:LineExtensionAmount', number_format(0 + $this->lineExtensionAmount, 2, '.', ''), ['currencyID' => $this->lineExtensionAmountCurrencyID]);
 
         foreach ($this->allowanceCharge->list as $ac) {
             $this->appendChild($element, $ac->toDOMElement($document));
@@ -124,5 +133,9 @@ class InvoiceLine extends UblDataType
         $this->appendChild($element, $this->price->toDOMElement($document));
 
         return $element;
+    }
+    public static function newLine($props){        
+        $line = new InvoiceLine($props);        
+        return $line;
     }
 }

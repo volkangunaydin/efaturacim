@@ -41,4 +41,7 @@ class Note extends UblDataType
         // cbc:Note is a simple element with just a text value.
         return $document->createElement('cbc:Note', $this->value);
     }
+    public static function newNote($str){
+        return new Note(array("value"=>$str));
+    }
 }

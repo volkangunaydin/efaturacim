@@ -200,7 +200,10 @@ abstract class UblDocument{
     protected function appendElementList($list,$parent=null): void{
         if(!is_null($list) && $list instanceof UblDataTypeList && !$list->isEmpty()){
             foreach($list->list as $item){
-                ($parent ?? $this->root)->appendChild($item->toDOMElement($this->document));
+                $el = $item->toDOMElement($this->document);
+                if(!is_null($el)){
+                    ($parent ?? $this->root)->appendChild($el);
+                }                
             }
         }
     }
