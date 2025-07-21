@@ -7,6 +7,8 @@ use DOMElement;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
 use Efaturacim\Util\Ubl\Objects\UblDataTrait;
+use Efaturacim\Util\Ubl\Objects\UblDataType;
+use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 
 /**
  * Abstract base class for Turkish UBL documents.
@@ -195,6 +197,13 @@ abstract class UblDocument{
             }            
         }
     }
+    protected function appendElementList($list,$parent=null): void{
+        if(!is_null($list) && $list instanceof UblDataTypeList && !$list->isEmpty()){
+            foreach($list->list as $item){
+                ($parent ?? $this->root)->appendChild($item->toDOMElement($this->document));
+            }
+        }
+    }
 
     /**
      * Helper to get a single node value from an XPath query.
@@ -237,13 +246,24 @@ abstract class UblDocument{
 
     }
     public function toArrayOrObject(){        
+        $res  = array();
         $data = get_object_vars($this);
         unset($data["options"],$data["document"],$data["root"]); 
-         foreach ($data as $key => &$value) {
-            if (is_object($value) && method_exists($value, 'toArrayOrObject')) {
-                $value = $value->toArrayOrObject();
+         foreach ($data as $key => $value) {
+            if (is_object($value) && method_exists($value, 'toArrayOrObject')) {                
+                if($value instanceof UblDataType && $value->isEmpty()){
+                    $value = null;
+                }else{
+                    $value = $value->toArrayOrObject();
+                }                
+            }
+            if(!is_null($value)){
+                $res[$key] = $value;
             }
         }
-        return (object)$data;
+        return (object)$res;
+    }
+    public function getPropertyAlias($k,$v){
+        return null;
     }
 }

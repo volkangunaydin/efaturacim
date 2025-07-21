@@ -73,5 +73,12 @@ class EFaturaSamples{
     }
 }';
     }
+    public static function getArrayForStdFatura(){
+        return array(
+            "profileId"=>"TEMELFATURA"
+            ,"fatura_no"=>"ARR2025000000002"
+            ,"satici"=>array("unvan"=>"G YAZILIM LTD","vkn"=>"3880628557","il"=>"ANKARA","ilce"=>"CANKAYA","sokak"=>"Halit Ziya Cad ","bina"=>"19")
+        );
+    }
 }
 ?>

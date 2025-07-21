@@ -49,7 +49,7 @@ class PreviewUtil{
         // Output with some basic styling for readability
         $s .= <<<HTML
 <style>
-    pre {
+    pre.my_xml {
         background-color: #f4f4f4;
         border: 1px solid #ddd;
         border-left: 3px solid #f36d33;
@@ -60,7 +60,7 @@ class PreviewUtil{
         padding: 1em 1.5em;
     }
 </style>
-<pre><code>{$escapedXml}</code></pre>
+<pre class="my_xml"><code>{$escapedXml}</code></pre>
 HTML;
         if($showOutput){ return self::showAsHtml($s); }
         return $s;
@@ -105,7 +105,7 @@ HTML;
         // Output with some basic styling for readability
         $s .= <<<HTML
 <style>
-    pre {
+    pre.my_json {
         background-color: #f4f4f4;
         border: 1px solid #ddd;
         border-left: 3px solid #007bff; /* Blue for JSON */
@@ -116,12 +116,59 @@ HTML;
         padding: 1em 1.5em;
     }
 </style>
-<pre><code>{$escapedJson}</code></pre>
+<pre class="my_json"><code>{$escapedJson}</code></pre>
 HTML;
         if ($showOutput) {
             return self::showAsHtml($s);
         }
         return $s;
     }
+
+    /**
+     * Displays a given PHP variable as pretty-printed, syntax-highlighted HTML.
+     *
+     * @param mixed $variable The variable to display.
+     * @param bool $showOutput
+     * @return string|void
+     */
+    public static function previewPhpVar(mixed $variable, bool $showOutput = false)
+    {
+        $s = '';
+        if (is_null($variable)) {
+            $s .= '<p>No variable content to display.</p>';
+            if ($showOutput) {
+                return self::showAsHtml($s);
+            }
+            return $s;
+        }
+
+        // Use print_r to get a human-readable representation of the variable
+        $formattedVar = print_r($variable, true);
+
+        // Escape the formatted variable for safe display in HTML
+        $escapedVar = htmlspecialchars($formattedVar);
+
+        // Output with some basic styling for readability
+        $s .= <<<HTML
+<style>
+    pre.my_phpvar {
+        background-color: #f4f4f4;
+        border: 1px solid #ddd;
+        border-left: 3px solid #8855ff; /* Purple for PHP Var */
+        color: #333;
+        font-family: monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 1em 1.5em;
+    }
+</style>
+<pre class="my_phpvar"><code>{$escapedVar}</code></pre>
+HTML;
+        if ($showOutput) {
+            return self::showAsHtml($s);
+        }
+        return $s;
+    }
+    
 }
 ?>

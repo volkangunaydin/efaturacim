@@ -54,5 +54,11 @@ class CastUtil{
             }
             return $defVal;
         }    
+        public static function asInt($str){
+            return self::getAs($str,0,self::$DATA_INT);
+        }
+        public static function asBool($str){
+            return self::getAs($str,false,self::$DATA_BOOL);
+        }        
 }
 ?>

@@ -31,9 +31,13 @@ class EFaturaBelgesi{
         return $this->ubl->accountingCustomerParty;
     }
     public function ekleSiparis($sipKodu=null,$tarih=null){
+        if(is_null($tarih)){ $tarih = date('Y-m-d'); }
+        $this->ubl->addToOrderList($sipKodu,$tarih);
         return $this;
     }
     public function ekleIrsaliye($irsKodu=null,$tarih=null){
+        if(is_null($tarih)){ $tarih = date('Y-m-d'); }        
+        $this->ubl->addToDespatchList($irsKodu,$tarih);
         return $this;
     }
     
@@ -45,9 +49,16 @@ class EFaturaBelgesi{
         $xmlString = $this->ubl->toJson();        
         return PreviewUtil::previewJson($xmlString,showOutput: $showOutput);        
     }    
-    public static function fromJson($jsonString){        
+    public function showAsArray($showOutput=true){
+        $arr = $this->ubl->toArrayOrObject();        
+        return PreviewUtil::previewPhpVar($arr,showOutput: $showOutput);        
+    }
+    public static function fromJson($jsonString){                
+        return self::smart($jsonString,"json");        
+    }    
+    public static function smart($strOrObject,$type=null){        
         $a = new static();
-        $a->ubl->loadSmart($jsonString,"json");
+        $a->ubl->loadSmart($strOrObject,$type);
         return $a;        
     }    
 }

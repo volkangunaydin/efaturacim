@@ -24,5 +24,21 @@ class ArrayUtil{
         }
         return false;
     }
+    public static function arrayHasValue($arr,$nameOrNames){
+        $k = null;
+        $v = self::arrayGetKey($arr,$k,$nameOrNames,null);
+        return !self::isEmpty($v);
+    }    
+    public static function isEmpty($strOrObject){
+        if(is_null($strOrObject) || $strOrObject===""){
+            return true;
+        }else if (is_string($strOrObject) && strlen(trim("".$strOrObject))==0){
+            return true;
+        }else if (is_array($strOrObject) && count($strOrObject)==0){
+            return true;
+        }else{
+            return false;
+        }            
+    }    
 }
 ?>

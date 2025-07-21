@@ -29,7 +29,7 @@ class Options{
             return $this;
         }
         public function hasValue($nameOrNames){
-            return V::arrayHasValue($this->params,$nameOrNames);
+            return ArrayUtil::arrayHasValue($this->params,$nameOrNames);
         }
         public function hasKey($nameOrNames){
             if(is_array($nameOrNames)){
@@ -93,5 +93,9 @@ class Options{
         public function getAsString($name,$defVal=null){
             return self::getAs($name,$defVal,CastUtil::$DATA_STRING);
         }        
+
+        public function getAsInt($nameOrNames,$defVal=0){
+            return $this->getAs($nameOrNames,$defVal,CastUtil::$DATA_INT);
+        }            
     }  
 ?>

@@ -3,7 +3,11 @@
 namespace Efaturacim\Util\Ubl;
 
 use DOMElement;
+use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
+use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\Party;
+use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.
@@ -27,6 +31,14 @@ class InvoiceDocument extends UblDocument{
      * @var Party
      */
     public $accountingSupplierParty = null;
+    /**     
+     * @var UblDataTypeList
+     */
+    public $orderReference = null;
+    /**     
+     * @var UblDataTypeList
+     */
+    public $despatchDocumentReference = null;
 
 
     // TODO: Add properties for invoice lines, parties, totals etc.
@@ -53,6 +65,8 @@ class InvoiceDocument extends UblDocument{
         $this->setDocumentCurrencyCode("TRY");        
         $this->accountingCustomerParty = new Party();
         $this->accountingSupplierParty = new Party();
+        $this->orderReference = new UblDataTypeList(OrderReference::class);
+        $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
     }
     public function setLineCount(){
         
@@ -72,8 +86,11 @@ class InvoiceDocument extends UblDocument{
 
         // TODO: Implement and call methods to append other required sections:
         $this->appendSignature();
+        $this->appendElementList($this->orderReference);
+        $this->appendElementList($this->despatchDocumentReference);
         $this->appendAccountingSupplierParty();
         $this->appendAccountingCustomerParty();
+
         // $this->appendTaxTotal();
         // $this->appendLegalMonetaryTotal();
         // $this->appendInvoiceLines();
@@ -86,7 +103,29 @@ class InvoiceDocument extends UblDocument{
     public function appendAccountingCustomerParty(){
         $this->appendElement('cac:AccountingCustomerParty',$this->accountingCustomerParty->toDOMElement($this->document));
     }
-   
+    /**
+     * getPropertyAlias array den yyukleme yaparken yasanabilecek yanlis yazilmari engellemek veya daha kolay yazim icin olusturuldu
+     * ornek olarak array de satici yazildigi zaman sanki accountingSupplierParty yazilmis gibi davranir
+     * @return string|null
+     */
+    public function getPropertyAlias($k,$v){
+        if(in_array($k,array("satici"))){
+            return "accountingSupplierParty";
+        }else if(in_array($k,array("alici","musteri"))){
+            return "accountingCustomerParty";
+        }
+        return null;
+    }
+    /**
+     * Skalar degerlerin nasil atnacagi belirtilir
+     */
+    public function setPropertyFromOptions($k,$v,$options){
+        if(in_array($k,array("fatura_no","faturano","belgeno")) && StrUtil::notEmpty($v)){
+            $this->id = $v;
+        }
+        //\Vulcan\V::dump(array($k,$v,$options));
+        return false;
+    }
 
     /**
      * Loads document properties from an XML string.
@@ -144,6 +183,14 @@ class InvoiceDocument extends UblDocument{
         $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
         $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ext', 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2');
     }
-
-
+    public function addToOrderList($code=null,$date=null){
+        if(StrUtil::notEmpty($code)){
+            $this->orderReference->add(new OrderReference(array("id"=>$code,"date"=>$date)));
+        }
+    }
+    public function addToDespatchList($code=null,$date=null){
+        if(StrUtil::notEmpty($code)){
+            $this->despatchDocumentReference->add(new DespatchDocumentReference(array("id"=>$code,"date"=>$date)));
+        }
+    }
 }

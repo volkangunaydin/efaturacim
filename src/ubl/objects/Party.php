@@ -70,8 +70,7 @@ class Party extends UblDataType
         $this->appendChild($element,$this->contact->toDOMElement($document));
         return $element;
     }
-    public function isEmpty(){
-        \Vulcan\V::dump($this->partyIdentification->isEmpty());
+    public function isEmpty(){        
         if(is_null($this->partyIdentification) || $this->partyIdentification->isEmpty() ){
             return true;
         }

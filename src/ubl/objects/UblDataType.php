@@ -83,14 +83,17 @@ abstract class UblDataType{
         return false;
     }
     public function loadFromOptions($options,$clear=false){
-        if(Options::ensureParam($options) && $options instanceof Options){
+        if(Options::ensureParam(op: $options) && $options instanceof Options){
             foreach($options->params as $k=>$v){
                 if($this->setPropertyFromOptions($k,$v,$options)){
 
-                }else if(property_exists($this,$k)){
+                }else if(property_exists($this,$k) && is_scalar($v)){
                     $this->$k = $v;
-                }
-                //\Vulcan\V::dump(array($k,$v));
+                }else if(property_exists($this,$k) && is_array($v) && count($v)>0 && $this->$k instanceof UblDataType){
+                    $this->$k->loadFromOptions($v);
+                }else{
+                    //\Vulcan\V::dump(array($k,$v));
+                }                
             }
         }
     }

@@ -4,6 +4,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\StrUtil;
 
 class PartyIdentification extends UblDataType
 {
@@ -30,7 +31,9 @@ class PartyIdentification extends UblDataType
         return $element;
     }
     public function isEmpty(){
-        
-        return false;
+        if(StrUtil::isEmpty($this->id) && StrUtil::isEmpty($this->schemeID)){
+            return true;
+        }
+        return false;        
     }
 }
