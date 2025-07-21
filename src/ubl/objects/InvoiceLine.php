@@ -4,7 +4,9 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\CastUtil;
 use Efaturacim\Util\NumberUtil;
+use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
 
 class InvoiceLine extends UblDataType
@@ -55,7 +57,7 @@ class InvoiceLine extends UblDataType
             return true;
         }
         if (in_array($k, ['price', 'fiyat', 'birim_fiyat']) && NumberUtil::isPositiveNumber($v)) {
-            $this->price = new Price(array('priceAmount'));
+            $this->price = new Price(array('priceAmount'=>$v));
             return true;
         }
         if (in_array($k, ['note', 'not']) && StrUtil::notEmpty($v)) {
@@ -87,8 +89,13 @@ class InvoiceLine extends UblDataType
                 }
             }
             return true;
+        }        
+        if (in_array($k, ['kdv','kdv_orani']) && StrUtil::notEmpty($v)) {
+            $this->setVatRate($v);
         }
-
+        if (in_array($k, ['kdv_tutar','kdv_tutari']) && StrUtil::notEmpty($v)) {
+            $this->setVatValue($v);
+        }
         // Pass other options to children
         if ($this->item->setPropertyFromOptions($k, $v, $options)) {
             return true;
@@ -138,7 +145,50 @@ class InvoiceLine extends UblDataType
         $line = new InvoiceLine($props);        
         return $line;
     }
-    public function onBeforeAdd($context){
-        //\Vulcan\V::dump($context);        
+    public function onBeforeAdd($context=null){
+        if(Options::ensureParam($context) && $context instanceof Options){
+            if(is_null($this->id)){
+                $nid = $context->getAsInt("nextLineId");
+                if($nid>0){
+                    $this->id = $nid;
+                }else{
+                    $this->id = StrUtil::getGUID();
+                }
+            }
+            if(is_null($this->lineExtensionAmount)){
+                $this->lineExtensionAmount = $this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0);
+            }
+        }        
+    }
+    public function setVatRate($rate){             
+        $this->taxTotal->setVatRate($rate);        
+    }
+    public function setVatValue($val){        
+        $this->taxTotal->setVatValue($val);        
+    }
+    public function calculateLineExtensionAmount(){
+        return NumberUtil::asMoneyVal($this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0));
+    }
+    public function getLineExtensionAmount(){
+        if(!is_null($this->lineExtensionAmount)){
+            return $this->lineExtensionAmount;
+        }
+        return $this->calculateLineExtensionAmount();
+    }
+    public function getContextArray(){
+        return new Options(array(
+            "lineExtensionAmount"=>$this->getLineExtensionAmount()
+        ));
+    }
+    public function rebuildValues(){
+        $this->lineExtensionAmount = $this->calculateLineExtensionAmount();
+        $kdvKey = $this->taxTotal->getVatDefIndex(false);
+        if(!is_null($kdvKey)){
+            $kdv  = &$this->taxTotal->taxSubtotal->list[$kdvKey];
+            if($kdv instanceof TaxSubtotal){
+                $kdv->taxableAmount = $this->lineExtensionAmount;
+                $kdv->taxAmount     = NumberUtil::asMoneyVal( ($this->lineExtensionAmount*$kdv->percent/100));
+            }
+        }
     }
 }

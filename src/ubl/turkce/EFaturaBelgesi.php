@@ -71,5 +71,9 @@ class EFaturaBelgesi{
         $this->ubl->addLineFromArray($arrProps);
         return $this;
     }
+    public function rebuildValues(){
+        $this->ubl->rebuildValues();
+        return $this;
+    }
 }
 ?>

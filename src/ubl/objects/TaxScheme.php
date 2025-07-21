@@ -5,10 +5,12 @@ namespace Efaturacim\Util\Ubl\Objects;
 use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\StrUtil;
+use PDO;
 
 class TaxScheme extends UblDataType
 {
     public ?string $name = null;
+    public ?string $taxTypeCode = null;
 
     public function __construct($options = null)
     {
@@ -33,6 +35,9 @@ class TaxScheme extends UblDataType
         if($this->isEmpty()){ return null; }
         $element = $document->createElement('cac:TaxScheme');
         $this->appendElement($document, $element, 'cbc:Name', $this->name);
+        if(StrUtil::notEmpty($this->taxTypeCode)){
+            $this->appendElement($document, $element, 'cbc:TaxTypeCode', $this->taxTypeCode);
+        }
         return $element;
     }
 }

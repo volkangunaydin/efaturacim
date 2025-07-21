@@ -4,6 +4,7 @@ namespace Efaturacim\Util\Ubl;
 
 use DOMElement;
 use Efaturacim\Util\ArrayUtil;
+use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
 use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
 use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
@@ -149,7 +150,7 @@ class InvoiceDocument extends UblDocument{
             return true;
         }else if(in_array($k,array("invoiceLine","satirlar","lines")) && ArrayUtil::notEmpty($v)){        
             foreach($v as $vv){ 
-                $this->invoiceLine->add(InvoiceLine::newLine($vv)); 
+                $this->invoiceLine->add(InvoiceLine::newLine($vv),null,null,$this->getContextArray()); 
             }
             return true;
         }else if(in_array($k,array("note","notes")) && StrUtil::notEmpty($v)){
@@ -230,6 +231,20 @@ class InvoiceDocument extends UblDocument{
         $this->note->add(Note::newNote($noteStr));
     }
     public function addLineFromArray($props){
-        $this->invoiceLine->add(InvoiceLine::newLine($props));
+        $this->invoiceLine->add(InvoiceLine::newLine($props),null,null,$this->getContextArray());
+    }
+    public function getContextArray(){
+        return new Options(array(
+            "nextLineId"=>$this->invoiceLine->getCount()+1
+            ,"documentCurrencyCode"=>$this->documentCurrencyCode
+            ,"invoiceTypeCode"=>$this->invoiceTypeCode
+        ));
+    }
+    public function rebuildValues(){
+        foreach($this->invoiceLine->list as &$invLine){                            
+            if($invLine instanceof InvoiceLine){                
+                $invLine->rebuildValues();
+            }    
+        }
     }
 }

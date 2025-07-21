@@ -81,8 +81,8 @@ class EFaturaSamples{
             ,"alici"=>array("unvan"=>"VOLKAN GUNAYDIN","vkn"=>"65401211066","il"=>"ANKARA","ilce"=>"CANKAYA","sokak"=>"Halit Ziya Cad ","bina"=>"19")
             ,"notlar"=>array("Not 1","Not 2","Not 3")
             ,"satirlar"=>array(
-                array("ad"=>"Urun 1","miktar"=>1,"birim"=>"C62","kdv"=>20,"fiyat"=>100)
-                ,array("ad"=>"Urun 2","miktar"=>4,"birim"=>"C62","kdv"=>20,"fiyat"=>125)
+                array("ad"=>"Urun 1","miktar"=>1,"birim"=>"C62","kdv"=>20,"birim_fiyat"=>100)
+                ,array("ad"=>"Urun 2","miktar"=>4,"birim"=>"C62","kdv_tutari"=>100,"birim_fiyat"=>125)
             )
         );
     }

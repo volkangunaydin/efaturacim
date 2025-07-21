@@ -4,6 +4,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
 
 class TaxTotal extends UblDataType
@@ -25,9 +26,9 @@ class TaxTotal extends UblDataType
         }
     }
 
-    public function addTaxSubtotal(array $options): self
+    public function addTaxSubtotal(array $options,$context=null): self
     {
-        $this->taxSubtotal->add(new TaxSubtotal($options));
+        $this->taxSubtotal->add(new TaxSubtotal($options),null,null,$context);
         return $this;
     }
 
@@ -57,7 +58,8 @@ class TaxTotal extends UblDataType
 
     public function isEmpty(): bool
     {
-        return is_null($this->taxAmount) || $this->taxSubtotal->isEmpty();
+        return false;
+        //return is_null($this->taxAmount) || $this->taxSubtotal->isEmpty();
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
@@ -67,13 +69,52 @@ class TaxTotal extends UblDataType
         }
 
         $element = $document->createElement('cac:TaxTotal');
-
-        $this->appendElement($document, $element, 'cbc:TaxAmount', number_format($this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID]);
+        if(is_null($this->taxAmount)){
+            $this->appendElement($document, $element, 'cbc:TaxAmount', number_format(0 + $this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID]);
+        }                
 
         foreach ($this->taxSubtotal->list as $subtotal) {
             $this->appendChild($element, $subtotal->toDOMElement($document));
         }
 
         return $element;
+    }
+    public function getVatDefIndex($create=true){
+        foreach($this->taxSubtotal->list as $key=>$subtotal){
+            if($subtotal instanceof TaxSubtotal){
+                if($subtotal->getTaxSchemeTaxTypeCode()=="0015"){
+                    return $key;
+                }
+            }    
+        }
+        if($create){
+            $this->addTaxSubtotal(array("taxTypeCode"=>"0015","name"=>"KDV","percent"=>0));        
+            return $this->getVatDefIndex(false);
+        }
+        return false;        
+    }
+    public function setVatRate($rate){
+        $key = $this->getVatDefIndex();        
+        if(!is_null($key)){        
+            $this->taxSubtotal->list[$key]->options->setValue("percent",$rate);
+            $this->taxSubtotal->list[$key]->percent = $rate;            
+        }
+    }
+    public function setVatValue($val){
+        $key = $this->getVatDefIndex();
+        if(!is_null($key)){
+            $this->taxSubtotal->list[$key]->taxAmount = $val;
+        }
+    }
+    public function setVatTaxableAmount($val){
+        $key = $this->getVatDefIndex();
+        if(!is_null($key)){
+            $this->taxSubtotal->list[$key]->taxableAmount = $val;
+        }
+    }
+    public function onBeforeAdd($context=null){
+        if(Options::ensureParam($context) && $context instanceof Options){
+
+        }        
     }
 }

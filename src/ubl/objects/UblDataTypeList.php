@@ -29,5 +29,17 @@ class UblDataTypeList{
     public function getCount(){
         return count($this->list);
     }
+    public function toArrayOrObject(){
+        if($this->getCount()>0){
+            $arr = array();
+            foreach($this->list as $item){
+                if($item instanceof UblDataType && $item->isEmpty()===false){
+                    $arr[] = $item->toArrayOrObject();
+                }
+            }
+            return $arr;
+        }
+        return array();
+    }
 }
 ?>
