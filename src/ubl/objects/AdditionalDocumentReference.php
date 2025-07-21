@@ -6,19 +6,19 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\DateUtil;
 use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Ubl\Objects\Attachment;
 
 class AdditionalDocumentReference extends UblDataType
 {
     public ?string $id = null;
     public ?string $issueDate = null;
     public ?string $documentType = null;
-    public ?string $attachmentContent = null;
-    public ?string $attachmentMimeCode = 'application/xml';
-    public ?string $attachmentFilename = null;
+    public ?Attachment $attachment = null;
 
     public function __construct($options = null)
     {
         parent::__construct($options);
+        $this->attachment = new Attachment();
         if (!is_null($this->options)) {
             $this->loadFromOptions($this->options);
         }
@@ -38,18 +38,12 @@ class AdditionalDocumentReference extends UblDataType
             $this->documentType = $v;
             return true;
         }
-        if (in_array($k, ['attachmentContent', 'icerik', 'content']) && StrUtil::notEmpty($v)) {
-            $this->attachmentContent = $v;
+
+        // Pass other options to attachment
+        if ($this->attachment->setPropertyFromOptions($k, $v, $options)) {
             return true;
         }
-        if (in_array($k, ['attachmentMimeCode', 'mime_type']) && StrUtil::notEmpty($v)) {
-            $this->attachmentMimeCode = $v;
-            return true;
-        }
-        if (in_array($k, ['attachmentFilename', 'dosya_adi', 'filename']) && StrUtil::notEmpty($v)) {
-            $this->attachmentFilename = $v;
-            return true;
-        }
+
         return false;
     }
 
@@ -71,17 +65,7 @@ class AdditionalDocumentReference extends UblDataType
         $this->appendElement($document, $element, 'cbc:IssueDate', $this->issueDate);
         $this->appendElement($document, $element, 'cbc:DocumentType', $this->documentType);
 
-        if (StrUtil::notEmpty($this->attachmentContent)) {
-            $attachmentElement = $document->createElement('cac:Attachment');
-            $element->appendChild($attachmentElement);
-
-            $attributes = ['mimeCode' => $this->attachmentMimeCode, 'encodingCode' => 'Base64'];
-            if (StrUtil::notEmpty($this->attachmentFilename)) {
-                $attributes['filename'] = $this->attachmentFilename;
-            }
-
-            $this->appendElement($document, $attachmentElement, 'cbc:EmbeddedDocumentBinaryObject', $this->attachmentContent, $attributes);
-        }
+        $this->appendChild($element, $this->attachment->toDOMElement($document));
 
         return $element;
     }

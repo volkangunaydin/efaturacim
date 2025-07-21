@@ -139,6 +139,6 @@ class InvoiceLine extends UblDataType
         return $line;
     }
     public function onBeforeAdd($context){
-        \Vulcan\V::dump($context);        
+        //\Vulcan\V::dump($context);        
     }
 }
