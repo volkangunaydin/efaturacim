@@ -13,6 +13,7 @@ use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
+use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
 use V_UBL_AccountingSupplierParty;
 
 /**
@@ -81,7 +82,7 @@ class InvoiceDocument extends UblDocument{
         $this->orderReference = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note = new UblDataTypeList(Note::class);
-        $this->invoiceLine = new UblDataTypeList(InvoiceLine::class);        
+        $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);        
     }
     public function setLineCount(){
         
@@ -147,7 +148,9 @@ class InvoiceDocument extends UblDocument{
             foreach($v as $vv){ $this->note->add(Note::newNote($vv)); }
             return true;
         }else if(in_array($k,array("invoiceLine","satirlar","lines")) && ArrayUtil::notEmpty($v)){        
-            foreach($v as $vv){ $this->invoiceLine->add(InvoiceLine::newLine($vv)); }
+            foreach($v as $vv){ 
+                $this->invoiceLine->add(InvoiceLine::newLine($vv)); 
+            }
             return true;
         }else if(in_array($k,array("note","notes")) && StrUtil::notEmpty($v)){
             $this->note->add(Note::newNote($v));            
@@ -227,11 +230,6 @@ class InvoiceDocument extends UblDocument{
         $this->note->add(Note::newNote($noteStr));
     }
     public function addLineFromArray($props){
-        $currentCount = $this->invoiceLine->getCount();
-        $this->invoiceLine->add(InvoiceLine::newLine($props),null,function(&$obj)use($currentCount){
-            if($obj instanceof InvoiceLine && is_null($obj->id)){
-                $obj->id = $currentCount+1;
-            }
-        });
+        $this->invoiceLine->add(InvoiceLine::newLine($props));
     }
 }
