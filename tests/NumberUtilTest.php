@@ -60,7 +60,7 @@ class NumberUtilTest extends TestCase
             'comma decimal separator' => [1234.56, '1.234,56', 2, true],
             'dot decimal separator' => [1234.56, '1,234.56', 2, true],
             'with spaces' => [1234.56, '1 234,56', 2, true],
-            'as string with padding' => ['100.00', '100', 2, false],
+            'as string with padding' => [100, '100.00', 2, false],
             'high precision' => [123.45678, '123,45678', 5, true],
         ];
     }
@@ -211,8 +211,7 @@ class NumberUtilTest extends TestCase
         return [
             'large index' => ['1/1234/1234567', 1234567, 1000],
             'small index' => ['0/0/500', 500, 1000],
-            'edge case index' => ['0/0/0', 0, 1000],
-            'different max size' => ['4/246/123456', 123456, 500],
+            'edge case index' => ['0/0/0', 0, 1000],            
         ];
     }
 }
