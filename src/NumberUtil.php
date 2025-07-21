@@ -12,7 +12,7 @@ class NumberUtil{
         return 0;
     }
     public static function isValidRef($ref){
-        if(is_null($ref) || $ref==0 || $ref==""){ return false; }
+        if(is_null($ref) || $ref===0 || $ref===""){ return false; }
         return self::isInt($ref) && $ref>0;
     }
     public static function cleanNumber($str,$decimal=2,$convertToNumber=true){
@@ -123,9 +123,11 @@ class NumberUtil{
         if(is_null($str) || $str===""){ return false; }            
         if(is_int($str)){ return true; }
         $str2 = preg_replace("/[^0-9]/", "","".$str);            
-        if($str==$str2){ return true; }
-        $diff = abs(  self::getAsCleanNumber($str,16) - CastUtil::asInt($str) );                
-        if($diff==0){ return true; }
+        if($str==$str2 && strlen("".$str)>0){ return true; }
+        if(is_numeric($str)){
+            $diff = abs( self::getAsCleanNumber($str,16) - CastUtil::asInt($str) );                
+            if($diff==0){ return true; }
+        }
         if(!is_null($epsilon) && $epsilon>=0){                                                                
             if($diff<=$epsilon){
                 return true;
