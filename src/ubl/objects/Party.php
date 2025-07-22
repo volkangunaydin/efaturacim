@@ -60,14 +60,15 @@ class Party extends UblDataType
         if(StrUtil::notEmpty($this->websiteURI)){
             $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
         }        
-        $partyNameElement = $this->appendElement($document, $element, 'cac:PartyName', null);
-        if(StrUtil::notEmpty($this->partyName)){
+        
+        $partyNameElement = $this->appendElement($document, $element, 'cac:PartyName', '');        
+        if(StrUtil::notEmpty($this->partyName)){            
             $this->appendElement($document, $partyNameElement, 'cbc:Name', $this->partyName);
         }        
         $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
         $this->appendChild($element,$this->postalAddress->toDOMElement($document));
         $this->appendChild($element,$this->partyTaxScheme->toDOMElement($document));
-        $this->appendChild($element,$this->contact->toDOMElement($document));
+        $this->appendChild($element,$this->contact->toDOMElement($document));                
         return $element;
     }
     public function isEmpty(){        

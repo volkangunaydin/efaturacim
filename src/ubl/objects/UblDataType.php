@@ -106,5 +106,7 @@ abstract class UblDataType{
             }
         }
     }
-    
+    public function toXmlString($document){
+        return $document->saveXML($this->toDOMElement($document));
+    }   
 }
