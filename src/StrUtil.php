@@ -188,5 +188,33 @@ class StrUtil{
             }
             return $defVal;
         }        
+        public static function encodeBase64($str){
+            if($str && is_object($str) && !is_string($str)){
+                return @base64_encode(serialize($str));
+            }else if($str && is_array($str)){
+                return @base64_encode(serialize($str));
+            }else if($str && strlen($str)>0){
+                try {
+                    $a = @base64_encode($str);
+                    if($a && strlen("".$a)>0){
+                        return $a;
+                    }
+                } catch (\Exception $e) {
+                }
+            }
+            return "";
+        }
+        public static function decodeBase64($str){
+            if($str && strlen($str)>0){
+                try {
+                    $a = base64_decode($str);
+                    if($a && strlen("".$a)>0){
+                        return $a;
+                    }
+                } catch (\Exception $e) {
+                }
+            }
+            return null;
+        }                
 
 }
