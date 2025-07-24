@@ -21,7 +21,8 @@ trait UblDataTrait{
     public function loadFromJson($jsonString){
         //try {            
             $arr = json_decode($jsonString,true);            
-            if(is_array($arr) && count($arr)>0){                
+            if(is_array($arr) && count($arr)>0){    
+                //\Vulcan\V::dump($arr);            
                 return $this->loadFromArray($arr);
             }
         //} catch (\Throwable $th) {       }
@@ -42,11 +43,13 @@ trait UblDataTrait{
                     if(!in_array($k_upper,$paramArray)){$paramArray[] = $k_upper;}                    
                     $isFound = false;
                     foreach($paramArray as $paramName){
+
                         if(property_exists($this,$paramName)){
                             if(is_scalar($v) && (is_null($this->$paramName) || !is_object($this->$paramName) )){
                                 $this->$paramName = $v;                                
-                            }else if (is_array($v) && !is_null($this->$paramName) && ($this->$paramName instanceof UblDataType)){                                                                
-                                $this->$paramName->loadFromOptions($v);                                                            
+                            }else if (is_array($v) && !is_null($this->$paramName) && ( is_object($this->$paramName) && method_exists($this->$paramName,"loadFromArray")  )){                                                                                                
+                                //if($k=="invoiceLine"){\Vulcan\V::dump($this->$paramName);}
+                                $this->$paramName->loadFromArray($v);                                                            
                             }
                             $isFound = true;
                             break;
