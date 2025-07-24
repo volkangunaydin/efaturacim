@@ -47,6 +47,11 @@ abstract class UblDocument{
      * @var string
      */
     protected string $customizationId = 'TR1.2';
+    /**
+     * Copy Indicator. e.g., "false"
+     * @var bool
+     */
+    protected bool $copyIndicator = false;
 
     /**
      * Profile Identifier. e.g., "TEMELFATURA", "TICARIFATURA"
@@ -164,6 +169,12 @@ abstract class UblDocument{
         return $this;
     }
 
+    public function setCopyIndicator(bool $copyIndicator): static
+    {
+        $this->copyIndicator = $copyIndicator;
+        return $this;
+    }
+
     /**
      * Sets the document currency code.
      *
@@ -240,6 +251,7 @@ abstract class UblDocument{
         $this->appendElement('cbc:CustomizationID', $this->customizationId);
         $this->appendElement('cbc:ProfileID', $this->profileId);
         $this->appendElement('cbc:ID', $this->id);
+        $this->appendElement('cbc:CopyIndicator', $this->copyIndicator ? 'true' : 'false');
         $this->appendElement('cbc:UUID', $this->uuid);
         $this->appendElement('cbc:IssueDate', $this->issueDate);
         $this->appendElement('cbc:IssueTime', $this->issueTime);        

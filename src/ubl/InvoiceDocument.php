@@ -7,9 +7,13 @@ use Efaturacim\Util\ArrayUtil;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
 use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
+use Efaturacim\Util\Ubl\Objects\TaxTotal;
+use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
 use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
+use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
+use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\Party;
@@ -23,8 +27,9 @@ use V_UBL_AccountingSupplierParty;
  * This class extends the base UblDocument and implements the specific
  * structure and logic required for generating a UBL Invoice XML.
  */
-class InvoiceDocument extends UblDocument{
-    
+class InvoiceDocument extends UblDocument
+{
+
     /**
      * Invoice type code. e.g., "SATIS", "IADE"
      * @var string|null
@@ -39,9 +44,30 @@ class InvoiceDocument extends UblDocument{
      * @var AccountingSupplierParty
      */
     public $accountingSupplierParty = null;
-    /**     
-     * @var UblDataTypeList
+
+    public $legalMonetaryTotal = null;
+    /**
+     * @var TaxTotal
      */
+    public $taxTotal = null;
+
+    
+/**
+     * @var WithholdingTaxTotal
+     */
+    public $withholdingTaxTotal = null;
+
+    
+    /**
+     * @var PricingExchangeRate
+     */
+    public $pricingExchangeRate = null;
+
+    /**
+     * @var PaymentMeans
+     */
+    public $paymentMeans = null;
+    
     public $orderReference = null;
     /**     
      * @var UblDataTypeList
@@ -70,23 +96,30 @@ class InvoiceDocument extends UblDocument{
     {
         parent::__construct();
         // Default profile for a commercial invoice. Can be overridden for "TEMELFATURA".
-        
+
     }
-    public function initMe(){
+    public function initMe()
+    {
         $this->rootElementName = 'Invoice';
         $this->setProfileId('TICARIFATURA');
         $this->setIssueDate(date('Y-m-d'));
-        $this->setIssueTime(date('H:i:s'));     
-        $this->setDocumentCurrencyCode("TRY");        
+        $this->setIssueTime(date('H:i:s'));
+        $this->setDocumentCurrencyCode("TRY");
+        $this->setCopyIndicator(false);
         $this->accountingCustomerParty = new AccountingCustomerParty();
         $this->accountingSupplierParty = new AccountingSupplierParty();
         $this->orderReference = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note = new UblDataTypeList(Note::class);
-        $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);        
+        $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
+        $this->taxTotal = new TaxTotal();
+        $this->withholdingTaxTotal = new WithholdingTaxTotal();
+        $this->pricingExchangeRate = new PricingExchangeRate();
+        $this->paymentMeans = new PaymentMeans();
     }
-    public function setLineCount(){
-        
+    public function setLineCount()
+    {
+
     }
     /**
      * Generates the XML representation of the UBL Invoice.
@@ -95,6 +128,7 @@ class InvoiceDocument extends UblDocument{
      */
     public function toXml(): string
     {
+        $this->rebuildValues();
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
         $this->setNamespaces();
@@ -102,38 +136,65 @@ class InvoiceDocument extends UblDocument{
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
 
         // TODO: Implement and call methods to append other required sections:
-        $this->appendSignature();
+        //$this->appendSignature();
         $this->appendElementList($this->orderReference);
-        $this->appendElementList($this->despatchDocumentReference);        
+        $this->appendElementList($this->despatchDocumentReference);
         $this->appendElementList($this->note);
         $this->appendAccountingSupplierParty();
-        $this->appendAccountingCustomerParty();        
+        $this->appendAccountingCustomerParty();
+        $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
         $this->appendElementList($this->invoiceLine);
-        // $this->appendTaxTotal();
-        // $this->appendLegalMonetaryTotal();
-        // $this->appendInvoiceLines();
+        $this->appendTaxTotal();
+        $this->appendWithholdingTaxTotal();
+        $this->appendPricingExchangeRate();
+        $this->appendPaymentMeans();
 
         return $this->document->saveXML();
     }
-    public function appendAccountingSupplierParty(){
-        $this->appendElement('cac:AccountingSupplierParty',$this->accountingSupplierParty->toDOMElement($this->document));
+
+    public function appendLegalMonetaryTotal()
+    {
+        $this->appendElement('cac:LegalMonetaryTotal', $this->legalMonetaryTotal ? $this->legalMonetaryTotal->toDOMElement($this->document) : null);
     }
-    public function appendAccountingCustomerParty(){
-        $this->appendElement('cac:AccountingCustomerParty',$this->accountingCustomerParty->toDOMElement($this->document));
+    public function appendAccountingSupplierParty()
+    {
+        $this->appendElement('cac:AccountingSupplierParty', $this->accountingSupplierParty->toDOMElement($this->document));
     }
+    public function appendAccountingCustomerParty()
+    {
+        $this->appendElement('cac:AccountingCustomerParty', $this->accountingCustomerParty->toDOMElement($this->document));
+    }
+    public function appendTaxTotal()
+    {
+        $this->appendElement('cac:TaxTotal', $this->taxTotal->toDOMElement($this->document));
+    }
+    public function appendWithholdingTaxTotal()
+    {
+        $this->appendElement('cac:WithholdingTaxTotal', $this->withholdingTaxTotal->toDOMElement($this->document));
+    }
+    public function appendPricingExchangeRate()
+    { 
+        $this->appendElement('cac:PricingExchangeRate', $this->pricingExchangeRate->toDOMElement($this->document));
+    }
+    public function appendPaymentMeans()
+    {
+        $this->appendElement('cac:PaymentMeans', $this->paymentMeans->toDOMElement($this->document));
+    }
+
     /**
      * getPropertyAlias array den yyukleme yaparken yasanabilecek yanlis yazilmari engellemek veya daha kolay yazim icin olusturuldu
      * ornek olarak array de satici yazildigi zaman sanki accountingSupplierParty yazilmis gibi davranir
      * @return string|null
      */
-    public function getPropertyAlias($k,$v){
-        if(in_array($k,array("satici"))){
+    public function getPropertyAlias($k, $v)
+    {
+        if (in_array($k, array("satici"))) {
             return "accountingSupplierParty";
-        }else if(in_array($k,array("alici","musteri"))){
+        } else if (in_array($k, array("alici", "musteri"))) {
             return "accountingCustomerParty";
-        }else if(in_array($k,array("notlar","notes"))){            
+        } else if (in_array($k, array("notlar", "notes"))) {
             return "note";
-        }else if(in_array($k,array("lines","satirlar"))){              
+        } else if (in_array($k, array("lines", "satirlar"))) {
             return "invoiceLine";
         }
         return null;
@@ -141,20 +202,23 @@ class InvoiceDocument extends UblDocument{
     /**
      * Skalar degerlerin nasil atnacagi belirtilir
      */
-    public function setPropertyFromOptions($k,$v,$options){
-        if(in_array($k,array("fatura_no","faturano","belgeno")) && StrUtil::notEmpty($v)){
+    public function setPropertyFromOptions($k, $v, $options)
+    {
+        if (in_array($k, array("fatura_no", "faturano", "belgeno")) && StrUtil::notEmpty($v)) {
             $this->id = $v;
             return true;
-        }else if(in_array($k,array("note","notes")) && ArrayUtil::notEmpty($v)){    
-            foreach($v as $vv){ $this->note->add(Note::newNote($vv)); }
-            return true;
-        }else if(in_array($k,array("invoiceLine","satirlar","lines")) && ArrayUtil::notEmpty($v)){        
-            foreach($v as $vv){ 
-                $this->invoiceLine->add(InvoiceLine::newLine($vv),null,null,$this->getContextArray()); 
+        } else if (in_array($k, array("note", "notes")) && ArrayUtil::notEmpty($v)) {
+            foreach ($v as $vv) {
+                $this->note->add(Note::newNote($vv));
             }
             return true;
-        }else if(in_array($k,array("note","notes")) && StrUtil::notEmpty($v)){
-            $this->note->add(Note::newNote($v));            
+        } else if (in_array($k, array("invoiceLine", "satirlar", "lines")) && ArrayUtil::notEmpty($v)) {
+            foreach ($v as $vv) {
+                $this->invoiceLine->add(InvoiceLine::newLine($vv), null, null, $this->getContextArray());
+            }
+            return true;
+        } else if (in_array($k, array("note", "notes")) && StrUtil::notEmpty($v)) {
+            $this->note->add(Note::newNote($v));
             return true;
         }
         //\Vulcan\V::dump(array($k,$v,$options));
@@ -185,13 +249,13 @@ class InvoiceDocument extends UblDocument{
         $xpath->registerNamespace('cac', 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2');
 
         // Populate common properties from the base class
-        $this->ublVersionId    = $this->getValueFromXpath($xpath, '/Invoice/cbc:UBLVersionID');
+        $this->ublVersionId = $this->getValueFromXpath($xpath, '/Invoice/cbc:UBLVersionID');
         $this->customizationId = $this->getValueFromXpath($xpath, '/Invoice/cbc:CustomizationID');
-        $this->profileId       = $this->getValueFromXpath($xpath, '/Invoice/cbc:ProfileID');
-        $this->id              = $this->getValueFromXpath($xpath, '/Invoice/cbc:ID');
-        $this->uuid            = $this->getValueFromXpath($xpath, '/Invoice/cbc:UUID');
-        $this->issueDate       = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueDate');
-        $this->issueTime       = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueTime');
+        $this->profileId = $this->getValueFromXpath($xpath, '/Invoice/cbc:ProfileID');
+        $this->id = $this->getValueFromXpath($xpath, '/Invoice/cbc:ID');
+        $this->uuid = $this->getValueFromXpath($xpath, '/Invoice/cbc:UUID');
+        $this->issueDate = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueDate');
+        $this->issueTime = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueTime');
         $this->documentCurrencyCode = $this->getValueFromXpath($xpath, '/Invoice/cbc:DocumentCurrencyCode');
 
         // Populate Invoice-specific properties
@@ -217,34 +281,42 @@ class InvoiceDocument extends UblDocument{
         $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
         $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ext', 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2');
     }
-    public function addToOrderList($code=null,$date=null){
-        if(StrUtil::notEmpty($code)){
-            $this->orderReference->add(new OrderReference(array("id"=>$code,"date"=>$date)));
+    public function addToOrderList($code = null, $date = null)
+    {
+        if (StrUtil::notEmpty($code)) {
+            $this->orderReference->add(new OrderReference(array("id" => $code, "date" => $date)));
         }
     }
-    public function addToDespatchList($code=null,$date=null){
-        if(StrUtil::notEmpty($code)){
-            $this->despatchDocumentReference->add(new DespatchDocumentReference(array("id"=>$code,"date"=>$date)));
+    public function addToDespatchList($code = null, $date = null)
+    {
+        if (StrUtil::notEmpty($code)) {
+            $this->despatchDocumentReference->add(new DespatchDocumentReference(array("id" => $code, "date" => $date)));
         }
     }
-    public function addNote($noteStr){
+    public function addNote($noteStr)
+    {
         $this->note->add(Note::newNote($noteStr));
     }
-    public function addLineFromArray($props){
-        $this->invoiceLine->add(InvoiceLine::newLine($props),null,null,$this->getContextArray());
+    public function addLineFromArray($props)
+    {
+        $this->invoiceLine->add(InvoiceLine::newLine($props), null, null, $this->getContextArray());
     }
-    public function getContextArray(){
+    public function getContextArray()
+    {
         return new Options(array(
-            "nextLineId"=>$this->invoiceLine->getCount()+1
-            ,"documentCurrencyCode"=>$this->documentCurrencyCode
-            ,"invoiceTypeCode"=>$this->invoiceTypeCode
+            "nextLineId" => $this->invoiceLine->getCount() + 1
+            ,
+            "documentCurrencyCode" => $this->documentCurrencyCode
+            ,
+            "invoiceTypeCode" => $this->invoiceTypeCode
         ));
     }
-    public function rebuildValues(){
-        foreach($this->invoiceLine->list as &$invLine){                            
-            if($invLine instanceof InvoiceLine){                
+    public function rebuildValues()
+    {
+        foreach ($this->invoiceLine->list as &$invLine) {
+            if ($invLine instanceof InvoiceLine) {
                 $invLine->rebuildValues();
-            }    
+            }
         }
     }
 }

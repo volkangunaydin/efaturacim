@@ -26,16 +26,16 @@ class TaxTotal extends UblDataType
         }
     }
 
-    public function addTaxSubtotal(array $options,$context=null): self
+    public function addTaxSubtotal(array $options, $context = null): self
     {
-        $this->taxSubtotal->add(new TaxSubtotal($options),null,null,$context);
+        $this->taxSubtotal->add(new TaxSubtotal($options), null, null, $context);
         return $this;
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         if (in_array($k, ['taxAmount', 'toplam_vergi_tutari']) && is_numeric($v)) {
-            $this->taxAmount = (float)$v;
+            $this->taxAmount = (float) $v;
             return true;
         }
 
@@ -69,9 +69,12 @@ class TaxTotal extends UblDataType
         }
 
         $element = $document->createElement('cac:TaxTotal');
-        if(is_null($this->taxAmount)){
-            $this->appendElement($document, $element, 'cbc:TaxAmount', number_format(0 + $this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID]);
-        }                
+
+        if (!is_null($this->taxAmount)) {
+            
+            $this->appendElement( $document, $element,'cbc:TaxAmount', number_format((float) $this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID]
+            );
+        }
 
         foreach ($this->taxSubtotal->list as $subtotal) {
             $this->appendChild($element, $subtotal->toDOMElement($document));
@@ -79,42 +82,47 @@ class TaxTotal extends UblDataType
 
         return $element;
     }
-    public function getVatDefIndex($create=true){
-        foreach($this->taxSubtotal->list as $key=>$subtotal){
-            if($subtotal instanceof TaxSubtotal){
-                if($subtotal->getTaxSchemeTaxTypeCode()=="0015"){
+    public function getVatDefIndex($create = true)
+    {
+        foreach ($this->taxSubtotal->list as $key => $subtotal) {
+            if ($subtotal instanceof TaxSubtotal) {
+                if ($subtotal->getTaxSchemeTaxTypeCode() == "0015") {
                     return $key;
                 }
-            }    
+            }
         }
-        if($create){
-            $this->addTaxSubtotal(array("taxTypeCode"=>"0015","name"=>"KDV","percent"=>0));        
+        if ($create) {
+            $this->addTaxSubtotal(array("taxTypeCode" => "0015", "name" => "KDV", "percent" => 0));
             return $this->getVatDefIndex(false);
         }
-        return false;        
+        return false;
     }
-    public function setVatRate($rate){
-        $key = $this->getVatDefIndex();        
-        if(!is_null($key)){        
-            $this->taxSubtotal->list[$key]->options->setValue("percent",$rate);
-            $this->taxSubtotal->list[$key]->percent = $rate;            
+    public function setVatRate($rate)
+    {
+        $key = $this->getVatDefIndex();
+        if (!is_null($key)) {
+            $this->taxSubtotal->list[$key]->options->setValue("percent", $rate);
+            $this->taxSubtotal->list[$key]->percent = $rate;
         }
     }
-    public function setVatValue($val){
+    public function setVatValue($val)
+    {
         $key = $this->getVatDefIndex();
-        if(!is_null($key)){
+        if (!is_null($key)) {
             $this->taxSubtotal->list[$key]->taxAmount = $val;
         }
     }
-    public function setVatTaxableAmount($val){
+    public function setVatTaxableAmount($val)
+    {
         $key = $this->getVatDefIndex();
-        if(!is_null($key)){
+        if (!is_null($key)) {
             $this->taxSubtotal->list[$key]->taxableAmount = $val;
         }
     }
-    public function onBeforeAdd($context=null){
-        if(Options::ensureParam($context) && $context instanceof Options){
+    public function onBeforeAdd($context = null)
+    {
+        if (Options::ensureParam($context) && $context instanceof Options) {
 
-        }        
+        }
     }
 }
