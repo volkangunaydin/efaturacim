@@ -3,8 +3,13 @@
 namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
+use DOMDocumentFragment;
 use DOMElement;
+use DOMNodeList;
 use Efaturacim\Util\Options;
+use Efaturacim\Util\PreviewUtil;
+use Efaturacim\Util\Ubl\InvoiceDocument;
+use Efaturacim\Util\Ubl\UblDocument;
 
 /**
  * Abstract base class for all UBL data objects.
@@ -19,10 +24,20 @@ abstract class UblDataType{
      * @var Options
      */
     public $options = null;
-    public function __construct($options=null){
+    public $textContent = null;
+    public $attributes  = array();
+    public function __construct($options=null,$debug=false){        
+        $this->initMe();
         if($options!=null){
             $this->options = new Options($options);
-        }
+            $this->loadFromOptions($this->options,false,$debug);
+        }        
+    }
+    public function initMe(){
+        
+    }
+    public function setTextContent($textVal){
+        $this->textContent = $textVal;
     }
     /**
      * Converts the object to a DOMElement.
@@ -65,7 +80,15 @@ abstract class UblDataType{
     }    
     protected function appendChild(&$el,$child){
         if($el && $el instanceof DOMElement && !is_null($child)){
-            $el->appendChild($child);
+            if($child instanceof DOMNodeList){
+                foreach($child as $ch){
+                    $el->appendChild($ch);        
+                }        
+            }else if ($child instanceof DOMDocumentFragment){
+                $el->appendChild($child);    
+            }else{
+                $el->appendChild($child);        
+            }            
         }
     }
     public function toXml($doc){
@@ -91,22 +114,47 @@ abstract class UblDataType{
     public function isEmpty(){
         return false;
     }
-    public function loadFromOptions($options,$clear=false){
+    public function loadFromOptions($options,$clear=false,$debug=false){
         if(Options::ensureParam(op: $options) && $options instanceof Options){
-            foreach($options->params as $k=>$v){
-                if($this->setPropertyFromOptions($k,$v,$options)){
-
-                }else if(property_exists($this,$k) && is_scalar($v)){
-                    $this->$k = $v;
-                }else if(property_exists($this,$k) && is_array($v) && count($v)>0 && $this->$k instanceof UblDataType){
-                    $this->$k->loadFromOptions($v);
-                }else{
-                    //\Vulcan\V::dump(array($k,$v));
-                }                
-            }
+            $this->loadFromArray($options->params,0,$debug);
         }
     }
-    public function toXmlString($document){
+    public function toXmlString($document=null){
+        if(is_null($document)){
+            $document = UblDocument::getNewXmlDocument("Invoice");
+        }
         return $document->saveXML($this->toDOMElement($document));
     }   
+    public function getAsXmlString($doc=null){
+        if(is_null($doc)){
+            $doc = UblDocument::getNewXmlDocument("Invoice");
+        }
+        return  $this->toXmlString($doc);
+    }
+    public function showAsXml($doc=null,$showOutput=true){
+        if(is_null($doc)){
+            $doc = UblDocument::getNewXmlDocument("Invoice");
+        }
+        $xml = $this->toXmlString($doc);
+        return PreviewUtil::previewXml($xml,$showOutput);
+    }
+    public function createElement(DOMDocument $document,$tagName){
+        $el = $document->createElement($tagName,"".$this->textContent);                
+        if($this->attributes && count($this->attributes)>0){                        
+            foreach($this->attributes as $attrName=>$attrValue){
+                if(is_array($attrValue)){
+                    foreach($attrValue as $kk=>$vv){
+                        if(is_scalar($vv)){
+                            $el->setAttribute($kk,$vv);
+                        }                        
+                    }
+                }else if (is_scalar($attrValue)){
+                    $el->setAttribute($attrName,$attrValue);
+                }
+                
+                
+            }
+        }
+        return $el;
+    }
 }

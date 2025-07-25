@@ -10,9 +10,9 @@ use Efaturacim\Util\StrUtil;
 class Party extends UblDataType
 {
     public ?string $websiteURI = null;
-    public ?string $partyName = null;
+    public ?PartyName $partyName = null;
     public ?Address $postalAddress = null;
-    public ?PartyIdentification $partyIdentification = null;
+    public ?UblDataTypeList $partyIdentification = null;
     public ?PartyTaxScheme $partyTaxScheme = null;
     public ?Contact $contact = null;
 
@@ -21,9 +21,10 @@ class Party extends UblDataType
         // Initialize composed objects
         parent::__construct($options);
         $this->postalAddress       = new Address();
-        $this->partyIdentification = new PartyIdentification();
+        $this->partyIdentification = new UblDataTypeList(PartyIdentification::class);
         $this->partyTaxScheme      = new PartyTaxScheme();
         $this->contact             = new Contact();
+        $this->partyName           = new PartyName();
         if(!is_null($this->options)){
             $this->loadFromOptions($this->options);
         }        
@@ -64,7 +65,7 @@ class Party extends UblDataType
         $partyNameElement = $this->appendElement($document, $element, 'cac:PartyName', '');        
         if(StrUtil::notEmpty($this->partyName)){            
             $this->appendElement($document, $partyNameElement, 'cbc:Name', $this->partyName);
-        }        
+        }                
         $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
         $this->appendChild($element,$this->postalAddress->toDOMElement($document));
         $this->appendChild($element,$this->partyTaxScheme->toDOMElement($document));

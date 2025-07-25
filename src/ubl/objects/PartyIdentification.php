@@ -8,30 +8,26 @@ use Efaturacim\Util\StrUtil;
 
 class PartyIdentification extends UblDataType
 {
-    public ?string $id = null;
-    public ?string $schemeID = null; // e.g., "VKN" or "TCKN"
-
-    public function __construct(?string $id = null, ?string $schemeID = null)
-    {
-        $this->id = $id;
-        $this->schemeID = $schemeID;
+    public ?ID $id = null;    
+    public function initMe(){
+        $this->id = new ID();
     }
+
     public function setValue($value,$schemeID=null){
-        $this->id = $value;
-        $this->schemeID = $schemeID;
+        $this->id = $value;        
         return $this;
     }
-    public function setPropertyFromOptions($k,$v,$options){
+    public function setPropertyFromOptions($k,$v,$options){        
         return false;
     }
-    public function toDOMElement(DOMDocument $document): DOMElement
-    {
-        $element = $document->createElement('cac:PartyIdentification');
-        $this->appendElement($document, $element, 'cbc:ID', $this->id, ['schemeID' => $this->schemeID]);
+    public function toDOMElement(DOMDocument $document){
+        if($this->isEmpty()){ return null; }
+        $element = $this->createElement($document,'cac:PartyIdentification');        
+        $element->appendChild($this->id->toDOMElement($document));
         return $element;
     }
     public function isEmpty(){
-        if(StrUtil::isEmpty($this->id) && StrUtil::isEmpty($this->schemeID)){
+        if(is_null($this->id) || $this->id->isEmpty()){
             return true;
         }
         return false;        

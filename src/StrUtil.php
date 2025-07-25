@@ -12,8 +12,29 @@ class StrUtil{
         }
         return false;
     }
+    public static function isXML($string,$softCheck=true) {
+        $string = trim((string) $string);
+        if (self::isEmpty($string)) {
+            return false;
+        }
+
+        // A "soft" check is unreliable and can lead to false positives.
+        // For robust validation, it's best to always use a proper parser.
+        // This implementation performs a full validation to ensure correctness.
+        libxml_use_internal_errors(true);
+        $doc = new \DOMDocument();
+        // Suppress warnings from loadXML, we'll check them with libxml_get_errors
+        $loaded = @$doc->loadXML($string);
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+
+        return $loaded !== false && empty($errors);
+    }
     public static function isJson($string,$softCheck=false) {
         $string = trim("".$string);
+        if (self::isEmpty($string)) {
+            return false;
+        }        
         if($softCheck){
             if(substr($string,0,1)=="[" && substr($string,-1,1)=="]"){
                 return true;                
