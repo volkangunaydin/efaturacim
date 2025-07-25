@@ -1,0 +1,39 @@
+<?php
+
+namespace Efaturacim\Util\Ubl\Objects;
+
+use DOMDocument;
+use DOMElement;
+
+class ManufacturersItemIdentification extends UblDataType
+{
+    public ?string $id = null;
+
+    public function __construct($options = null)
+    {
+        parent::__construct($options);
+        if (is_array($options) && isset($options['id'])) {
+            $this->id = $options['id'];
+        }
+    }
+
+    public function toDOMElement(DOMDocument $document): ?DOMElement
+    {
+        if (empty($this->id)) {
+            return null;
+        }
+        $element = $document->createElement('cac:ManufacturersItemIdentification');
+        $idElement = $document->createElement('cbc:ID', $this->id);
+        $element->appendChild($idElement);
+        return $element;
+    }
+
+    public function setPropertyFromOptions($k, $v, $options): bool
+    {
+        if ($k === 'id' && !empty($v)) {
+            $this->id = $v;
+            return true;
+        }
+        return false;
+    }
+} 

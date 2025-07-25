@@ -64,17 +64,20 @@ class WithholdingTaxTotal extends UblDataType
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
-        if ($this->isEmpty()) {
+        
+        if ($this->isEmpty() || is_null($this->taxAmount)) {
             return null;
         }
 
         $element = $document->createElement('cac:WithholdingTaxTotal');
 
-        if (!is_null($this->taxAmount)) {
-            
-            $this->appendElement( $document, $element,'cbc:TaxAmount', number_format((float) $this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID]
-            );
-        }
+        $this->appendElement(
+            $document,
+            $element,
+            'cbc:TaxAmount',
+            number_format((float) $this->taxAmount, 2, '.', ''),
+            ['currencyID' => $this->taxAmountCurrencyID]
+        );
 
         foreach ($this->taxSubtotal->list as $subtotal) {
             $this->appendChild($element, $subtotal->toDOMElement($document));

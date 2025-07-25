@@ -25,6 +25,10 @@ class InvoiceLine extends UblDataType
      * @var UblDataTypeList
      */
     public $allowanceCharge;
+    /**
+     * @var UblDataTypeList
+     */
+    public $withholdingTaxTotal;
 
     public ?TaxTotal $taxTotal = null;
     public ?Item $item = null;
@@ -34,6 +38,7 @@ class InvoiceLine extends UblDataType
     {
         parent::__construct($options);
         $this->allowanceCharge = new UblDataTypeList(AllowanceCharge::class);
+        $this->withholdingTaxTotal = new UblDataTypeList(WithholdingTaxTotal::class);
         $this->taxTotal = new TaxTotal();
         $this->item = new Item();
         $this->price = new Price();
@@ -47,6 +52,12 @@ class InvoiceLine extends UblDataType
     public function addAllowanceCharge(array $options): self
     {
         $this->allowanceCharge->add(new AllowanceCharge($options));
+        return $this;
+    }
+
+    public function addWithholdingTaxTotal(array $options): self
+    {
+        $this->withholdingTaxTotal->add(new WithholdingTaxTotal($options));
         return $this;
     }
 
@@ -133,6 +144,10 @@ class InvoiceLine extends UblDataType
 
         foreach ($this->allowanceCharge->list as $ac) {
             $this->appendChild($element, $ac->toDOMElement($document));
+        }
+
+        foreach ($this->withholdingTaxTotal->list as $wtt) {
+            $this->appendChild($element, $wtt->toDOMElement($document));
         }
 
         $this->appendChild($element, $this->taxTotal->toDOMElement($document));

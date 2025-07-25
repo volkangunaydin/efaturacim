@@ -38,7 +38,7 @@ class DespatchDocumentReference extends UblDataType
         if($this->isEmpty()){ return null; }
         $element = $document->createElement('cac:DespatchDocumentReference');
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
-        $this->appendElement($document, $element, 'IssueDate', DateUtil::getAsDbDate($this->issueDate));
+        $this->appendElement($document, $element, 'cbc:IssueDate', DateUtil::getAsDbDate($this->issueDate));
         return $element;
     }
 }

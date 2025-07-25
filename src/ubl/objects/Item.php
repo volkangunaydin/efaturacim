@@ -10,13 +10,26 @@ class Item extends UblDataType
 {
     public ?string $name = null;
     public ?string $description = null;
-    public ?string $sellersItemID = null;
+    public ?BuyersItemIdentification $buyersItemIdentification = null;
+    public ?SellersItemIdentification $sellersItemIdentification = null;
+    public ?ManufacturersItemIdentification $manufacturersItemIdentification = null;
 
     public function __construct($options = null)
     {
         parent::__construct($options);
         if (!is_null($this->options)) {
             $this->loadFromOptions($this->options);
+        }
+        if (is_array($options)) {
+            if (isset($options['buyersItemID'])) {
+                $this->buyersItemIdentification = new BuyersItemIdentification(['id' => $options['buyersItemID']]);
+            }
+            if (isset($options['sellersItemID'])) {
+                $this->sellersItemIdentification = new SellersItemIdentification(['id' => $options['sellersItemID']]);
+            }
+            if (isset($options['manufacturersItemID'])) {
+                $this->manufacturersItemIdentification = new ManufacturersItemIdentification(['id' => $options['manufacturersItemID']]);
+            }
         }
     }
 
@@ -33,7 +46,15 @@ class Item extends UblDataType
         }
 
         if (in_array($k, ['sellersItemID', 'satici_stok_kodu']) && StrUtil::notEmpty($v)) {
-            $this->sellersItemID = $v;
+            $this->sellersItemIdentification = new SellersItemIdentification(['id' => $v]);
+            return true;
+        }
+        if (in_array($k, ['buyersItemID', 'alici_stok_kodu']) && StrUtil::notEmpty($v)) {
+            $this->buyersItemIdentification = new BuyersItemIdentification(['id' => $v]);
+            return true;
+        }
+        if (in_array($k, ['manufacturersItemID', 'uretici_stok_kodu']) && StrUtil::notEmpty($v)) {
+            $this->manufacturersItemIdentification = new ManufacturersItemIdentification(['id' => $v]);
             return true;
         }
 
@@ -57,9 +78,14 @@ class Item extends UblDataType
         $this->appendElement($document, $element, 'cbc:Name', $this->name);
         $this->appendElement($document, $element, 'cbc:Description', $this->description);
 
-        if (StrUtil::notEmpty($this->sellersItemID)) {
-            $sellersItemIdentificationElement = $this->appendElement($document, $element, 'cac:SellersItemIdentification', null);
-            $this->appendElement($document, $sellersItemIdentificationElement, 'cbc:ID', $this->sellersItemID);
+        if ($this->buyersItemIdentification) {
+            $this->appendChild($element, $this->buyersItemIdentification->toDOMElement($document));
+        }
+        if ($this->sellersItemIdentification) {
+            $this->appendChild($element, $this->sellersItemIdentification->toDOMElement($document));
+        }
+        if ($this->manufacturersItemIdentification) {
+            $this->appendChild($element, $this->manufacturersItemIdentification->toDOMElement($document));
         }
 
         return $element;
