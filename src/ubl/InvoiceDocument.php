@@ -16,6 +16,7 @@ use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
+use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
@@ -45,6 +46,9 @@ class InvoiceDocument extends UblDocument
      */
     public $accountingSupplierParty = null;
 
+    /**
+     * @var LegalMonetaryTotal
+     */
     public $legalMonetaryTotal = null;
     /**
      * @var TaxTotal
@@ -116,6 +120,7 @@ class InvoiceDocument extends UblDocument
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
         $this->paymentMeans = new PaymentMeans();
+        $this->legalMonetaryTotal = new LegalMonetaryTotal();
     }
     public function setLineCount()
     {
@@ -148,6 +153,7 @@ class InvoiceDocument extends UblDocument
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
         $this->appendPaymentMeans();
+        $this->appendLegalMonetaryTotal();
 
         return $this->document->saveXML();
     }

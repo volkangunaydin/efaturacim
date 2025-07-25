@@ -182,7 +182,17 @@ class InvoiceLine extends UblDataType
         $this->taxTotal->setVatValue($val);        
     }
     public function calculateLineExtensionAmount(){
-        return NumberUtil::asMoneyVal($this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0));
+        $gross = $this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0);
+        $discount = 0;
+        foreach ($this->allowanceCharge->list as $ac) {
+            if (isset($ac->chargeIndicator) && !$ac->chargeIndicator) {
+                $discount += NumberUtil::coalesce($ac->amount, 0);
+            }
+            if (isset($ac->chargeIndicator) && $ac->chargeIndicator) {
+                $gross += NumberUtil::coalesce($ac->amount, 0);
+            }
+        }
+        return NumberUtil::asMoneyVal($gross - $discount);
     }
     public function getLineExtensionAmount(){
         if(!is_null($this->lineExtensionAmount)){
