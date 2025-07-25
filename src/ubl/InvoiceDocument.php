@@ -2,6 +2,7 @@
 
 namespace Efaturacim\Util\Ubl;
 
+use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\ArrayUtil;
 use Efaturacim\Util\Options;
@@ -21,6 +22,8 @@ use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
 use V_UBL_AccountingSupplierParty;
+use Vulcan\Base\Util\StringUtil\StrSerialize;
+use Vulcan\Base\Util\XML\XmlToArray;
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.
@@ -126,6 +129,7 @@ class InvoiceDocument extends UblDocument
     {
 
     }
+
     /**
      * Generates the XML representation of the UBL Invoice.
      *
@@ -148,13 +152,11 @@ class InvoiceDocument extends UblDocument
         $this->appendAccountingSupplierParty();
         $this->appendAccountingCustomerParty();
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
-        $this->appendElementList($this->invoiceLine);
+        $this->appendPaymentMeans();        
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
-        $this->appendPaymentMeans();
-        $this->appendLegalMonetaryTotal();
-
+        $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();
     }
 
@@ -200,7 +202,7 @@ class InvoiceDocument extends UblDocument
             return "accountingCustomerParty";
         } else if (in_array($k, array("notlar", "notes"))) {
             return "note";
-        } else if (in_array($k, array("lines", "satirlar"))) {
+        } else if (in_array($k, array("lines", "satirlar","invoiceLine"))) {
             return "invoiceLine";
         }
         return null;
@@ -219,6 +221,7 @@ class InvoiceDocument extends UblDocument
             }
             return true;
         } else if (in_array($k, array("invoiceLine", "satirlar", "lines")) && ArrayUtil::notEmpty($v)) {
+            \Vulcan\V::dump($k);
             foreach ($v as $vv) {
                 $this->invoiceLine->add(InvoiceLine::newLine($vv), null, null, $this->getContextArray());
             }
@@ -231,62 +234,24 @@ class InvoiceDocument extends UblDocument
         return false;
     }
 
-    /**
-     * Loads document properties from an XML string.
-     *
-     * @param string $xmlString The UBL XML content.
-     * @return static
-     * @throws \Exception if the XML is invalid or empty.
-     */
-    public function loadFromXml($xmlString): static
-    {
-        if (empty($xmlString)) {
-            throw new \Exception('XML string cannot be empty.');
+
+    public function loadFromXml($xmlString,$debug=false): static{
+        $arr  = XmlToArray::xmlStringToArray($xmlString,false);
+        if($arr && is_array($arr) && key_exists("Invoice",$arr)){
+            $this->loadFromArray($arr["Invoice"],0,$debug);
+            //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
         }
-
-        if (!@$this->document->loadXML($xmlString)) {
-            throw new \Exception('Failed to parse XML string.');
-        }
-
-        $this->root = $this->document->documentElement;
-
-        $xpath = new \DOMXPath($this->document);
-        $xpath->registerNamespace('cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
-        $xpath->registerNamespace('cac', 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2');
-
-        // Populate common properties from the base class
-        $this->ublVersionId = $this->getValueFromXpath($xpath, '/Invoice/cbc:UBLVersionID');
-        $this->customizationId = $this->getValueFromXpath($xpath, '/Invoice/cbc:CustomizationID');
-        $this->profileId = $this->getValueFromXpath($xpath, '/Invoice/cbc:ProfileID');
-        $this->id = $this->getValueFromXpath($xpath, '/Invoice/cbc:ID');
-        $this->uuid = $this->getValueFromXpath($xpath, '/Invoice/cbc:UUID');
-        $this->issueDate = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueDate');
-        $this->issueTime = $this->getValueFromXpath($xpath, '/Invoice/cbc:IssueTime');
-        $this->documentCurrencyCode = $this->getValueFromXpath($xpath, '/Invoice/cbc:DocumentCurrencyCode');
-
-        // Populate Invoice-specific properties
-        $this->invoiceTypeCode = $this->getValueFromXpath($xpath, '/Invoice/cbc:InvoiceTypeCode');
-
-        // TODO: Implement and call methods to parse other required sections:
-        // $this->parseAccountingSupplierParty($xpath);
-        // $this->parseAccountingCustomerParty($xpath);
-        // $this->parseTaxTotal($xpath);
-        // $this->parseLegalMonetaryTotal($xpath);
-        // $this->parseInvoiceLines($xpath);
-
+        //\Vulcan\V::dump($arr["Invoice"]["AccountingCustomerParty"]["Party"]);
         return $this;
     }
 
     /**
      * Sets the standard UBL namespaces on the root element.
      */
-    protected function setNamespaces(): void
-    {
-        $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2');
-        $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cac', 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2');
-        $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
-        $this->root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ext', 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2');
+    protected function setNamespaces(): void{
+        UblDocument::setNamespacesFor($this->root,"Invoice");
     }
+  
     public function addToOrderList($code = null, $date = null)
     {
         if (StrUtil::notEmpty($code)) {

@@ -1,6 +1,26 @@
 <?php
 namespace Efaturacim\Util\Ubl\Samples;
+
+use Efaturacim\Util\IO\IO_Util;
+use Efaturacim\Util\Ubl\Objects\InvoiceLine;
+use Efaturacim\Util\Ubl\Objects\PartyIdentification;
+use Efaturacim\Util\Ubl\Objects\PartyName;
+use Efaturacim\Util\Ubl\Turkce\EFaturaBelgesi;
+use Vulcan\Base\Util\StringUtil\StrSerialize;
+
 class EFaturaSamples{
+    public static function getCurrentDebugFatura(){
+        echo phpinfo();
+        exit;
+        $debug = true;
+        if(false){                        
+            //$p = new InvoiceLine(StrSerialize::unserializeBase64('YTo4OntzOjI6IklEIjtzOjE6IjEiO3M6MTY6Ikludm9pY2VkUXVhbnRpdHkiO2E6Mjp7czoxMToiQGF0dHJpYnV0ZXMiO2E6MTp7czo4OiJ1bml0Q29kZSI7czozOiJDNjIiO31zOjY6IkB2YWx1ZSI7czoxOiIxIjt9czoxOToiTGluZUV4dGVuc2lvbkFtb3VudCI7YToyOntzOjExOiJAYXR0cmlidXRlcyI7YToxOntzOjEwOiJjdXJyZW5jeUlEIjtzOjM6IkVVUiI7fXM6NjoiQHZhbHVlIjtzOjU6IjIwMTUwIjt9czoxNToiQWxsb3dhbmNlQ2hhcmdlIjthOjM6e3M6MTU6IkNoYXJnZUluZGljYXRvciI7czo0OiJ0cnVlIjtzOjIzOiJNdWx0aXBsaWVyRmFjdG9yTnVtZXJpYyI7czo2OiIwLjAwNzUiO3M6NjoiQW1vdW50IjthOjI6e3M6MTE6IkBhdHRyaWJ1dGVzIjthOjE6e3M6MTA6ImN1cnJlbmN5SUQiO3M6MzoiRVVSIjt9czo2OiJAdmFsdWUiO3M6MzoiMTUwIjt9fXM6ODoiVGF4VG90YWwiO2E6Mjp7czo5OiJUYXhBbW91bnQiO2E6Mjp7czoxMToiQGF0dHJpYnV0ZXMiO2E6MTp7czoxMDoiY3VycmVuY3lJRCI7czozOiJFVVIiO31zOjY6IkB2YWx1ZSI7czo3OiIyMDAwLjAwIjt9czoxMToiVGF4U3VidG90YWwiO2E6NDp7czoxMzoiVGF4YWJsZUFtb3VudCI7YToyOntzOjExOiJAYXR0cmlidXRlcyI7YToxOntzOjEwOiJjdXJyZW5jeUlEIjtzOjM6IkVVUiI7fXM6NjoiQHZhbHVlIjtzOjU6IjIwMDAwIjt9czo5OiJUYXhBbW91bnQiO2E6Mjp7czoxMToiQGF0dHJpYnV0ZXMiO2E6MTp7czoxMDoiY3VycmVuY3lJRCI7czozOiJFVVIiO31zOjY6IkB2YWx1ZSI7czo3OiIyMDAwLjAwIjt9czo3OiJQZXJjZW50IjtzOjI6IjEwIjtzOjExOiJUYXhDYXRlZ29yeSI7YToxOntzOjk6IlRheFNjaGVtZSI7YToyOntzOjQ6Ik5hbWUiO3M6MzoiS0RWIjtzOjExOiJUYXhUeXBlQ29kZSI7czo0OiIwMDE1Ijt9fX19czoxOToiV2l0aGhvbGRpbmdUYXhUb3RhbCI7YToyOntzOjk6IlRheEFtb3VudCI7YToyOntzOjExOiJAYXR0cmlidXRlcyI7YToxOntzOjEwOiJjdXJyZW5jeUlEIjtzOjM6IkVVUiI7fXM6NjoiQHZhbHVlIjtzOjQ6IjE4MDAiO31zOjExOiJUYXhTdWJ0b3RhbCI7YTo0OntzOjEzOiJUYXhhYmxlQW1vdW50IjthOjI6e3M6MTE6IkBhdHRyaWJ1dGVzIjthOjE6e3M6MTA6ImN1cnJlbmN5SUQiO3M6MzoiRVVSIjt9czo2OiJAdmFsdWUiO3M6NDoiMjAwMCI7fXM6OToiVGF4QW1vdW50IjthOjI6e3M6MTE6IkBhdHRyaWJ1dGVzIjthOjE6e3M6MTA6ImN1cnJlbmN5SUQiO3M6MzoiRVVSIjt9czo2OiJAdmFsdWUiO3M6NDoiMTgwMCI7fXM6NzoiUGVyY2VudCI7czoyOiI5MCI7czoxMToiVGF4Q2F0ZWdvcnkiO2E6MTp7czo5OiJUYXhTY2hlbWUiO2E6Mjp7czo0OiJOYW1lIjtzOjQyOiJUZW1pemxpayBoaXptZXRpICpHVCAxMTctQsO2bMO8bSAoMy4yLjEwKSsiO3M6MTE6IlRheFR5cGVDb2RlIjtzOjM6IjYxMiI7fX19fXM6NDoiSXRlbSI7YTo0OntzOjQ6Ik5hbWUiO3M6MTA6IsOWUk5FSyBLT0QiO3M6MjQ6IkJ1eWVyc0l0ZW1JZGVudGlmaWNhdGlvbiI7YToxOntzOjI6IklEIjtzOjEwOiLDllJORUsgS09EIjt9czoyNToiU2VsbGVyc0l0ZW1JZGVudGlmaWNhdGlvbiI7YToxOntzOjI6IklEIjtzOjI5OiJUZXY6IEdvb2R5ZWFyIE90byBMYXN0aWsgOS8xMCI7fXM6MzE6Ik1hbnVmYWN0dXJlcnNJdGVtSWRlbnRpZmljYXRpb24iO2E6MTp7czoyOiJJRCI7czoxMDoiw5ZSTkVLIEtPRCI7fX1zOjU6IlByaWNlIjthOjE6e3M6MTE6IlByaWNlQW1vdW50IjthOjI6e3M6MTE6IkBhdHRyaWJ1dGVzIjthOjE6e3M6MTA6ImN1cnJlbmN5SUQiO3M6MzoiRVVSIjt9czo2OiJAdmFsdWUiO3M6NToiMjAwMDAiO319fQ=='),$debug);
+            $p = new InvoiceLine(array("id"=>123,"InvoicedQuantity"=>5,"invoicedQuantityUnitCode"=>"NIU","LineExtensionAmount"=>array("@attributes"=>array("currencyID"=>"USD"),"@value"=>1234)),$debug);
+            $p->showAsXml();
+        }
+
+        return EFaturaBelgesi::smart(IO_Util::readFileAsString("C:/Users/volka/OneDrive/Desktop/EAM2025000000086.xml"),null,$debug);
+    }
     public static function getJsonForStdFatura(){
         return '{
     "ublVersionId": "2.1",

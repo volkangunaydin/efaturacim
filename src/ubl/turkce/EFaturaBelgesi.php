@@ -59,9 +59,9 @@ class EFaturaBelgesi{
     public static function fromJson($jsonString){                
         return self::smart($jsonString,"json");        
     }    
-    public static function smart($strOrObject,$type=null){        
+    public static function smart($strOrObject,$type=null,$debug=false){        
         $a = new static();
-        $a->ubl->loadSmart($strOrObject,$type);
+        $a->ubl->loadSmart($strOrObject,$type,$debug);
         return $a;        
     }    
     public function ekleSatir($name,$quantity=1,$price=0,$kdv=20){        

@@ -193,7 +193,7 @@ abstract class UblDocument{
      * @return string The generated XML string.
      */
     abstract public function toXml(): string;    
-    abstract public function loadFromXml($xmlString);
+    abstract public function loadFromXml($xmlString,$debug=false);
 
         /**
      * Helper to create and append a new element if the value is not null.
@@ -281,4 +281,21 @@ abstract class UblDocument{
     public function getPropertyAlias($k,$v){
         return null;
     }
+    public static function setNamespacesFor(&$root,$rootElementName="Invoice"){
+        if($rootElementName=="Invoice"){
+            $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2');
+            $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cac', 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2');
+            $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
+            $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ext', 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2');
+        }
+    }
+
+    public static function getNewXmlDocument($rootElementName="Invoice"){
+        $document = new DOMDocument('1.0', 'UTF-8');
+        $document->formatOutput = true;
+        $root = $document->createElement($rootElementName);
+        $document->appendChild($root);
+        self::setNamespacesFor($root,$rootElementName);
+        return $document;      
+    }      
 }

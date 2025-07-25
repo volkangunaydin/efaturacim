@@ -11,12 +11,9 @@ use Efaturacim\Util\StrUtil;
 
 class InvoiceLine extends UblDataType
 {
-    public ?string $id = null;    
-    public ?float $invoicedQuantity = null;
-    public ?string $invoicedQuantityUnitCode = 'C62'; // Default to "unit"
-    public ?float $lineExtensionAmount = null;
-    public ?string $lineExtensionAmountCurrencyID = 'TRY';
-
+    public ?ID $id = null;    
+    public ?InvoicedQuantity $invoicedQuantity = null;
+    public ?LineExtensionAmount $lineExtensionAmount = null;
     /**     
      * @var UblDataTypeList
      */
@@ -29,42 +26,35 @@ class InvoiceLine extends UblDataType
      * @var UblDataTypeList
      */
     public $withholdingTaxTotal;
-
     public ?TaxTotal $taxTotal = null;
     public ?Item $item = null;
     public ?Price $price = null;
 
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
+    public function initMe(){
+        $this->id              = new ID();
+        $this->invoicedQuantity = new InvoicedQuantity();
         $this->allowanceCharge = new UblDataTypeList(AllowanceCharge::class);
         $this->withholdingTaxTotal = new UblDataTypeList(WithholdingTaxTotal::class);
+        $this->lineExtensionAmount = new LineExtensionAmount();
         $this->taxTotal = new TaxTotal();
         $this->item = new Item();
         $this->price = new Price();
-        $this->note  = new UblDataTypeList(Note::class);
-
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
+        $this->note  = new UblDataTypeList(Note::class);        
     }
-
     public function addAllowanceCharge(array $options): self
     {
         $this->allowanceCharge->add(new AllowanceCharge($options));
         return $this;
     }
-
     public function addWithholdingTaxTotal(array $options): self
     {
         $this->withholdingTaxTotal->add(new WithholdingTaxTotal($options));
         return $this;
     }
-
     public function setPropertyFromOptions($k, $v, $options): bool
-    {
+    {                            
         if (in_array($k, ['id', 'line_id', 'sira_no']) && StrUtil::notEmpty($v)) {
-            $this->id = $v;
+            $this->id->textContent = $v;
             return true;
         }
         if (in_array($k, ['price', 'fiyat', 'birim_fiyat']) && NumberUtil::isPositiveNumber($v)) {
@@ -76,22 +66,21 @@ class InvoiceLine extends UblDataType
             return true;
         }
         if (in_array($k, ['invoicedQuantity', 'quantity', 'miktar']) && is_numeric($v)) {
-            $this->invoicedQuantity = (float)$v;
+            $this->invoicedQuantity->setQuantity($v);
             return true;
         }
         if (in_array($k, ['invoicedQuantityUnitCode', 'unitCode', 'birim_kodu']) && StrUtil::notEmpty($v)) {
-            $this->invoicedQuantityUnitCode = $v;
+            $this->invoicedQuantity->setCode($v);
             return true;
         }
-        if (in_array($k, ['lineExtensionAmount', 'line_amount', 'satir_tutari']) && is_numeric($v)) {
-            $this->lineExtensionAmount = (float)$v;
+        if (in_array($k, ['lineExtensionAmount', 'line_amount', 'satir_tutari']) && is_numeric($v)) {                        
+            $this->lineExtensionAmount->setValue($v);
             return true;
         }
         if (in_array($k, ['currency', 'currencyID', 'para_birimi']) && StrUtil::notEmpty($v)) {
-            $this->lineExtensionAmountCurrencyID = $v;
+            $this->lineExtensionAmount->setCurrencyID($v);
             return true;
         }
-
         // Handle allowance charges array
         if (in_array(strtolower($k), ['allowancecharges', 'discounts', 'charges', 'iskontolar']) && is_array($v)) {
             foreach ($v as $acOptions) {
@@ -103,57 +92,57 @@ class InvoiceLine extends UblDataType
         }        
         if (in_array($k, ['kdv','kdv_orani']) && StrUtil::notEmpty($v)) {
             $this->setVatRate($v);
+            return true;
         }
         if (in_array($k, ['kdv_tutar','kdv_tutari']) && StrUtil::notEmpty($v)) {
             $this->setVatValue($v);
+            return true;
         }
         // Pass other options to children
-        if ($this->item->setPropertyFromOptions($k, $v, $options)) {
-            return true;
+        if(is_array($v)){
+            if ($this->item->setPropertyFromOptions($k, $v, $options)) {
+                return true;
+            }
+            if ($this->price->setPropertyFromOptions($k, $v, $options)) {
+                return true;
+            }
+            if ($this->taxTotal->setPropertyFromOptions($k, $v, $options)) {
+                return true;
+            }
         }
-        if ($this->price->setPropertyFromOptions($k, $v, $options)) {
-            return true;
-        }
-        if ($this->taxTotal->setPropertyFromOptions($k, $v, $options)) {
-            return true;
-        }
-
         return false;
     }
-
     public function isEmpty(): bool
     {
         // An invoice line must have an ID, a quantity, an amount, and an item.
-        return StrUtil::isEmpty($this->id) || is_null($this->invoicedQuantity)  || $this->item->isEmpty();
+        //|| is_null($this->invoicedQuantity)  || $this->item->isEmpty()
+        return is_null($this->id) || $this->id->isEmpty() ;
     }
-
+    public function getInvoicedQuantity(){
+        if($this->invoicedQuantity){
+            return $this->invoicedQuantity;
+        }
+        return 0;
+    }
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
-        if ($this->isEmpty()) {
+        if ($this->isEmpty()) {            
             return null;
         }
-
         $element = $document->createElement('cac:InvoiceLine');
-
-        $this->appendElement($document, $element, 'cbc:ID', $this->id);
+        $this->appendChild($element,$this->id->toDOMElement($document));
         //$this->appendElementList($document,$this->note);
-
-        $this->appendElement($document, $element, 'cbc:InvoicedQuantity', number_format($this->invoicedQuantity, 2, '.', ''), ['unitCode' => $this->invoicedQuantityUnitCode]);
-
-        $this->appendElement($document, $element, 'cbc:LineExtensionAmount', number_format(0 + $this->lineExtensionAmount, 2, '.', ''), ['currencyID' => $this->lineExtensionAmountCurrencyID]);
-
+        $this->appendChild($element, $this->invoicedQuantity->toDOMElement($document));
+        $this->appendChild($element,$this->lineExtensionAmount->toDOMElement($document));
         foreach ($this->allowanceCharge->list as $ac) {
             $this->appendChild($element, $ac->toDOMElement($document));
         }
-
         foreach ($this->withholdingTaxTotal->list as $wtt) {
             $this->appendChild($element, $wtt->toDOMElement($document));
         }
-
         $this->appendChild($element, $this->taxTotal->toDOMElement($document));
         $this->appendChild($element, $this->item->toDOMElement($document));
         $this->appendChild($element, $this->price->toDOMElement($document));
-
         return $element;
     }
     public static function newLine($props){        
@@ -165,13 +154,13 @@ class InvoiceLine extends UblDataType
             if(is_null($this->id)){
                 $nid = $context->getAsInt("nextLineId");
                 if($nid>0){
-                    $this->id = $nid;
+                    $this->id->textContent = $nid;
                 }else{
-                    $this->id = StrUtil::getGUID();
+                    $this->id->textContent = StrUtil::getGUID();
                 }
             }
             if(is_null($this->lineExtensionAmount)){
-                $this->lineExtensionAmount = $this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0);
+                $this->lineExtensionAmount->setValue($this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0));
             }
         }        
     }
@@ -182,17 +171,7 @@ class InvoiceLine extends UblDataType
         $this->taxTotal->setVatValue($val);        
     }
     public function calculateLineExtensionAmount(){
-        $gross = $this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0);
-        $discount = 0;
-        foreach ($this->allowanceCharge->list as $ac) {
-            if (isset($ac->chargeIndicator) && !$ac->chargeIndicator) {
-                $discount += NumberUtil::coalesce($ac->amount, 0);
-            }
-            if (isset($ac->chargeIndicator) && $ac->chargeIndicator) {
-                $gross += NumberUtil::coalesce($ac->amount, 0);
-            }
-        }
-        return NumberUtil::asMoneyVal($gross - $discount);
+        return NumberUtil::asMoneyVal($this->invoicedQuantity->toNumber() * NumberUtil::coalesce($this->price->priceAmount,0));
     }
     public function getLineExtensionAmount(){
         if(!is_null($this->lineExtensionAmount)){
@@ -205,14 +184,20 @@ class InvoiceLine extends UblDataType
             "lineExtensionAmount"=>$this->getLineExtensionAmount()
         ));
     }
+    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)   {        
+        parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);        
+    }
+    public function onAfterLoadComplete($arr,$debugArray){
+        $this->showAsXml();
+    }
     public function rebuildValues(){
-        $this->lineExtensionAmount = $this->calculateLineExtensionAmount();
+        $this->lineExtensionAmount->setValue($this->calculateLineExtensionAmount());
         $kdvKey = $this->taxTotal->getVatDefIndex(false);
         if(!is_null($kdvKey)){
             $kdv  = &$this->taxTotal->taxSubtotal->list[$kdvKey];
             if($kdv instanceof TaxSubtotal){
-                $kdv->taxableAmount = $this->lineExtensionAmount;
-                $kdv->taxAmount     = NumberUtil::asMoneyVal( ($this->lineExtensionAmount*$kdv->percent/100));
+                $kdv->taxableAmount = $this->lineExtensionAmount->toNumber();
+                $kdv->taxAmount     = NumberUtil::asMoneyVal( ($this->lineExtensionAmount->toNumber()*$kdv->percent/100));
             }
         }
     }

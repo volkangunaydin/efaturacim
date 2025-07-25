@@ -1,6 +1,9 @@
 <?php
 
 namespace Efaturacim\Util\Ubl\Objects;
+
+use DOMDocument;
+use DOMNodeList;
 class UblDataTypeList{
     public $className = null;
     public $list = array();
@@ -47,16 +50,28 @@ class UblDataTypeList{
             $i=0;
             foreach($arr as $k=>$v){
                 $i++;
-                if($i==1 && is_scalar($v)){
+                if($i==1 && is_scalar($v)){                    
                     break;
-                }
-                if(!is_null($v) && is_array($v) && count($v)>0 && strlen("".$this->className)>0 && class_exists($this->className,true)  ){
+                }                
+                if(!is_null($v) && is_array($v) && count($v)>0 && strlen("".$this->className)>0 && class_exists($this->className,true)  ){                    
                     $obj = new $this->className();
                     $obj->loadFromArray($v,$depth+1);
                     $this->add($obj);
                 }
             }
         }
+    }
+    public function toDOMElement(DOMDocument $doc){
+        $fragment = $doc->createDocumentFragment();
+        foreach($this->list as $item){
+            if($item instanceof UblDataType){       
+                    $childElement = $item->toDOMElement($doc);
+                    if($childElement){
+                        $fragment->appendChild($childElement);
+                    }
+            }
+        }
+        return $fragment;
     }
 }
 ?>
