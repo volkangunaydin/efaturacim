@@ -50,10 +50,10 @@ class UblDataTypeList{
             $i=0;
             foreach($arr as $k=>$v){
                 $i++;
-                if($i==1 && is_scalar($v)){
+                if($i==1 && is_scalar($v)){                    
                     break;
-                }
-                if(!is_null($v) && is_array($v) && count($v)>0 && strlen("".$this->className)>0 && class_exists($this->className,true)  ){
+                }                
+                if(!is_null($v) && is_array($v) && count($v)>0 && strlen("".$this->className)>0 && class_exists($this->className,true)  ){                    
                     $obj = new $this->className();
                     $obj->loadFromArray($v,$depth+1);
                     $this->add($obj);

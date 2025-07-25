@@ -106,7 +106,7 @@ trait UblDataTrait{
                                  if($isDebug){  
                                     $valStr = print_r($v,true);
                                     if(strlen($valStr)>200){ $valStr = mb_substr($valStr,0,200)."..."; }
-                                    $debugArray["log"][] = "loadFromArray for ".$paramName." := ".$valStr;
+                                    $debugArray["log"][] = "loadFromArray for ".$paramName." @".get_class($this->$paramName)."  := ".$valStr."";
                                 }               
                                 $rr = $this->$paramName->loadFromArray($v,$depth+1,$isDebug,false);                                                            
                                 

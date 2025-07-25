@@ -147,12 +147,11 @@ class InvoiceDocument extends UblDocument
         $this->appendAccountingSupplierParty();
         $this->appendAccountingCustomerParty();
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
-        $this->appendElementList($this->invoiceLine);
+        $this->appendPaymentMeans();        
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
-        $this->appendPaymentMeans();
-
+        $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();
     }
 
@@ -198,7 +197,7 @@ class InvoiceDocument extends UblDocument
             return "accountingCustomerParty";
         } else if (in_array($k, array("notlar", "notes"))) {
             return "note";
-        } else if (in_array($k, array("lines", "satirlar"))) {
+        } else if (in_array($k, array("lines", "satirlar","invoiceLine"))) {
             return "invoiceLine";
         }
         return null;
@@ -217,6 +216,7 @@ class InvoiceDocument extends UblDocument
             }
             return true;
         } else if (in_array($k, array("invoiceLine", "satirlar", "lines")) && ArrayUtil::notEmpty($v)) {
+            \Vulcan\V::dump($k);
             foreach ($v as $vv) {
                 $this->invoiceLine->add(InvoiceLine::newLine($vv), null, null, $this->getContextArray());
             }

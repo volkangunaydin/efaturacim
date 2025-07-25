@@ -201,8 +201,11 @@ class InvoiceLine extends UblDataType
             "lineExtensionAmount"=>$this->getLineExtensionAmount()
         ));
     }
+    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)   {        
+        parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);        
+    }
     public function onAfterLoadComplete($arr,$debugArray){
-        //$this->showAsXml();
+        $this->showAsXml();
     }
     public function rebuildValues(){
         $this->lineExtensionAmount->setValue($this->calculateLineExtensionAmount());
