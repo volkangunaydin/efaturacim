@@ -46,19 +46,26 @@ class UblDataTypeList{
     }
     public function loadFromArray($arr,$depth=0){
         if($depth>10){  return; }
-        if(!is_null($arr) && is_array($arr)){            
-            $i=0;
-            foreach($arr as $k=>$v){
-                $i++;
-                if($i==1 && is_scalar($v)){                    
-                    break;
-                }                
-                if(!is_null($v) && is_array($v) && count($v)>0 && strlen("".$this->className)>0 && class_exists($this->className,true)  ){                    
-                    $obj = new $this->className();
-                    $obj->loadFromArray($v,$depth+1);
-                    $this->add($obj);
+        if(!is_null($arr) && is_array($arr)){   
+            if(key_exists(0,$arr)){
+                $i=0;
+                foreach($arr as $k=>$v){
+                    $i++;
+                    if($i==1 && is_scalar($v)){                    
+                        break;
+                    }                
+                    if(!is_null($v) && is_array($v) && count($v)>0 && strlen("".$this->className)>0 && class_exists($this->className,true)  ){                    
+                        $obj = new $this->className();
+                        $obj->loadFromArray($v,$depth+1);
+                        $this->add($obj);
+                    }
                 }
-            }
+            }else if(count($arr)>0){
+                $obj = new $this->className();
+                $obj->loadFromArray($arr,$depth+1);
+                $this->add($obj);                
+            }         
+
         }
     }
     public function toDOMElement(DOMDocument $doc){

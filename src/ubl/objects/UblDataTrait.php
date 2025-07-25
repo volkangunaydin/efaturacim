@@ -33,7 +33,8 @@ trait UblDataTrait{
         if($depth>10){  return; }        
         $debugArray = array("log"=>array());        
         if(!is_null($arr) && is_array($arr)){            
-            foreach($arr as $k=>$v){                
+            foreach($arr as $k=>$v){           
+                $paramArray = array();     
                 if(!is_null($v)){                            
                     if($k=="@attributes" && $this instanceof UblDataType && is_array($v)){                                                
                         if(!is_array($this->attributes)){
@@ -65,9 +66,10 @@ trait UblDataTrait{
                     $k_up       = strtoupper(substr($k,0,1)).substr($k,1);
                     $k_lower    = strtolower($k);
                     $k_upper    = strtoupper($k);
-                    $paramArray = array($k);
-                    if(!in_array($k_safe,$paramArray)){$paramArray[] = $k_safe;}
+                    
+                    if(!in_array($k_safe,$paramArray)){$paramArray[] = $k_safe;}                    
                     if(!in_array($k_up,$paramArray)){$paramArray[] = $k_up;}
+                    if(!in_array($k,$paramArray)){$paramArray[] = $k;}                    
                     if(!in_array($k_lower,$paramArray)){$paramArray[] = $k_lower;}
                     if(!in_array($k_upper,$paramArray)){$paramArray[] = $k_upper;}                    
                     $isFound = false;                    

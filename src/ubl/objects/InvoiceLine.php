@@ -13,7 +13,10 @@ class InvoiceLine extends UblDataType
 {
     public ?ID $id = null;    
     public ?InvoicedQuantity $invoicedQuantity = null;
+
     public ?LineExtensionAmount $lineExtensionAmount = null;
+    
+
     /**     
      * @var UblDataTypeList
      */
@@ -26,10 +29,12 @@ class InvoiceLine extends UblDataType
      * @var UblDataTypeList
      */
     public $withholdingTaxTotal;
+
     public ?TaxTotal $taxTotal = null;
     public ?Item $item = null;
     public ?Price $price = null;
 
+    
     public function initMe(){
         $this->id              = new ID();
         $this->invoicedQuantity = new InvoicedQuantity();
@@ -46,11 +51,13 @@ class InvoiceLine extends UblDataType
         $this->allowanceCharge->add(new AllowanceCharge($options));
         return $this;
     }
+
     public function addWithholdingTaxTotal(array $options): self
     {
         $this->withholdingTaxTotal->add(new WithholdingTaxTotal($options));
         return $this;
     }
+
     public function setPropertyFromOptions($k, $v, $options): bool
     {                            
         if (in_array($k, ['id', 'line_id', 'sira_no']) && StrUtil::notEmpty($v)) {
@@ -81,6 +88,7 @@ class InvoiceLine extends UblDataType
             $this->lineExtensionAmount->setCurrencyID($v);
             return true;
         }
+
         // Handle allowance charges array
         if (in_array(strtolower($k), ['allowancecharges', 'discounts', 'charges', 'iskontolar']) && is_array($v)) {
             foreach ($v as $acOptions) {
@@ -112,6 +120,7 @@ class InvoiceLine extends UblDataType
         }
         return false;
     }
+
     public function isEmpty(): bool
     {
         // An invoice line must have an ID, a quantity, an amount, and an item.
@@ -129,20 +138,28 @@ class InvoiceLine extends UblDataType
         if ($this->isEmpty()) {            
             return null;
         }
+
         $element = $document->createElement('cac:InvoiceLine');
+
         $this->appendChild($element,$this->id->toDOMElement($document));
         //$this->appendElementList($document,$this->note);
+
         $this->appendChild($element, $this->invoicedQuantity->toDOMElement($document));
+
         $this->appendChild($element,$this->lineExtensionAmount->toDOMElement($document));
+
         foreach ($this->allowanceCharge->list as $ac) {
             $this->appendChild($element, $ac->toDOMElement($document));
         }
+
         foreach ($this->withholdingTaxTotal->list as $wtt) {
             $this->appendChild($element, $wtt->toDOMElement($document));
         }
+
         $this->appendChild($element, $this->taxTotal->toDOMElement($document));
         $this->appendChild($element, $this->item->toDOMElement($document));
         $this->appendChild($element, $this->price->toDOMElement($document));
+
         return $element;
     }
     public static function newLine($props){        
@@ -188,7 +205,7 @@ class InvoiceLine extends UblDataType
         parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);        
     }
     public function onAfterLoadComplete($arr,$debugArray){
-        $this->showAsXml();
+        //$this->showAsXml();
     }
     public function rebuildValues(){
         $this->lineExtensionAmount->setValue($this->calculateLineExtensionAmount());
