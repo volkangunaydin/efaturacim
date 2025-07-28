@@ -17,7 +17,7 @@ class Name extends UblDataType{
         if ($this->isEmpty()) {
             return null;
         }
-        // cbc:Note is a simple element with just a text value.
+        // cbc:Name is a simple element with just a text value.
         return $this->createElement($document,'cbc:Name');
     }
     public static function newNote($str){

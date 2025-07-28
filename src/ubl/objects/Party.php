@@ -30,8 +30,8 @@ class Party extends UblDataType
         }        
     }
     public function setPropertyFromOptions($k,$v,$options){
-        if(in_array($k,array("name","unvan","cari_adi")) && StrUtil::notEmpty($v)){
-            $this->partyName = $v;
+        if(in_array($k,array("name","unvan","cari_adi","partyName")) && StrUtil::notEmpty($v)){
+            $this->partyName->name->textContent = $v;
             return true;
         }else if(in_array($k,array("vkn","tckn","tc","vergino","vergi_no")) && StrUtil::notEmpty($v)){
             if(strlen($v)==11){
@@ -62,9 +62,8 @@ class Party extends UblDataType
             $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
         }        
         
-        $partyNameElement = $this->appendElement($document, $element, 'cac:PartyName', '');        
-        if(StrUtil::notEmpty($this->partyName)){            
-            $this->appendElement($document, $partyNameElement, 'cbc:Name', $this->partyName);
+        if(!$this->partyName->isEmpty()){            
+            $element->appendChild($this->partyName->toDOMElement($document));
         }                
         $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
         $this->appendChild($element,$this->postalAddress->toDOMElement($document));

@@ -15,7 +15,7 @@ use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
 use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
-use Efaturacim\Util\Ubl\Objects\Note;
+use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Party;
@@ -157,6 +157,7 @@ class InvoiceDocument extends UblDocument
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
         $this->appendElementList($this->invoiceLine);
+        $this->appendLegalMonetaryTotal();
         return $this->document->saveXML();
     }
 
@@ -284,10 +285,38 @@ class InvoiceDocument extends UblDocument
     }
     public function rebuildValues()
     {
+        $totalLineExtensionAmount = 0;
+        $totalTaxExclusiveAmount = 0;
+        $totalTaxInclusiveAmount = 0;
+        $totalAllowanceTotalAmount = 0;
+        $totalChargeTotalAmount = 0;
+        $totalPayableAmount = 0;
+        
+        // Rebuild invoice line values and collect totals
         foreach ($this->invoiceLine->list as &$invLine) {
             if ($invLine instanceof InvoiceLine) {
                 $invLine->rebuildValues();
+                
+                // Get calculated values from line context
+                $lineContext = $invLine->getContextArray();
+                if ($lineContext instanceof Options) {
+                    $totalLineExtensionAmount += NumberUtil::asMoneyVal($lineContext->getAs("lineExtensionAmount", 0));
+                    $totalTaxExclusiveAmount += NumberUtil::asMoneyVal($lineContext->getAs("taxExclusiveAmount", 0));
+                    $totalTaxInclusiveAmount += NumberUtil::asMoneyVal($lineContext->getAs("taxInclusiveAmount", 0));
+                    $totalAllowanceTotalAmount += NumberUtil::asMoneyVal($lineContext->getAs("allowanceTotalAmount", 0));
+                    $totalChargeTotalAmount += NumberUtil::asMoneyVal($lineContext->getAs("chargeTotalAmount", 0));
+                    $totalPayableAmount += NumberUtil::asMoneyVal($lineContext->getAs("payableAmount", 0));
+                }
             }
         }
+        
+        // Set LegalMonetaryTotal values
+        $this->legalMonetaryTotal->lineExtensionAmount = $totalLineExtensionAmount;
+        $this->legalMonetaryTotal->taxExclusiveAmount = $totalTaxExclusiveAmount;
+        $this->legalMonetaryTotal->taxInclusiveAmount = $totalTaxInclusiveAmount;
+        $this->legalMonetaryTotal->allowanceTotalAmount = $totalAllowanceTotalAmount;
+        $this->legalMonetaryTotal->chargeTotalAmount = $totalChargeTotalAmount;
+        $this->legalMonetaryTotal->payableAmount = $totalPayableAmount;
+        $this->legalMonetaryTotal->currencyID = $this->documentCurrencyCode;
     }
 }

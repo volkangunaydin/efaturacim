@@ -15,6 +15,11 @@ class InvoiceLine extends UblDataType
     public ?InvoicedQuantity $invoicedQuantity = null;
 
     public ?LineExtensionAmount $lineExtensionAmount = null;
+    public ?TaxExclusiveAmount $taxExclusiveAmount = null;
+    public ?TaxInclusiveAmount $taxInclusiveAmount = null;
+    public ?AllowanceTotalAmount $allowanceTotalAmount = null;
+    public ?ChargeTotalAmount $chargeTotalAmount = null;
+    public ?PayableAmount $payableAmount = null;
     
 
     /**     
@@ -41,6 +46,11 @@ class InvoiceLine extends UblDataType
         $this->allowanceCharge = new UblDataTypeList(AllowanceCharge::class);
         $this->withholdingTaxTotal = new UblDataTypeList(WithholdingTaxTotal::class);
         $this->lineExtensionAmount = new LineExtensionAmount();
+        $this->taxExclusiveAmount = new TaxExclusiveAmount();
+        $this->taxInclusiveAmount = new TaxInclusiveAmount();
+        $this->allowanceTotalAmount = new AllowanceTotalAmount();
+        $this->chargeTotalAmount = new ChargeTotalAmount();
+        $this->payableAmount = new PayableAmount();
         $this->taxTotal = new TaxTotal();
         $this->item = new Item();
         $this->price = new Price();
@@ -192,13 +202,68 @@ class InvoiceLine extends UblDataType
     }
     public function getLineExtensionAmount(){
         if(!is_null($this->lineExtensionAmount)){
-            return $this->lineExtensionAmount;
+            return $this->lineExtensionAmount->toNumber();
         }
         return $this->calculateLineExtensionAmount();
     }
+    
+    public function getTaxExclusiveAmount(){
+        $lineExtensionAmount = $this->getLineExtensionAmount();
+        $allowanceTotalAmount = $this->getAllowanceTotalAmount();
+        $chargeTotalAmount = $this->getChargeTotalAmount();
+        
+        // TaxExclusiveAmount: lineExtensionAmount - indirimler + vergiler
+        $taxExclusiveAmount = $lineExtensionAmount - $allowanceTotalAmount + $chargeTotalAmount;
+        
+        return NumberUtil::asMoneyVal($taxExclusiveAmount);
+    }
+    
+    public function getTaxInclusiveAmount(){
+        $taxExclusiveAmount = $this->getTaxExclusiveAmount();
+        $taxAmount = NumberUtil::asMoneyVal($this->taxTotal->taxAmount ?? 0);
+        return NumberUtil::asMoneyVal($taxExclusiveAmount + $taxAmount);
+    }
+    
+    public function getAllowanceTotalAmount(){
+        $allowanceTotalAmount = 0;
+        if ($this->allowanceCharge && $this->allowanceCharge->list) {
+            foreach ($this->allowanceCharge->list as $allowanceCharge) {
+                if ($allowanceCharge instanceof AllowanceCharge && 
+                    isset($allowanceCharge->chargeIndicator) && 
+                    $allowanceCharge->chargeIndicator === false) {
+                    $allowanceTotalAmount += NumberUtil::asMoneyVal($allowanceCharge->amount ?? 0);
+                }
+            }
+        }
+        return $allowanceTotalAmount;
+    }
+    
+    public function getChargeTotalAmount(){
+        $chargeTotalAmount = 0;
+        if ($this->allowanceCharge && $this->allowanceCharge->list) {
+            foreach ($this->allowanceCharge->list as $allowanceCharge) {
+                if ($allowanceCharge instanceof AllowanceCharge && 
+                    isset($allowanceCharge->chargeIndicator) && 
+                    $allowanceCharge->chargeIndicator === true) {
+                    $chargeTotalAmount += NumberUtil::asMoneyVal($allowanceCharge->amount ?? 0);
+                }
+            }
+        }
+        return $chargeTotalAmount;
+    }
+    
+    public function getPayableAmount(){
+        return $this->getTaxInclusiveAmount();
+    }
     public function getContextArray(){
+        // If we have calculated values, return them
+        if (isset($this->contextArray)) {
+            return $this->contextArray;
+        }
+        
+        // Otherwise return basic line extension amount
         return new Options(array(
-            "lineExtensionAmount"=>$this->getLineExtensionAmount()
+            "lineExtensionAmount" => $this->getLineExtensionAmount()
         ));
     }
     public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)   {        
@@ -213,9 +278,50 @@ class InvoiceLine extends UblDataType
         if(!is_null($kdvKey)){
             $kdv  = &$this->taxTotal->taxSubtotal->list[$kdvKey];
             if($kdv instanceof TaxSubtotal){
-                $kdv->taxableAmount = $this->lineExtensionAmount->toNumber();
-                $kdv->taxAmount     = NumberUtil::asMoneyVal( ($this->lineExtensionAmount->toNumber()*$kdv->percent/100));
+                // KDV matrahı: lineExtensionAmount + vergiler
+                $taxableAmount = $this->lineExtensionAmount->toNumber();
+                
+                // AllowanceCharge'dan vergileri topla
+                if ($this->allowanceCharge && $this->allowanceCharge->list) {
+                    foreach ($this->allowanceCharge->list as $allowanceCharge) {
+                        if ($allowanceCharge instanceof AllowanceCharge && 
+                            isset($allowanceCharge->chargeIndicator) && 
+                            $allowanceCharge->chargeIndicator === true) {
+                            $taxableAmount += NumberUtil::asMoneyVal($allowanceCharge->amount ?? 0);
+                        }
+                    }
+                }
+                
+                $kdv->taxableAmount = $taxableAmount;
+                $kdv->taxAmount     = NumberUtil::asMoneyVal($taxableAmount * $kdv->percent / 100);
             }
         }
+        
+        // Calculate LegalMonetaryTotal values for this line
+        $this->calculateLegalMonetaryTotal();
+    }
+    
+    /**
+     * Calculate LegalMonetaryTotal values for this invoice line
+     */
+    private function calculateLegalMonetaryTotal()
+    {
+        // Get calculated values using get methods
+        $lineExtensionAmount = $this->getLineExtensionAmount();
+        $taxExclusiveAmount = $this->getTaxExclusiveAmount();
+        $taxInclusiveAmount = $this->getTaxInclusiveAmount();
+        $allowanceTotalAmount = $this->getAllowanceTotalAmount();
+        $chargeTotalAmount = $this->getChargeTotalAmount();
+        $payableAmount = $this->getPayableAmount();
+        
+        // Store calculated values in context for parent document
+        $this->contextArray = new Options(array(
+            "lineExtensionAmount" => $lineExtensionAmount,
+            "taxExclusiveAmount" => $taxExclusiveAmount,
+            "taxInclusiveAmount" => $taxInclusiveAmount,
+            "allowanceTotalAmount" => $allowanceTotalAmount,
+            "chargeTotalAmount" => $chargeTotalAmount,
+            "payableAmount" => $payableAmount
+        ));
     }
 }
