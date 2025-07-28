@@ -239,7 +239,7 @@ class InvoiceDocument extends UblDocument
         return false;
     }
 
-
+     
     public function loadFromXml($xmlString,$debug=false): static{
         $arr  = XmlToArray::xmlStringToArray($xmlString,false);
         if($arr && is_array($arr) && key_exists("Invoice",$arr)){
