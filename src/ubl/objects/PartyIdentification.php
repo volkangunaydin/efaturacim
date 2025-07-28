@@ -14,7 +14,10 @@ class PartyIdentification extends UblDataType
     }
 
     public function setValue($value,$schemeID=null){
-        $this->id = $value;        
+        $this->id->textContent = $value;        
+        if(StrUtil::notEmpty($schemeID)){
+            $this->id->attributes['schemeID'] = $schemeID;
+        }        
         return $this;
     }
     public function setPropertyFromOptions($k,$v,$options){        

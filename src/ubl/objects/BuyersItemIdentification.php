@@ -11,10 +11,9 @@ class BuyersItemIdentification extends UblDataType
 
     public function __construct($options = null)
     {
-        parent::__construct($options);
-        if (is_array($options) && isset($options['id'])) {
-            $this->id = $options['id'];
-        }
+        parent::__construct($options);     
+    }
+    public function initMe(){
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement

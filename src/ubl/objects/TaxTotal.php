@@ -20,10 +20,10 @@ class TaxTotal extends UblDataType
     public function __construct($options = null)
     {
         parent::__construct($options);
+    }
+    public function initMe()
+    {
         $this->taxSubtotal = new UblDataTypeList(TaxSubtotal::class);
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
     }
 
     public function addTaxSubtotal(array $options, $context = null): self
@@ -70,14 +70,14 @@ class TaxTotal extends UblDataType
 
         $element = $document->createElement('cac:TaxTotal');
 
-        if (!is_null($this->taxAmount)) {
-            
-            $this->appendElement( $document, $element,'cbc:TaxAmount', number_format((float) $this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID]
-            );
+        if (!is_null($this->taxAmount)) {            
+            $this->appendElement( $document, $element,'cbc:TaxAmount', number_format((float) $this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID] );
         }
 
-        foreach ($this->taxSubtotal->list as $subtotal) {
-            $this->appendChild($element, $subtotal->toDOMElement($document));
+        foreach ($this->taxSubtotal->list as $subtotal) {            
+            if ($subtotal instanceof TaxSubtotal) {
+                $this->appendChild($element, $subtotal->toDOMElement($document));
+            }            
         }
 
         return $element;

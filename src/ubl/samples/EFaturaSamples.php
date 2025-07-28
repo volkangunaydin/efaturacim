@@ -1,15 +1,66 @@
 <?php
 namespace Efaturacim\Util\Ubl\Samples;
 
+use Efaturacim\Util\ArrayUtil;
 use Efaturacim\Util\IO\IO_Util;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PartyIdentification;
 use Efaturacim\Util\Ubl\Objects\PartyName;
 use Efaturacim\Util\Ubl\Turkce\EFaturaBelgesi;
+use PDO;
 use Vulcan\Base\Debug\DebugUtil;
 use Vulcan\Base\Util\StringUtil\StrSerialize;
 
 class EFaturaSamples{
+    public static function callDebugAction(){
+        $extraOptions = array("fatura_no"=>"TST2025000000001","uid"=>"f499cac5-7fee-4f67-9c48-f760c11ca83e");
+        $efatura = EFaturaSamples::newFatura("",$extraOptions);
+        $efatura->ubl->addLineFromArray(array("id"=>1,"InvoicedQuantity"=>5,"invoicedQuantityUnitCode"=>"NIU","LineExtensionAmount"=>100,"birim_fiyat"=>100,"kdv_orani"=>20));
+        $efatura->showAsXml();        
+    }
+    /**
+     * @param mixed $template
+     * @return EFaturaBelgesi
+     */
+    public static function newFatura($template="",$extraArray=null){
+        $efatura = new EFaturaBelgesi();
+        if($template=="none"){
+        }else{
+            $efatura->setSaticiBilgileri([
+                "unvan" => "G YAZILIM LTD",
+                "vkn" => "3880628557",
+                "mersis"=>"0388062855700013",
+                "ticari_sicil"=>"276743",
+                "vergi_dairesi" => "Segmenler",
+                "sokak" => "Halit Ziya Cad",
+                "bina" => "19",
+                "ilce" => "CANKAYA",
+                "il" => "ANKARA",
+                "telefon" => "0850 420 2344",
+                "eposta" => "orkestra@orkestra.com.tr",
+                "web" => "www.orkestra.com.tr"
+            ]);
+
+            $efatura->setAliciBilgileri([
+                "unvan" => "GUNAYDIN OTOMOTIV - VOLKAN GUNAYDIN",
+                "ad"=>"Volkan",
+                "soyad"=>"Gunaydin",
+                "vkn" => "11111111111",
+                "vergi_dairesi" => "Baskent",
+                "sokak" => "Halit Ziya Cad",
+                "bina" => "19/4",
+                "ilce" => "CANKAYA",
+                "il" => "ANKARA",
+                "telefon" => "0535 555 4979",
+                "eposta" => "volkan@orkestra.com.tr",
+                "web" => "www.gyazilim.com"
+            ]);            
+            if(ArrayUtil::notEmpty(arr: $extraArray)){
+                $efatura->ubl->loadFromArray($extraArray);
+            }            
+        }
+        return $efatura;
+    }
     public static function getCurrentDebugFatura(){
         $debug = false;
         if(false){                        

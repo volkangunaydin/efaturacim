@@ -19,11 +19,9 @@ class AllowanceCharge extends UblDataType
     public function __construct($options = null)
     {
         parent::__construct($options);
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
     }
-
+    public function initMe(){
+    }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         if (in_array($k, ['chargeIndicator', 'is_charge']) && is_bool($v)) {

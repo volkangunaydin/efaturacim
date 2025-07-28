@@ -20,14 +20,12 @@ class TaxSubtotal extends UblDataType
 
     public function __construct($options = null)
     {
-        parent::__construct($options);
-        $this->taxCategory = new TaxCategory();
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
+        parent::__construct($options);                
         //\Vulcan\V::dump($options);
     }
-
+    public function initMe(){
+        $this->taxCategory = new TaxCategory();
+    }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         if (in_array($k, ['taxableAmount', 'matrah']) && is_numeric($v)) {
@@ -52,7 +50,7 @@ class TaxSubtotal extends UblDataType
             $this->taxCategory->taxScheme->name = $v; 
             return true;
         }
-        if (in_array($k, ['TaxTypeCode','taxTypeCode','vergi_kodu']) && StrUtil::notEmpty($v)) {
+        if (in_array($k, ['TaxTypeCode','taxTypeCode','vergi_kodu']) && StrUtil::notEmpty($v)) {            
             $this->taxCategory->taxScheme->taxTypeCode  = $v;
             return true;
         }

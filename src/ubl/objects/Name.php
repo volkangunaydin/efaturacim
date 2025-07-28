@@ -20,7 +20,7 @@ class Name extends UblDataType{
         // cbc:Note is a simple element with just a text value.
         return $this->createElement($document,'cbc:Name');
     }
-    public static function newNote($str){
-        return new Note(array("value"=>$str));
+    public static function newName($str){
+        return new Name(array("value"=>$str));
     }
 }

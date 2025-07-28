@@ -19,11 +19,11 @@ class WithholdingTaxTotal extends UblDataType
 
     public function __construct($options = null)
     {
-        parent::__construct($options);
+        parent::__construct($options);                
+    }
+    public function initMe()
+    {
         $this->taxSubtotal = new UblDataTypeList(TaxSubtotal::class);
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
     }
 
     public function addTaxSubtotal(array $options, $context = null): self

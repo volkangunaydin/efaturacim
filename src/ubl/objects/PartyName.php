@@ -18,6 +18,12 @@ class PartyName extends UblDataType
         }   
         return false;
     }
+    public function setName($name){
+        $this->name->textContent = $name;
+    }
+    public function getName(){
+        return $this->name->textContent;
+    }
     public function toDOMElement(DOMDocument $document){
         if($this->isEmpty()){ return null; }
         $element = $this->createElement($document,'cac:PartyName');        

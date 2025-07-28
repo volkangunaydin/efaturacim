@@ -237,5 +237,14 @@ class StrUtil{
             }
             return null;
         }                
-
+        public static function trimAllExceptNumbers($s){
+            if (is_null($s) || !is_scalar($s)) {
+                return '';
+            }
+            return preg_replace('/[^0-9]/', '', (string) $s);
+        }
+        public static function len($str) {
+            if (is_null($str) || !is_scalar($str)) { return 0;}
+            return strlen((string)"".$str);
+        }        
 }

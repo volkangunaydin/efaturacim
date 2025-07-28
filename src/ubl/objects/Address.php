@@ -15,10 +15,11 @@ class Address extends UblDataType
     public ?String $citySubdivisionName = null;
     public ?Country $country = null;
     public function __construct($options = null){
-        parent::__construct($options);
-        $this->country = new Country();        
+        parent::__construct($options);     
     }
-
+    public function initMe(){
+        $this->country = new Country();
+    }
     public function setPropertyFromOptions($k,$v,$options){
         if(in_array($k,array("sokak")) && StrUtil::notEmpty($v)){
             $this->streetName = $v;

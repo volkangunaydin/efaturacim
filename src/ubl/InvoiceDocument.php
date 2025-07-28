@@ -137,7 +137,8 @@ class InvoiceDocument extends UblDocument
      */
     public function toXml(): string
     {
-        $this->rebuildValues();
+        $this->getGUID();
+        $this->rebuildValues();        
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
         $this->setNamespaces();
@@ -212,16 +213,19 @@ class InvoiceDocument extends UblDocument
      */
     public function setPropertyFromOptions($k, $v, $options)
     {
+        
         if (in_array($k, array("fatura_no", "faturano", "belgeno")) && StrUtil::notEmpty($v)) {
             $this->id = $v;
+            return true;        
+        } else if (in_array($k, array("guid", "uid","uuid")) && StrUtil::notEmpty($v)) {
+            $this->uuid = $v;
             return true;
         } else if (in_array($k, array("note", "notes")) && ArrayUtil::notEmpty($v)) {
             foreach ($v as $vv) {
                 $this->note->add(Note::newNote($vv));
             }
             return true;
-        } else if (in_array($k, array("invoiceLine", "satirlar", "lines")) && ArrayUtil::notEmpty($v)) {
-            \Vulcan\V::dump($k);
+        } else if (in_array($k, array("invoiceLine", "satirlar", "lines")) && ArrayUtil::notEmpty($v)) {            
             foreach ($v as $vv) {
                 $this->invoiceLine->add(InvoiceLine::newLine($vv), null, null, $this->getContextArray());
             }
@@ -275,10 +279,8 @@ class InvoiceDocument extends UblDocument
     public function getContextArray()
     {
         return new Options(array(
-            "nextLineId" => $this->invoiceLine->getCount() + 1
-            ,
-            "documentCurrencyCode" => $this->documentCurrencyCode
-            ,
+            "nextLineId" => $this->invoiceLine->getCount() + 1,
+            "documentCurrencyCode" => $this->documentCurrencyCode,
             "invoiceTypeCode" => $this->invoiceTypeCode
         ));
     }

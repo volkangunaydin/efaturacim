@@ -6,39 +6,41 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\StrNameSurname;
 
 class Party extends UblDataType
 {
     public ?string $websiteURI = null;
     public ?PartyName $partyName = null;
     public ?Address $postalAddress = null;
-    public ?UblDataTypeList $partyIdentification = null;
+    public ?UblDataTypeListForPartyIdentification $partyIdentification = null;
     public ?PartyTaxScheme $partyTaxScheme = null;
     public ?Contact $contact = null;
+    public ?Person $person = null;
 
     public function __construct($options=null)
     {
         // Initialize composed objects
         parent::__construct($options);
+    }
+    public function initMe(){
         $this->postalAddress       = new Address();
-        $this->partyIdentification = new UblDataTypeList(PartyIdentification::class);
+        $this->partyIdentification = new UblDataTypeListForPartyIdentification(PartyIdentification::class);
         $this->partyTaxScheme      = new PartyTaxScheme();
         $this->contact             = new Contact();
         $this->partyName           = new PartyName();
-        if(!is_null($this->options)){
-            $this->loadFromOptions($this->options);
-        }        
+        $this->person              = new Person();
     }
     public function setPropertyFromOptions($k,$v,$options){
-        if(in_array($k,array("name","unvan","cari_adi")) && StrUtil::notEmpty($v)){
-            $this->partyName = $v;
+        if(in_array($k,array("party_name","musteri_adi","unvan","cari_adi")) && StrUtil::notEmpty($v)){            
+            $this->partyName->setName($v);            
             return true;
+        } else if (in_array($k, array("mersis", "mersisno")) && StrUtil::notEmpty($v)) {                        
+            $this->partyIdentification->setMersisNo($v);
+        } else if (in_array($k, array("ticaret_sicil_no", "ticaret_sicil","sicil","ticaretsicilno","ticari_sicil")) && StrUtil::notEmpty($v)) {                                    
+            $this->partyIdentification->setTicaretSicilNo($v);
         }else if(in_array($k,array("vkn","tckn","tc","vergino","vergi_no")) && StrUtil::notEmpty($v)){
-            if(strlen($v)==11){
-                $this->partyIdentification->setValue("".$v,"TCKN");
-            }else{
-                $this->partyIdentification->setValue("".$v,"VKN");
-            }
+            $this->partyIdentification->setVkn($v);
             return true;
         }else if(in_array($k,array("vergi_dairesi","vergidairesi")) && StrUtil::notEmpty($v)){
             return $this->partyTaxScheme->setPropertyFromOptions($k, $v, $options);
@@ -50,26 +52,52 @@ class Party extends UblDataType
             $this->websiteURI = $v;
             return true;
         }else{
+            if ($this->person->setPropertyFromOptions($k, $v, $options)) {
+                return true;
+            }
             //\Vulcan\V::dump(array($k,$v,$options));
         }
         return false;
     }
-
+    public function getPartyName(){
+        return $this->partyName->getName();
+    }
+    public function getVknOrTckn(){
+        $key1 = $this->partyIdentification->getKeyForSchemeID("TCKN");        
+        if(!is_null($key1) && strlen("".$this->partyIdentification[$key1]->getValue())>0 ){
+            return $this->partyIdentification[$key1]->getValue();    
+        }
+        $key2 = $this->partyIdentification->getKeyForSchemeID("VKN");
+        if(!is_null($key2) && strlen("".$this->partyIdentification[$key2]->getValue())>0 ){
+            return $this->partyIdentification[$key2]->getValue();    
+        }
+        return null;
+    }
+    public function isRealPerson(){
+        $key = $this->partyIdentification->getKeyForSchemeID("TCKN");
+        if(!is_null($key)){
+            return true;
+        }
+        return false;
+    }
     public function toDOMElement(DOMDocument $document)    {
         if($this->isEmpty()){ return null;  }        
         $element = $document->createElement('cac:Party');        
         if(StrUtil::notEmpty($this->websiteURI)){
             $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
         }        
-        
-        $partyNameElement = $this->appendElement($document, $element, 'cac:PartyName', '');        
-        if(StrUtil::notEmpty($this->partyName)){            
-            $this->appendElement($document, $partyNameElement, 'cbc:Name', $this->partyName);
-        }                
+        $this->appendChild($element,$this->partyName->toDOMElement($document));
         $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
         $this->appendChild($element,$this->postalAddress->toDOMElement($document));
         $this->appendChild($element,$this->partyTaxScheme->toDOMElement($document));
-        $this->appendChild($element,$this->contact->toDOMElement($document));                
+        $this->appendChild($element,$this->contact->toDOMElement($document));
+        if($this->isRealPerson() && $this->person->isEmpty()){
+            $r = StrNameSurname::getAsResult($this->getPartyName());
+            if($r->isOK()){
+                $this->person->setNameSurname($r->getAttribute("name"),$r->getAttribute("surname"));
+            }            
+        }
+        $this->appendChild($element,$this->person->toDOMElement($document));
         return $element;
     }
     public function isEmpty(){        

@@ -14,11 +14,10 @@ class TaxCategory extends UblDataType
 
     public function __construct($options = null)
     {
-        parent::__construct($options);
+        parent::__construct($options);        
+    }
+    public function initMe(){
         $this->taxScheme = new TaxScheme();
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool

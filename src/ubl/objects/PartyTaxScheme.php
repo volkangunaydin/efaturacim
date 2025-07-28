@@ -12,12 +12,10 @@ class PartyTaxScheme extends UblDataType
     public function __construct($options = null)
     {
         parent::__construct($options);
-        $this->taxScheme = new TaxScheme();
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
     }
-
+    public function initMe(){
+        $this->taxScheme = new TaxScheme();
+    }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         // Pass options down to the child TaxScheme object.

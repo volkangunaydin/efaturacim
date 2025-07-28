@@ -118,7 +118,9 @@ abstract class UblDocument{
         $this->profileId = $profileId;
         return $this;
     }
-
+    public function getId(){
+        return $this->id;
+    }
     /**
      * Sets the document ID.
      *
@@ -144,7 +146,12 @@ abstract class UblDocument{
         $this->uuid = $uuid;
         return $this;
     }
-
+    public function getGUID(){
+        if(is_null($this->uuid) || $this->uuid==""){
+           $this->uuid = StrUtil::getGUID();     
+        }
+        return $this->uuid;
+    }
     /**
      * Sets the issue date.
      *

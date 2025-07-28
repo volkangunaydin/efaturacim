@@ -18,12 +18,10 @@ class AdditionalDocumentReference extends UblDataType
     public function __construct($options = null)
     {
         parent::__construct($options);
-        $this->attachment = new Attachment();
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
     }
-
+    public function initMe(){
+        $this->attachment = new Attachment();
+    }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         if (in_array($k, ['id', 'belge_no']) && StrUtil::notEmpty($v)) {

@@ -16,6 +16,9 @@ class Country extends UblDataType{
             $this->identificationCode = $identificationCode;
             $this->name = $name;
         }        
+    }    
+    public function isEmpty(): bool{
+        return StrUtil::isEmpty($this->identificationCode) && StrUtil::isEmpty($this->name);
     }
     public function setPropertyFromOptions($k,$v,$options){
         if(in_array($k,array("ulke_kodu","code","id")) && StrUtil::notEmpty($v)){

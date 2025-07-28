@@ -11,13 +11,11 @@ class Attachment extends UblDataType
 
     public function __construct($options = null)
     {
-        parent::__construct($options);
-        $this->embeddedDocumentBinaryObject = new EmbeddedDocumentBinaryObject();
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
+        parent::__construct($options);        
     }
-
+    public function initMe(){
+        $this->embeddedDocumentBinaryObject = new EmbeddedDocumentBinaryObject();
+    }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         // Pass options down to the child EmbeddedDocumentBinaryObject object.

@@ -9,6 +9,10 @@ class UblDataTypeList{
     public $list = array();
     public function __construct($class){
         $this->className = $class;
+        $this->initMe();
+    }
+    public function initMe(){
+        
     }
     public function isEmpty(){
         if(count($this->list)==0){
@@ -27,7 +31,7 @@ class UblDataTypeList{
             $this->list[] = $obj;
         }else{
             $this->list[$key] = $obj;
-        }
+        }        
     }
     public function getCount(){
         return count($this->list);

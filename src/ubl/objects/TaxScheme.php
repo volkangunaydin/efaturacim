@@ -15,9 +15,6 @@ class TaxScheme extends UblDataType
     public function __construct($options = null)
     {
         parent::__construct($options);
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool

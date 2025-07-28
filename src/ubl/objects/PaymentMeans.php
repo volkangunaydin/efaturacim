@@ -13,13 +13,11 @@ class PaymentMeans extends UblDataType
 
     public function __construct($options = null)
     {
-        parent::__construct($options);
-        $this->payeeFinancialAccount = new PayeeFinancialAccount();
-        if (!is_null($this->options)) {
-            $this->loadFromOptions($this->options);
-        }
+        parent::__construct($options);        
     }
-
+    public function initMe(){
+        $this->payeeFinancialAccount = new PayeeFinancialAccount();
+    }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         if (in_array($k, ['paymentMeansCode', 'odeme_sekli_kodu']) && StrUtil::notEmpty($v)) {
