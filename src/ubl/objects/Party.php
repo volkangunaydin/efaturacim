@@ -32,7 +32,7 @@ class Party extends UblDataType
         $this->person              = new Person();
     }
     public function setPropertyFromOptions($k,$v,$options){
-        if(in_array($k,array("party_name","musteri_adi","unvan","cari_adi")) && StrUtil::notEmpty($v)){            
+        if(in_array($k,array("party_name","musteri_adi","unvan","cari_adi","partyName")) && StrUtil::notEmpty($v)){            
             $this->partyName->setName($v);            
             return true;
         } else if (in_array($k, array("mersis", "mersisno")) && StrUtil::notEmpty($v)) {                        
@@ -85,8 +85,10 @@ class Party extends UblDataType
         $element = $document->createElement('cac:Party');        
         if(StrUtil::notEmpty($this->websiteURI)){
             $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
-        }        
-        $this->appendChild($element,$this->partyName->toDOMElement($document));
+        }                
+        if(!$this->partyName->isEmpty()){            
+            $element->appendChild($this->partyName->toDOMElement($document));
+        }                
         $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
         $this->appendChild($element,$this->postalAddress->toDOMElement($document));
         $this->appendChild($element,$this->partyTaxScheme->toDOMElement($document));
