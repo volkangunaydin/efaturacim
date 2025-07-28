@@ -74,7 +74,28 @@ trait UblDataTrait{
                     if(!in_array($k_upper,$paramArray)){$paramArray[] = $k_upper;}                    
                     $isFound = false;                    
                     foreach($paramArray as $paramName){
-                        if(property_exists($this,$paramName)){
+                        $key = null;
+                        if($isFound===false && method_exists($this,"getPropertyAlias")){
+                            $key = $this->getPropertyAlias($k,$v);
+                            if(!is_null($key) && strlen("".$key)>0){
+                                if(is_array($v)){
+                                    $this->loadFromArray( array("".$key => $v),$depth+1);
+                                }
+                            }
+                        }
+                        if($isFound===false && method_exists($this,"setPropertyFromOptions")){
+                            $isPropertyOptionIsOK = false;
+                            if(!is_null($key) && strlen("".$key)>0){
+                                $isPropertyOptionIsOK = $this->setPropertyFromOptions($key,$v,null);
+                            }else{
+                                $isPropertyOptionIsOK = $this->setPropertyFromOptions($k,$v,null);
+                            }                        
+                            if($isPropertyOptionIsOK===true){
+                                $isFound = true;
+                            }
+                        }
+                        // OTOMATIK ASSIGN ISLENMLERI
+                        if($isFound===false && property_exists($this,$paramName)){
                             if($paramName=="lineExtensionAmount"){
                                 //\Vulcan\V::dump($arr);
                                 //$isDebug = true;
@@ -125,22 +146,7 @@ trait UblDataTrait{
                             break;
                         }                        
                     }
-                    $key = null;
-                    if($isFound===false && method_exists($this,"getPropertyAlias")){
-                        $key = $this->getPropertyAlias($k,$v);
-                        if(!is_null($key) && strlen("".$key)>0){
-                            if(is_array($v)){
-                                $this->loadFromArray( array("".$key => $v),$depth+1);
-                            }
-                        }
-                    }
-                    if($isFound===false && method_exists($this,"setPropertyFromOptions")){
-                        if(!is_null($key) && strlen("".$key)>0){
-                            $this->setPropertyFromOptions($key,$v,null);
-                        }else{
-                            $this->setPropertyFromOptions($k,$v,null);
-                        }                        
-                    }
+                    
                 }
             }            
         }else if (is_object($arr) && method_exists($arr,"toArrayOrObject")){

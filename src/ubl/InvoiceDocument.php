@@ -18,12 +18,12 @@ use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
+use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
+use Efaturacim\Util\Utils\xml\XmlToArray;
 use V_UBL_AccountingSupplierParty;
-use Vulcan\Base\Util\StringUtil\StrSerialize;
-use Vulcan\Base\Util\XML\XmlToArray;
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.
@@ -213,18 +213,20 @@ class InvoiceDocument extends UblDocument
      * Skalar degerlerin nasil atnacagi belirtilir
      */
     public function setPropertyFromOptions($k, $v, $options)
-    {
-        
+    {        
         if (in_array($k, array("fatura_no", "faturano", "belgeno")) && StrUtil::notEmpty($v)) {
             $this->id = $v;
             return true;        
         } else if (in_array($k, array("guid", "uid","uuid")) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
-            return true;
-        } else if (in_array($k, array("note", "notes")) && ArrayUtil::notEmpty($v)) {
+            return true;            
+        } else if (in_array($k, array("note", "notes","Note")) && ArrayUtil::notEmpty($v)) {
             foreach ($v as $vv) {
                 $this->note->add(Note::newNote($vv));
             }
+            return true;
+        } else if (in_array($k, array("note", "notes","Note")) && StrUtil::notEmpty($v)) {                        
+            $this->note->add(Note::newNote($v));
             return true;
         } else if (in_array($k, array("invoiceLine", "satirlar", "lines")) && ArrayUtil::notEmpty($v)) {            
             foreach ($v as $vv) {
@@ -241,7 +243,7 @@ class InvoiceDocument extends UblDocument
 
      
     public function loadFromXml($xmlString,$debug=false): static{
-        $arr  = XmlToArray::xmlStringToArray($xmlString,false);
+        $arr  = XmlToArray::xmlStringToArray($xmlString,false);        
         if($arr && is_array($arr) && key_exists("Invoice",$arr)){
             $this->loadFromArray($arr["Invoice"],0,$debug);
             //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
