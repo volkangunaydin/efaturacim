@@ -20,7 +20,7 @@ class InvoiceLine extends UblDataType
     public ?AllowanceTotalAmount $allowanceTotalAmount = null;
     public ?ChargeTotalAmount $chargeTotalAmount = null;
     public ?PayableAmount $payableAmount = null;
-    
+
 
     /**     
      * @var UblDataTypeList
@@ -38,6 +38,7 @@ class InvoiceLine extends UblDataType
     public ?TaxTotal $taxTotal = null;
     public ?Item $item = null;
     public ?Price $price = null;
+
 
     
     public function initMe(){
@@ -255,16 +256,19 @@ class InvoiceLine extends UblDataType
     public function getPayableAmount(){
         return $this->getTaxInclusiveAmount();
     }
-    public function getContextArray(){
-        // If we have calculated values, return them
-        if (isset($this->contextArray)) {
-            return $this->contextArray;
+    public function ensureOptions(){
+        if(is_null($this->options)){
+            $this->options = new Options();
         }
-        
-        // Otherwise return basic line extension amount
-        return new Options(array(
-            "lineExtensionAmount" => $this->getLineExtensionAmount()
-        ));
+    }
+    public function getContextArray(){
+        $this->ensureOptions();
+        $arr = $this->options->getAs("context_array",array());
+        if(count($arr)==0){
+            $this->rebuildValues();            
+            $arr = $this->options->getAs("context_array",array());
+        }
+        return $arr;
     }
     public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)   {        
         parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);        
@@ -315,13 +319,15 @@ class InvoiceLine extends UblDataType
         $payableAmount = $this->getPayableAmount();
         
         // Store calculated values in context for parent document
-        $this->contextArray = new Options(array(
+        $arr = [
             "lineExtensionAmount" => $lineExtensionAmount,
             "taxExclusiveAmount" => $taxExclusiveAmount,
             "taxInclusiveAmount" => $taxInclusiveAmount,
             "allowanceTotalAmount" => $allowanceTotalAmount,
             "chargeTotalAmount" => $chargeTotalAmount,
             "payableAmount" => $payableAmount
-        ));
+        ];
+        $this->ensureOptions();
+        $this->options->setValue("context_array",$arr);
     }
 }

@@ -97,7 +97,7 @@ abstract class UblDataType{
     }
     public function toArrayOrObject(){        
         $data = get_object_vars($this);        
-        unset($data["options"]); // Exclude options object
+        unset($data["options"]); // Exclude options object        
         // Recursively convert UblDataType objects to arrays/objects.
         foreach ($data as $key => &$value) {
             if (is_object($value) && $value instanceof UblDataType && $value->isEmpty()) {

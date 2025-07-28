@@ -16,5 +16,12 @@ class EFaturaBelgesi extends EBelge{
     public function getFaturaNo(){
         return $this->ubl->getId();
     }
+    public static function fromXmlFile($xmlFile){
+        $a =  new EFaturaBelgesi();
+        if($xmlFile && strlen("".$xmlFile)>0 && file_exists($xmlFile) && is_readable($xmlFile)){
+            $a->ubl->loadFromXml(file_get_contents($xmlFile));            
+        }        
+        return $a;
+    }
 }
 ?>
