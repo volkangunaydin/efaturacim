@@ -12,7 +12,7 @@ class Party extends UblDataType
 {
     public ?string $websiteURI = null;
     public ?PartyName $partyName = null;
-    public ?Address $postalAddress = null;
+    public ?Address $postalAddress = null;  
     public ?UblDataTypeListForPartyIdentification $partyIdentification = null;
     public ?PartyTaxScheme $partyTaxScheme = null;
     public ?Contact $contact = null;

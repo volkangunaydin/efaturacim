@@ -35,11 +35,13 @@ trait UblDataTrait{
         if(!is_null($arr) && is_array($arr)){            
             foreach($arr as $k=>$v){           
                 $paramArray = array();     
-                if(!is_null($v)){                            
+                if(!is_null($v)){      
+                                      
                     if($k=="@attributes" && $this instanceof UblDataType && is_array($v)){                                                
                         if(!is_array($this->attributes)){
                             $this->attributes = array();
                         }
+                        
                         foreach($v as $kk=>$vv){                                                        
                             if($isDebug){                                
                                 $debugArray["log"][] = "Setting attribute named => ".$kk." => ".print_r($vv,true);

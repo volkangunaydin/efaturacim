@@ -8,48 +8,31 @@ use Efaturacim\Util\StrUtil;
 
 class PaymentMeans extends UblDataType
 {
-    public ?string $paymentMeansCode = null;
-    public ?PayeeFinancialAccount $payeeFinancialAccount = null;
-
-    public function __construct($options = null)
-    {
-        parent::__construct($options);        
-    }
+    public ?PaymentMeansCode $paymentMeansCode = null;    
     public function initMe(){
-        $this->payeeFinancialAccount = new PayeeFinancialAccount();
+        $this->paymentMeansCode = new PaymentMeansCode();
     }
-    public function setPropertyFromOptions($k, $v, $options): bool
-    {
-        if (in_array($k, ['paymentMeansCode', 'odeme_sekli_kodu']) && StrUtil::notEmpty($v)) {
-            $this->paymentMeansCode = $v;
-            return true;
-        }
 
-        // Pass other options to payeeFinancialAccount
-        if ($this->payeeFinancialAccount->setPropertyFromOptions($k, $v, $options)) {
-            return true;
-        }
-
+    public function setValue($value,$listID=null){
+        $this->paymentMeansCode->textContent = $value;        
+        if(StrUtil::notEmpty($listID)){
+            $this->paymentMeansCode->attributes['listID'] = $listID;
+        }        
+        return $this;
+    }
+    public function setPropertyFromOptions($k,$v,$options){        
         return false;
     }
-
-    public function isEmpty(): bool
-    {
-        // PaymentMeans must have a code.
-        return StrUtil::isEmpty($this->paymentMeansCode);
-    }
-
-    public function toDOMElement(DOMDocument $document): ?DOMElement
-    {
-        if ($this->isEmpty()) {
-            return null;
-        }
-
-        $element = $document->createElement('cac:PaymentMeans');
-
-        $this->appendElement($document, $element, 'cbc:PaymentMeansCode', $this->paymentMeansCode);
-        $this->appendChild($element, $this->payeeFinancialAccount->toDOMElement($document));
-
+    public function toDOMElement(DOMDocument $document){
+        if($this->isEmpty()){ return null; }
+        $element = $this->createElement($document,'cac:PaymentMeans');        
+        $element->appendChild($this->paymentMeansCode->toDOMElement($document));
         return $element;
+    }
+    public function isEmpty(){
+        if(is_null($this->paymentMeansCode) || $this->paymentMeansCode->isEmpty()){
+            return true;
+        }
+        return false;        
     }
 }

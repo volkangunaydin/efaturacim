@@ -1,0 +1,83 @@
+<?php
+
+namespace Efaturacim\Util\Ubl\Objects;
+
+use DOMDocument;
+use DOMElement;
+use Efaturacim\Util\StrUtil;
+
+class DeliveryAddress extends UblDataType
+{
+    public ?string $streetName = null;
+    public ?string $buildingNumber = null;
+    public ?string $cityName = null;
+    public ?string $postalZone = null;
+    public ?string $citySubdivisionName = null;
+    public ?Country $country = null;
+
+    public function __construct($options = null)
+    {
+        parent::__construct($options);
+    }
+
+    public function initMe(){
+        $this->country = new Country();
+    }
+
+    public function setPropertyFromOptions($k, $v, $options): bool
+    {
+        if(in_array($k,array("sokak")) && StrUtil::notEmpty($v)){
+            $this->streetName = $v;
+            return true;
+        }else if(in_array($k,array("bina")) && StrUtil::notEmpty($v)){
+            $this->buildingNumber = $v;
+            return true;
+        }else if(in_array($k,array("ilce")) && StrUtil::notEmpty($v)){
+            $this->citySubdivisionName = $v;
+            return true;
+        }else if(in_array($k,array("il")) && StrUtil::notEmpty($v)){
+            $this->cityName = $v;
+            return true;
+        }else if(in_array($k,array("posta_kodu")) && StrUtil::notEmpty($v)){
+            $this->postalZone = $v;
+            return true;
+        }else{
+            if (is_null($this->country)) {
+                $this->initMe();
+            }
+            if ($this->country->setPropertyFromOptions($k, $v, $options)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isEmpty(){        
+        return is_null($this->streetName) && 
+               is_null($this->buildingNumber) && 
+               is_null($this->cityName) && 
+               is_null($this->postalZone) && 
+               is_null($this->citySubdivisionName) && 
+               (is_null($this->country) || $this->country->isEmpty());
+    }
+
+    public function toDOMElement(DOMDocument $document): ?DOMElement
+    {
+        $element = $document->createElement('cac:DeliveryAddress');
+        
+        $this->appendElement($document, $element, 'cbc:StreetName', $this->streetName);
+        $this->appendElement($document, $element, 'cbc:BuildingNumber', $this->buildingNumber);
+        $this->appendElement($document, $element, 'cbc:CitySubdivisionName', $this->citySubdivisionName);
+        $this->appendElement($document, $element, 'cbc:CityName', $this->cityName);
+        $this->appendElement($document, $element, 'cbc:PostalZone', $this->postalZone);
+        
+        if ($this->country && !$this->country->isEmpty()) {
+            $countryElement = $this->country->toDOMElement($document);
+            if ($countryElement) {
+                $this->appendChild($element, $countryElement);
+            }
+        }
+        
+        return $element;
+    }
+}

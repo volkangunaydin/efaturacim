@@ -8,6 +8,7 @@ use Efaturacim\Util\ArrayUtil;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
 use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
+use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
 use Efaturacim\Util\Ubl\Objects\TaxTotal;
 use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
@@ -15,6 +16,7 @@ use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
 use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
+use Efaturacim\Util\Ubl\Objects\Delivery;
 use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
@@ -45,6 +47,12 @@ class InvoiceDocument extends UblDocument
      * @var AccountingCustomerParty
      */
     public $accountingCustomerParty = null;
+
+    /**
+     * @var BuyerCustomerParty
+     */
+    public $buyerCustomerParty = null;
+
     /**
      * @var AccountingSupplierParty
      */
@@ -75,6 +83,11 @@ class InvoiceDocument extends UblDocument
      * @var PaymentMeans
      */
     public $paymentMeans = null;
+
+        /**
+     * @var Delivery
+     */
+    public $delivery = null;
     
     public $orderReference = null;
     /**     
@@ -120,6 +133,8 @@ class InvoiceDocument extends UblDocument
         $this->setCopyIndicator(false);
         $this->accountingCustomerParty = new AccountingCustomerParty();
         $this->accountingSupplierParty = new AccountingSupplierParty();
+        $this->buyerCustomerParty = new BuyerCustomerParty();
+        $this->delivery = new Delivery();
         $this->orderReference = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note = new UblDataTypeList(Note::class);
@@ -128,6 +143,7 @@ class InvoiceDocument extends UblDocument
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
         $this->paymentMeans = new PaymentMeans();
+        $this->delivery = new Delivery();
         $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference  = new UblDataTypeList(AdditionalDocumentReference::class);
     }
@@ -159,6 +175,8 @@ class InvoiceDocument extends UblDocument
         $this->appendElementList($this->note);
         $this->appendAccountingSupplierParty();
         $this->appendAccountingCustomerParty();
+        $this->appendBuyerCustomerParty();
+        $this->appendDelivery();
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
         $this->appendPaymentMeans();        
         $this->appendTaxTotal();
@@ -181,6 +199,10 @@ class InvoiceDocument extends UblDocument
     {
         $this->appendElement('cac:AccountingCustomerParty', $this->accountingCustomerParty->toDOMElement($this->document));
     }
+    public function appendBuyerCustomerParty()
+    {
+        $this->appendElement('cac:BuyerCustomerParty', $this->buyerCustomerParty->toDOMElement($this->document));
+    }
     public function appendTaxTotal()
     {
         $this->appendElement('cac:TaxTotal', $this->taxTotal->toDOMElement($this->document));
@@ -196,6 +218,10 @@ class InvoiceDocument extends UblDocument
     public function appendPaymentMeans()
     {
         $this->appendElement('cac:PaymentMeans', $this->paymentMeans->toDOMElement($this->document));
+    }
+    public function appendDelivery()
+    {
+        $this->appendElement('cac:Delivery', $this->delivery->toDOMElement($this->document));
     }
 
     /**
