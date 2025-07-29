@@ -25,6 +25,7 @@ class Attachment extends UblDataType
 
     public function isEmpty(): bool
     {
+        return false;
         return is_null($this->embeddedDocumentBinaryObject) || $this->embeddedDocumentBinaryObject->isEmpty();
     }
 

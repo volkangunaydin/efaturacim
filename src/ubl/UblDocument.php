@@ -205,8 +205,12 @@ abstract class UblDocument{
         /**
      * Helper to create and append a new element if the value is not null.
      */
-    protected function appendElement($name,  $value,$parent = null): void
+    protected function appendElement($name,  $value=null,$parent = null): void
     {
+        if ($name !== null && $name instanceof DOMElement) {
+            ($parent ?? $this->root)->appendChild($name);
+            return;
+        }
         if ($value !== null) {
             if($value && $value instanceof DOMElement){
                 ($parent ?? $this->root)->appendChild($value);

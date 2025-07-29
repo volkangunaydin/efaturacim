@@ -11,6 +11,7 @@ class EmbeddedDocumentBinaryObject extends UblDataType
     public ?string $value = null;
     public ?string $mimeCode = 'application/xml';
     public ?string $encodingCode = 'Base64';
+    public ?string $characterSetCode = '';
     public ?string $filename = null;
 
     public function __construct($options = null)
@@ -41,28 +42,15 @@ class EmbeddedDocumentBinaryObject extends UblDataType
 
     public function isEmpty(): bool
     {
-        return StrUtil::isEmpty($this->value);
+        return false;
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
         if ($this->isEmpty()) {
             return null;
-        }
-
-        $element = $document->createElement('cbc:EmbeddedDocumentBinaryObject', $this->value);
-
-        $attributes = ['mimeCode' => $this->mimeCode, 'encodingCode' => $this->encodingCode];
-        if (StrUtil::notEmpty($this->filename)) {
-            $attributes['filename'] = $this->filename;
-        }
-
-        foreach ($attributes as $attrName => $attrValue) {
-            if (!is_null($attrValue)) {
-                $element->setAttribute($attrName, $attrValue);
-            }
-        }
-
+        }        
+        $element = $this->createElement($document,'cbc:EmbeddedDocumentBinaryObject');        
         return $element;
     }
 }

@@ -64,8 +64,7 @@ class AdditionalDocumentReference extends UblDataType
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
         $this->appendElement($document, $element, 'cbc:IssueDate', $this->issueDate);
         $this->appendElement($document, $element, 'cbc:DocumentType', $this->documentType);
-
-        $this->appendChild($element, $this->attachment->toDOMElement($document));
+        $this->appendElementList($document, $this->attachment,$element);
 
         return $element;
     }

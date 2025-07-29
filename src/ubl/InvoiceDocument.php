@@ -10,6 +10,7 @@ use Efaturacim\Util\StrUtil;
 use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
 use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
 use Efaturacim\Util\Ubl\Objects\TaxTotal;
+use Efaturacim\Util\Ubl\Objects\UBLExtensions;
 use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
 use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
@@ -23,6 +24,7 @@ use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\Party;
+use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
 use Efaturacim\Util\Utils\xml\XmlToArray;
@@ -84,7 +86,11 @@ class InvoiceDocument extends UblDocument
      */
     public $paymentMeans = null;
 
-        /**
+    /**     
+     * @var UblDataType
+     */
+    public $UBLExtensions = null;
+    /**
      * @var Delivery
      */
     public $delivery = null;
@@ -146,6 +152,7 @@ class InvoiceDocument extends UblDocument
         $this->delivery = new Delivery();
         $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference  = new UblDataTypeList(AdditionalDocumentReference::class);
+        $this->UBLExtensions = new UBLExtensions();
     }
     public function setLineCount()
     {
@@ -164,7 +171,8 @@ class InvoiceDocument extends UblDocument
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
         $this->setNamespaces();
-        $this->appendCommonElements();
+        $this->appendElement(null,$this->UBLExtensions->toDOMElement($this->document));
+        $this->appendCommonElements();        
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
 
         // TODO: Implement and call methods to append other required sections:
@@ -181,9 +189,9 @@ class InvoiceDocument extends UblDocument
         $this->appendPaymentMeans();        
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
-        $this->appendPricingExchangeRate();
-        $this->appendElementList($this->invoiceLine);
+        $this->appendPricingExchangeRate();        
         $this->appendLegalMonetaryTotal();
+        $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();
     }
 
