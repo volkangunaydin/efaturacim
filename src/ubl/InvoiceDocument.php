@@ -16,6 +16,7 @@ use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\NumberUtil;
+use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Note;
@@ -23,7 +24,7 @@ use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
 use Efaturacim\Util\Utils\xml\XmlToArray;
-use V_UBL_AccountingSupplierParty;
+
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.
@@ -88,6 +89,10 @@ class InvoiceDocument extends UblDocument
      * @var UblDataTypeList
      */
     public $invoiceLine = null;
+        /**
+     * @var UblDataTypeList
+     */
+    public $additionalDocumentReference = null  ;
 
     // TODO: Add properties for invoice lines, parties, totals etc.
     // public array $invoiceLines = [];
@@ -124,6 +129,7 @@ class InvoiceDocument extends UblDocument
         $this->pricingExchangeRate = new PricingExchangeRate();
         $this->paymentMeans = new PaymentMeans();
         $this->legalMonetaryTotal = new LegalMonetaryTotal();
+        $this->additionalDocumentReference  = new UblDataTypeList(AdditionalDocumentReference::class);
     }
     public function setLineCount()
     {
@@ -147,6 +153,7 @@ class InvoiceDocument extends UblDocument
 
         // TODO: Implement and call methods to append other required sections:
         //$this->appendSignature();
+        $this->appendElementList($this->additionalDocumentReference);
         $this->appendElementList($this->orderReference);
         $this->appendElementList($this->despatchDocumentReference);
         $this->appendElementList($this->note);

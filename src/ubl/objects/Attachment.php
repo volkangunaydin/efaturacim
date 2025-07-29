@@ -17,9 +17,10 @@ class Attachment extends UblDataType
         $this->embeddedDocumentBinaryObject = new EmbeddedDocumentBinaryObject();
     }
     public function setPropertyFromOptions($k, $v, $options): bool
-    {
+    {        
         // Pass options down to the child EmbeddedDocumentBinaryObject object.
-        return $this->embeddedDocumentBinaryObject->setPropertyFromOptions($k, $v, $options);
+        //return $this->embeddedDocumentBinaryObject->setPropertyFromOptions($k, $v, $options);
+        return false;
     }
 
     public function isEmpty(): bool
@@ -34,12 +35,8 @@ class Attachment extends UblDataType
         }
 
         $element = $document->createElement('cac:Attachment');
-
-        $childElement = $this->embeddedDocumentBinaryObject->toDOMElement($document);
-        if ($childElement) {
-            $this->appendChild($element, $childElement);
-        }
-
+        $this->appendChild($element, $this->embeddedDocumentBinaryObject->toDOMElement($document));
+        
         return $element;
     }
 }

@@ -85,7 +85,9 @@ abstract class UblDataType{
                     $el->appendChild($ch);        
                 }        
             }else if ($child instanceof DOMDocumentFragment){
-                $el->appendChild($child);    
+                if ($child->hasChildNodes()) {
+                    $el->appendChild($child);    
+                }                
             }else{
                 $el->appendChild($child);        
             }            

@@ -13,14 +13,18 @@ class AdditionalDocumentReference extends UblDataType
     public ?string $id = null;
     public ?string $issueDate = null;
     public ?string $documentType = null;
-    public ?Attachment $attachment = null;
+    /**
+     * Summary of attachment
+     * @var UblDataTypeList
+     */
+    public  $attachment = null;
 
     public function __construct($options = null)
     {
         parent::__construct($options);
     }
     public function initMe(){
-        $this->attachment = new Attachment();
+        $this->attachment = new UblDataTypeList(Attachment::class);
     }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
@@ -37,14 +41,12 @@ class AdditionalDocumentReference extends UblDataType
             return true;
         }
 
-        // Pass other options to attachment
-        if ($this->attachment->setPropertyFromOptions($k, $v, $options)) {
-            return true;
-        }
-
         return false;
     }
-
+    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true){
+        //\Vulcan\V::dump($arr);
+        return parent::loadFromArray($arr,$depth,$isDebug,$dieOnDebug);
+    }
     public function isEmpty(): bool
     {
         // An AdditionalDocumentReference must have an ID to be valid.
