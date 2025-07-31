@@ -11,6 +11,8 @@ class TaxCategory extends UblDataType
     public ?string $name = null;
     public ?float $percent = null;
     public ?TaxScheme $taxScheme = null;
+    public ?string $taxExemptionReasonCode = null;
+    public ?string $taxExemptionReason = null;
 
     public function __construct($options = null)
     {
@@ -28,6 +30,14 @@ class TaxCategory extends UblDataType
         }
         if (in_array($k, ['percent', 'oran']) && is_numeric($v)) {
             $this->percent = (float)$v;
+            return true;
+        }
+        if (in_array($k, ['taxExemptionReasonCode', 'vergi_muafiyet_kodu']) && StrUtil::notEmpty($v)) {
+            $this->taxExemptionReasonCode = $v;
+            return true;
+        }
+        if (in_array($k, ['taxExemptionReason', 'vergi_muafiyet_nedeni']) && StrUtil::notEmpty($v)) {
+            $this->taxExemptionReason = $v;
             return true;
         }
 
@@ -54,6 +64,8 @@ class TaxCategory extends UblDataType
         $element = $document->createElement('cac:TaxCategory');
 
         $this->appendElement($document, $element, 'cbc:Name', $this->name);
+        $this->appendElement($document, $element, 'cbc:TaxExemptionReasonCode', $this->taxExemptionReasonCode);
+        $this->appendElement($document, $element, 'cbc:TaxExemptionReason', $this->taxExemptionReason);
 
         if ($this->percent !== null) {
             $this->appendElement($document, $element, 'cbc:Percent', number_format($this->percent, 2, '.', ''));

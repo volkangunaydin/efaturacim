@@ -13,6 +13,8 @@ class DeliveryAddress extends UblDataType
     public ?string $cityName = null;
     public ?string $postalZone = null;
     public ?string $citySubdivisionName = null;
+    public ?string $region = null;
+    public ?string $district = null;
     public ?Country $country = null;
 
     public function __construct($options = null)
@@ -40,6 +42,12 @@ class DeliveryAddress extends UblDataType
             return true;
         }else if(in_array($k,array("posta_kodu")) && StrUtil::notEmpty($v)){
             $this->postalZone = $v;
+            return true;
+        }else if(in_array($k,array("bolge")) && StrUtil::notEmpty($v)){
+            $this->region = $v;
+            return true;
+        }else if(in_array($k,array("semt")) && StrUtil::notEmpty($v)){
+            $this->district = $v;
             return true;
         }else{
             if (is_null($this->country)) {
@@ -70,6 +78,8 @@ class DeliveryAddress extends UblDataType
         $this->appendElement($document, $element, 'cbc:CitySubdivisionName', $this->citySubdivisionName);
         $this->appendElement($document, $element, 'cbc:CityName', $this->cityName);
         $this->appendElement($document, $element, 'cbc:PostalZone', $this->postalZone);
+        $this->appendElement($document, $element, 'cbc:Region', $this->region);
+        $this->appendElement($document, $element, 'cbc:District', $this->district);
         
         if ($this->country && !$this->country->isEmpty()) {
             $countryElement = $this->country->toDOMElement($document);
