@@ -26,6 +26,7 @@ abstract class UblDataType{
     public $options = null;
     public $textContent = null;
     public $attributes  = array();
+    public $defaultTagName = "";
     public function __construct($options=null,$debug=false){        
         $this->initMe();
         if($options!=null){

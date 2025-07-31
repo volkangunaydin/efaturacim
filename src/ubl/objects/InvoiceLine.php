@@ -221,7 +221,7 @@ class InvoiceLine extends UblDataType
     
     public function getTaxInclusiveAmount(){
         $taxExclusiveAmount = $this->getTaxExclusiveAmount();
-        $taxAmount = NumberUtil::asMoneyVal($this->taxTotal->taxAmount ?? 0);
+        $taxAmount = $this->taxTotal->taxAmount->toNumber();
         return NumberUtil::asMoneyVal($taxExclusiveAmount + $taxAmount);
     }
     
@@ -296,8 +296,8 @@ class InvoiceLine extends UblDataType
                     }
                 }
                 
-                $kdv->taxableAmount = $taxableAmount;
-                $kdv->taxAmount     = NumberUtil::asMoneyVal($taxableAmount * $kdv->percent / 100);
+                $kdv->taxableAmount->setValue($taxableAmount);
+                $kdv->taxAmount->setValue(NumberUtil::asMoneyVal($taxableAmount * $kdv->percent / 100));
             }
         }
         
@@ -311,12 +311,12 @@ class InvoiceLine extends UblDataType
     private function calculateLegalMonetaryTotal()
     {
         // Get calculated values using get methods
-        $lineExtensionAmount = $this->getLineExtensionAmount();
-        $taxExclusiveAmount = $this->getTaxExclusiveAmount();
-        $taxInclusiveAmount = $this->getTaxInclusiveAmount();
+        $lineExtensionAmount  = $this->getLineExtensionAmount();
+        $taxExclusiveAmount   = $this->getTaxExclusiveAmount();
+        $taxInclusiveAmount   = $this->getTaxInclusiveAmount();
         $allowanceTotalAmount = $this->getAllowanceTotalAmount();
-        $chargeTotalAmount = $this->getChargeTotalAmount();
-        $payableAmount = $this->getPayableAmount();
+        $chargeTotalAmount    = $this->getChargeTotalAmount();
+        $payableAmount        = $this->getPayableAmount();
         
         // Store calculated values in context for parent document
         $arr = [

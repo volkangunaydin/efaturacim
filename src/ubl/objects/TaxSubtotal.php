@@ -9,12 +9,18 @@ use Efaturacim\Util\StrUtil;
 
 class TaxSubtotal extends UblDataType
 {
-    public ?float $taxableAmount = null;
+    /**
+     * Summary of taxableAmount
+     * @var TaxableAmount
+     */
+    public ?TaxableAmount $taxableAmount = null;
     public ?float $percent       = 20;
-    public ?string $taxableAmountCurrencyID = 'TRY';
 
-    public ?float $taxAmount = null;
-    public ?string $taxAmountCurrencyID = 'TRY';
+    /**
+     * Summary of taxAmount
+     * @var TaxAmount
+     */
+    public ?TaxAmount $taxAmount = null;    
 
     public ?TaxCategory $taxCategory = null;
 
@@ -24,26 +30,29 @@ class TaxSubtotal extends UblDataType
         //\Vulcan\V::dump($options);
     }
     public function initMe(){
-        $this->taxCategory = new TaxCategory();
+        $this->taxCategory   = new TaxCategory();
+        $this->taxableAmount = new TaxableAmount();
+        $this->taxAmount     = new TaxAmount();
+        $this->defaultTagName = "cac:TaxSubtotal";
     }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, ['taxableAmount', 'matrah']) && is_numeric($v)) {
-            $this->taxableAmount = (float)$v;
+        if (in_array($k, ['taxableAmount', 'matrah']) && NumberUtil::isNumberString($v)) {
+            $this->taxableAmount->setValue((float)$v);
             return true;
         }
 
-        if (in_array($k, ['taxAmount', 'vergi_tutari']) && is_numeric($v)) {
-            $this->taxAmount = (float)$v;
+        if (in_array($k, ['taxAmount', 'vergi_tutari']) && NumberUtil::isNumberString($v)) {
+            $this->taxAmount->setValue((float)$v);
             return true;
         }
-        if (in_array($k, ['percent',  'kdv_oran','kdv_orani']) && is_numeric($v)) {
+        if (in_array($k, ['percent',  'kdv_oran','kdv_orani']) && NumberUtil::isNumberString($v)) {
             $this->percent = $v;
             return true;
         }
         if (in_array($k, ['currency', 'currencyID', 'para_birimi']) && StrUtil::notEmpty($v)) {
-            $this->taxableAmountCurrencyID = $v;
-            $this->taxAmountCurrencyID = $v;
+            $this->taxableAmount->setCurrencyID($v);
+            $this->taxAmount->setCurrencyID($v);
             return true;
         }
         if (in_array($k, ['name']) && StrUtil::notEmpty($v)) {
@@ -64,6 +73,7 @@ class TaxSubtotal extends UblDataType
 
     public function isEmpty(): bool
     {        
+        return false;
         // A tax subtotal is considered empty if the tax amount is not set,
         // or if the mandatory tax category is empty.
         return is_null($this->taxAmount) || is_null($this->taxCategory) || $this->taxCategory->isEmpty();
@@ -75,18 +85,12 @@ class TaxSubtotal extends UblDataType
             return null;
         }
 
-        $element = $document->createElement('cac:TaxSubtotal');
-
-        if(!is_null($this->taxableAmount)){
-            $this->appendElement($document, $element, 'cbc:TaxableAmount', number_format($this->taxableAmount, 2, '.', ''), ['currencyID' => $this->taxableAmountCurrencyID]);
-        }
-        
-
-        $this->appendElement($document, $element, 'cbc:TaxAmount', number_format($this->taxAmount, 2, '.', ''), ['currencyID' => $this->taxAmountCurrencyID]);
+        $element = $this->createElement($document,$this->defaultTagName);
+        $this->appendChild($element,$this->taxableAmount->toDOMElement($document));
+        $this->appendChild($element,$this->taxAmount->toDOMElement($document));
         if(!is_null($this->percent)){
             $this->appendElement($document, $element, 'cbc:Percent',NumberUtil::asCleanNumber($this->percent));
         }
-
         $this->appendChild($element, $this->taxCategory->toDOMElement($document));
 
         return $element;
