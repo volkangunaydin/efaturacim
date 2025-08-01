@@ -6,7 +6,7 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
-use Vulcan\Base\Util\MathUtil\NumberUtil;
+use Efaturacim\Util\NumberUtil;
 
 class TaxTotal extends UblDataType
 {

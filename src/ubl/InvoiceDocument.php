@@ -69,13 +69,13 @@ class InvoiceDocument extends UblDocument
      */
     public $taxTotal = null;
 
-    
-/**
+
+    /**
      * @var WithholdingTaxTotal
      */
     public $withholdingTaxTotal = null;
 
-    
+
     /**
      * @var PricingExchangeRate
      */
@@ -94,7 +94,7 @@ class InvoiceDocument extends UblDocument
      * @var Delivery
      */
     public $delivery = null;
-    
+
     public $orderReference = null;
     /**     
      * @var UblDataTypeList
@@ -108,10 +108,10 @@ class InvoiceDocument extends UblDocument
      * @var UblDataTypeList
      */
     public $invoiceLine = null;
-        /**
+    /**
      * @var UblDataTypeList
      */
-    public $additionalDocumentReference = null  ;
+    public $additionalDocumentReference = null;
 
     // TODO: Add properties for invoice lines, parties, totals etc.
     // public array $invoiceLines = [];
@@ -151,7 +151,7 @@ class InvoiceDocument extends UblDocument
         $this->paymentMeans = new PaymentMeans();
         $this->delivery = new Delivery();
         $this->legalMonetaryTotal = new LegalMonetaryTotal();
-        $this->additionalDocumentReference  = new UblDataTypeList(AdditionalDocumentReference::class);
+        $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
         $this->UBLExtensions = new UBLExtensions();
     }
     public function setLineCount()
@@ -167,12 +167,12 @@ class InvoiceDocument extends UblDocument
     public function toXml(): string
     {
         $this->getGUID();
-        $this->rebuildValues();        
+        $this->rebuildValues();
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
         $this->setNamespaces();
-        $this->appendElement(null,$this->UBLExtensions->toDOMElement($this->document));
-        $this->appendCommonElements();        
+        $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
+        $this->appendCommonElements();
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
 
         // TODO: Implement and call methods to append other required sections:
@@ -186,10 +186,10 @@ class InvoiceDocument extends UblDocument
         $this->appendBuyerCustomerParty();
         $this->appendDelivery();
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
-        $this->appendPaymentMeans();        
+        $this->appendPaymentMeans();
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
-        $this->appendPricingExchangeRate();        
+        $this->appendPricingExchangeRate();
         $this->appendLegalMonetaryTotal();
         $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();
@@ -220,7 +220,7 @@ class InvoiceDocument extends UblDocument
         $this->appendElement('cac:WithholdingTaxTotal', $this->withholdingTaxTotal->toDOMElement($this->document));
     }
     public function appendPricingExchangeRate()
-    { 
+    {
         $this->appendElement('cac:PricingExchangeRate', $this->pricingExchangeRate->toDOMElement($this->document));
     }
     public function appendPaymentMeans()
@@ -245,8 +245,6 @@ class InvoiceDocument extends UblDocument
             return "accountingCustomerParty";
         } else if (in_array($k, array("notlar", "notes"))) {
             return "note";
-        } else if (in_array($k, array("lines", "satirlar","invoiceLine"))) {
-            return "invoiceLine";
         }
         return null;
     }
@@ -254,24 +252,28 @@ class InvoiceDocument extends UblDocument
      * Skalar degerlerin nasil atnacagi belirtilir
      */
     public function setPropertyFromOptions($k, $v, $options)
-    {        
+    {
         if (in_array($k, array("fatura_no", "faturano", "belgeno")) && StrUtil::notEmpty($v)) {
             $this->id = $v;
-            return true;        
-        } else if (in_array($k, array("guid", "uid","uuid")) && StrUtil::notEmpty($v)) {
+            return true;
+        } else if (in_array($k, array("guid", "uid", "uuid")) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
-            return true;            
-        } else if (in_array($k, array("note", "notes","Note")) && ArrayUtil::notEmpty($v)) {
+            return true;
+        } else if (in_array($k, array("note", "notes", "Note")) && ArrayUtil::notEmpty($v)) {
             foreach ($v as $vv) {
                 $this->note->add(Note::newNote($vv));
             }
             return true;
-        } else if (in_array($k, array("note", "notes","Note")) && StrUtil::notEmpty($v)) {                        
+        } else if (in_array($k, array("note", "notes", "Note")) && StrUtil::notEmpty($v)) {
             $this->note->add(Note::newNote($v));
             return true;
-        } else if (in_array($k, array("invoiceLine", "satirlar", "lines")) && ArrayUtil::notEmpty($v)) {            
-            foreach ($v as $vv) {
-                $this->invoiceLine->add(InvoiceLine::newLine($vv), null, null, $this->getContextArray());
+        } else if (in_array($k, array("invoiceLine", "satirlar", "lines", "InvoiceLine")) && ArrayUtil::notEmpty($v)) {
+            if (ArrayUtil::isAssoc($v)) {
+                $this->invoiceLine->add(InvoiceLine::newLine($v), null, null, $this->getContextArray());
+            } else {
+                foreach ($v as $vv) {
+                    $this->invoiceLine->add(InvoiceLine::newLine($vv), null, null, $this->getContextArray());
+                }
             }
             return true;
         } else if (in_array($k, array("note", "notes")) && StrUtil::notEmpty($v)) {
@@ -282,11 +284,12 @@ class InvoiceDocument extends UblDocument
         return false;
     }
 
-     
-    public function loadFromXml($xmlString,$debug=false): static{
-        $arr  = XmlToArray::xmlStringToArray($xmlString,false);        
-        if($arr && is_array($arr) && key_exists("Invoice",$arr)){
-            $this->loadFromArray($arr["Invoice"],0,$debug);
+
+    public function loadFromXml($xmlString, $debug = false): static
+    {
+        $arr = XmlToArray::xmlStringToArray($xmlString, false);
+        if ($arr && is_array($arr) && key_exists("Invoice", $arr)) {
+            $this->loadFromArray($arr["Invoice"], 0, $debug);
             //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
         }
         //\Vulcan\V::dump($arr["Invoice"]["AccountingCustomerParty"]["Party"]);
@@ -296,10 +299,11 @@ class InvoiceDocument extends UblDocument
     /**
      * Sets the standard UBL namespaces on the root element.
      */
-    protected function setNamespaces(): void{
-        UblDocument::setNamespacesFor($this->root,"Invoice");
+    protected function setNamespaces(): void
+    {
+        UblDocument::setNamespacesFor($this->root, "Invoice");
     }
-  
+
     public function addToOrderList($code = null, $date = null)
     {
         if (StrUtil::notEmpty($code)) {
@@ -336,12 +340,12 @@ class InvoiceDocument extends UblDocument
         $totalAllowanceTotalAmount = 0;
         $totalChargeTotalAmount = 0;
         $totalPayableAmount = 0;
-        
+
         // Rebuild invoice line values and collect totals
         foreach ($this->invoiceLine->list as &$invLine) {
             if ($invLine instanceof InvoiceLine) {
                 $invLine->rebuildValues();
-                
+
                 // Get calculated values from line context
                 $lineContext = $invLine->getContextArray();
                 if ($lineContext instanceof Options) {
@@ -354,7 +358,7 @@ class InvoiceDocument extends UblDocument
                 }
             }
         }
-        
+
         // Set LegalMonetaryTotal values
         $this->legalMonetaryTotal->lineExtensionAmount = $totalLineExtensionAmount;
         $this->legalMonetaryTotal->taxExclusiveAmount = $totalTaxExclusiveAmount;
