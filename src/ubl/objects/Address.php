@@ -45,6 +45,11 @@ class Address extends UblDataType
         }
         return false;
     }
+
+    public function isEmpty(){
+       return !StrUtil::notEmpty($this->cityName);
+    }
+
     public function toDOMElement(DOMDocument $document): DOMElement
     {
         $element = $document->createElement('cac:PostalAddress');

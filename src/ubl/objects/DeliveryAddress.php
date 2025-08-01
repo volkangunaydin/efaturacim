@@ -61,12 +61,7 @@ class DeliveryAddress extends UblDataType
     }
 
     public function isEmpty(){        
-        return is_null($this->streetName) && 
-               is_null($this->buildingNumber) && 
-               is_null($this->cityName) && 
-               is_null($this->postalZone) && 
-               is_null($this->citySubdivisionName) && 
-               (is_null($this->country) || $this->country->isEmpty());
+        return !StrUtil::notEmpty($this->cityName);
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
