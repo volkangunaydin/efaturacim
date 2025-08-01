@@ -4,9 +4,10 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
-use Vulcan\Base\Util\MathUtil\NumberUtil;
+
 
 class TaxTotal extends UblDataType
 {
@@ -50,6 +51,7 @@ class TaxTotal extends UblDataType
             $this->taxAmount->setCurrencyID($v);
             return true;
         }
+
         return false;
     }
 
