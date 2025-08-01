@@ -6,26 +6,33 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\NumberUtil;
 
 class WithholdingTaxTotal extends UblDataType
 {
-    public ?float $taxAmount = null;
-    public ?string $taxAmountCurrencyID = 'TRY';
+    /**
+     * Summary of taxAmount
+     * @var TaxAmount
+     */
+    public  ?TaxAmount $taxAmount = null;    
 
     /**
      * @var UblDataTypeList
      */
-    public $taxSubtotal;
+    public ?UblDataTypeList $taxSubtotal;
 
     public function __construct($options = null)
     {
-        parent::__construct($options);                
+        parent::__construct($options);
     }
     public function initMe()
     {
+        $this->taxAmount   = new TaxAmount();
         $this->taxSubtotal = new UblDataTypeList(TaxSubtotal::class);
     }
-
+    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true) {
+        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);
+    }
     public function addTaxSubtotal(array $options, $context = null): self
     {
         $this->taxSubtotal->add(new TaxSubtotal($options), null, null, $context);
@@ -34,25 +41,15 @@ class WithholdingTaxTotal extends UblDataType
 
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, ['taxAmount', 'toplam_vergi_tutari']) && is_numeric($v)) {
-            $this->taxAmount = (float) $v;
+        if (in_array($k, ['taxAmount', 'vergi_tutari']) && NumberUtil::isNumberString($v)) {
+            $this->taxAmount->setValue((float)$v);
             return true;
         }
 
         if (in_array($k, ['currency', 'currencyID', 'para_birimi']) && StrUtil::notEmpty($v)) {
-            $this->taxAmountCurrencyID = $v;
+            $this->taxAmount->setCurrencyID($v);
             return true;
         }
-
-        if (in_array(strtolower($k), ['taxsubtotal', 'subtotals', 'vergi_detaylari']) && is_array($v)) {
-            foreach ($v as $subtotalOptions) {
-                if (is_array($subtotalOptions)) {
-                    $this->addTaxSubtotal($subtotalOptions);
-                }
-            }
-            return true;
-        }
-
         return false;
     }
 
@@ -64,25 +61,13 @@ class WithholdingTaxTotal extends UblDataType
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
-        
-        if ($this->isEmpty() || is_null($this->taxAmount)) {
+        if ($this->isEmpty()) {
             return null;
         }
 
-        $element = $document->createElement('cac:WithholdingTaxTotal');
-
-        $this->appendElement(
-            $document,
-            $element,
-            'cbc:TaxAmount',
-            number_format((float) $this->taxAmount, 2, '.', ''),
-            ['currencyID' => $this->taxAmountCurrencyID]
-        );
-
-        foreach ($this->taxSubtotal->list as $subtotal) {
-            $this->appendChild($element, $subtotal->toDOMElement($document));
-        }
-
+        $element = $this->createElement($document,'cac:WithholdingTaxTotal');
+        $this->appendChild($element,$this->taxAmount->toDOMElement($document));
+        $this->appendChild($element,$this->taxSubtotal->toDOMElement($document));
         return $element;
     }
     public function getVatDefIndex($create = true)

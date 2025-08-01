@@ -3,18 +3,21 @@ namespace Efaturacim\Util\Ubl\Turkce;
 
 use Efaturacim\Util\PreviewUtil;
 use Efaturacim\Util\Ubl\InvoiceDocument;
-
+use Efaturacim\Util\Ubl\DespatchAdviceDocument;
+use Efaturacim\Util\Ubl\CreditNoteDocument;
 class EBelge{
     /**
      * Summary of ubl
-     * @var InvoiceDocument
+     * @var InvoiceDocument|DespatchAdviceDocument
      */
     public $ubl = null;
     public function __construct($type=null){
-        if(in_array("".$type,array("irsaliye","eirsaliye"))){
-
-        }else{
+        if(in_array("".$type,array("irsaliye","eirsaliye","deliveryAdvice"))){
+            $this->ubl = new DespatchAdviceDocument();
+        }else if(in_array("".$type,array("fatura","einvoice","invoice"))){
             $this->ubl = new InvoiceDocument();            
+        }else if(in_array("".$type,array("mustahsil","emustahsil","creditNote"))){
+            $this->ubl = new CreditNoteDocument();
         }
     }
     public function getBelgeNo(){

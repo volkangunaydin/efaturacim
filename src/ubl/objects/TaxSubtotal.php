@@ -14,7 +14,7 @@ class TaxSubtotal extends UblDataType
      * @var TaxableAmount
      */
     public ?TaxableAmount $taxableAmount = null;
-    public ?float $percent       = 20;
+    public ?float $percent       = null;
 
     /**
      * Summary of taxAmount

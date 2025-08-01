@@ -9,6 +9,7 @@ use Efaturacim\Util\StrUtil;
 class PaymentMeans extends UblDataType
 {
     public ?PaymentMeansCode $paymentMeansCode = null;    
+    public ?string $paymentDueDate = null;
     public function initMe(){
         $this->paymentMeansCode = new PaymentMeansCode();
     }
@@ -27,6 +28,7 @@ class PaymentMeans extends UblDataType
         if($this->isEmpty()){ return null; }
         $element = $this->createElement($document,'cac:PaymentMeans');        
         $element->appendChild($this->paymentMeansCode->toDOMElement($document));
+        $this->appendElement($document, $element, 'cbc:PaymentDueDate', $this->paymentDueDate);
         return $element;
     }
     public function isEmpty(){
