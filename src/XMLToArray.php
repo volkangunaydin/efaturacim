@@ -2,6 +2,8 @@
 
 namespace Efaturacim\Util;
 
+use Efaturacim\Util\Utils\Array\ArrayCopy;
+
 class XMLToArray{
     public static function toArray($xmlStr,$appendObjectTag=false,$options=null){
         try {
