@@ -43,7 +43,7 @@ class XMLToArray{
         return array();
     }
     public static function applyOptionsAndReturn(&$array,$options=null){
-        if(Options::ensureParam($options) && $options instanceof VParams){
+        if(Options::ensureParam($options) && $options instanceof Options){
             $retVal = ArrayCopy::copy($array);
             if($options->getAsBool(array("to_lower_keys","lower_key"))){
                 $retVal = ArrayCopy::copy($retVal,array("to_lower_keys"=>true));
