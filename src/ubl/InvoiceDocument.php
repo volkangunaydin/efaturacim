@@ -398,4 +398,22 @@ class InvoiceDocument extends UblDocument
         }
         return $arr;
     }
+    public function getPayableAmount(){
+        return $this->legalMonetaryTotal->toNumber();
+    }
+    public function getLineExtensionAmount(){
+        return $this->legalMonetaryTotal->lineExtensionAmount->toNumber();
+    }
+    public function getTaxExclusiveAmount(){
+        return $this->legalMonetaryTotal->taxExclusiveAmount->toNumber();
+    }
+    public function getTaxInclusiveAmount(){
+        return $this->legalMonetaryTotal->taxInclusiveAmount->toNumber();
+    }
+    public function getAllowanceTotalAmount(){
+        return $this->legalMonetaryTotal->allowanceTotalAmount->toNumber();
+    }
+    public function getChargeTotalAmount(){
+        return $this->legalMonetaryTotal->chargeTotalAmount->toNumber();
+    }    
 }
