@@ -63,4 +63,10 @@ class AllowanceCharge extends UblDataType
         }                
         return $element;
     }
+    public function toNumber(){
+        return $this->amount->toNumber();
+    }
+    public function getValue(){
+        return $this->toNumber();
+    }
 }

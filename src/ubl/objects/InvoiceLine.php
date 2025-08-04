@@ -200,9 +200,9 @@ class InvoiceLine extends UblDataType
     }
     
     public function getTaxExclusiveAmount(){
-        $lineExtensionAmount = $this->getLineExtensionAmount();
+        $lineExtensionAmount  = $this->getLineExtensionAmount();
         $allowanceTotalAmount = $this->getAllowanceTotalAmount();
-        $chargeTotalAmount = $this->getChargeTotalAmount();
+        $chargeTotalAmount    = $this->getChargeTotalAmount();
         
         // TaxExclusiveAmount: lineExtensionAmount - indirimler + vergiler
         $taxExclusiveAmount = $lineExtensionAmount - $allowanceTotalAmount + $chargeTotalAmount;
@@ -217,31 +217,19 @@ class InvoiceLine extends UblDataType
     }
     
     public function getAllowanceTotalAmount(){
-        $allowanceTotalAmount = 0;
-        if ($this->allowanceCharge && $this->allowanceCharge->list) {
-            foreach ($this->allowanceCharge->list as $allowanceCharge) {
-                if ($allowanceCharge instanceof AllowanceCharge && 
-                    isset($allowanceCharge->chargeIndicator) && 
-                    $allowanceCharge->chargeIndicator === false) {
-                    $allowanceTotalAmount += NumberUtil::asMoneyVal($allowanceCharge->amount ?? 0);
-                }
+        return $this->allowanceCharge->sum(function($line){
+            if($line instanceof AllowanceCharge && $line->chargeIndicator->getValue()==false){
+                return $line->toNumber();
             }
-        }
-        return $allowanceTotalAmount;
+        });                        
     }
     
     public function getChargeTotalAmount(){
-        $chargeTotalAmount = 0;
-        if ($this->allowanceCharge && $this->allowanceCharge->list) {
-            foreach ($this->allowanceCharge->list as $allowanceCharge) {
-                if ($allowanceCharge instanceof AllowanceCharge && 
-                    isset($allowanceCharge->chargeIndicator) && 
-                    $allowanceCharge->chargeIndicator === true) {
-                    $chargeTotalAmount += NumberUtil::asMoneyVal($allowanceCharge->amount ?? 0);
-                }
+        return $this->allowanceCharge->sum(function($line){
+            if($line instanceof AllowanceCharge && $line->chargeIndicator->getValue()==true){
+                return $line->toNumber();
             }
-        }
-        return $chargeTotalAmount;
+        });                
     }
     
     public function getPayableAmount(){

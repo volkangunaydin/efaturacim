@@ -3,6 +3,7 @@
 namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
+use Efaturacim\Util\CastUtil;
 use Efaturacim\Util\StrUtil;
 
 class UblDataTypeForBool extends UblDataType{    
@@ -17,5 +18,12 @@ class UblDataTypeForBool extends UblDataType{
             return null;
         }
         return $this->createElement($document,$this->defaultTagName);
+    }
+    public function getValue(){
+        if(strlen("".$this->textContent)>0){
+            return CastUtil::asBool($this->textContent);
+        }else{
+            return null;
+        }
     }
 }

@@ -84,5 +84,17 @@ class UblDataTypeList{
         }
         return $fragment;
     }
+    public function sum($callable=null){
+        $r = 0;
+        if(!is_null($callable) && is_callable($callable)){
+            foreach($this->list as $k=>$v){
+                $tmp = call_user_func_array($callable,array($v));
+                if(is_numeric($tmp)){                    
+                    $r += $tmp;
+                }
+            }            
+        }        
+        return $r;
+    }
 }
 ?>

@@ -416,4 +416,46 @@ class InvoiceDocument extends UblDocument
     public function getChargeTotalAmount(){
         return $this->legalMonetaryTotal->chargeTotalAmount->toNumber();
     }    
+    public function getLineExtensionAmountFromLines(){        
+        return $this->invoiceLine->sum(function($line){
+            if($line instanceof InvoiceLine){
+                return $line->getLineExtensionAmount();
+            }                
+        });
+    }
+    public function getTaxExclusiveAmountFromLines(){        
+        return $this->invoiceLine->sum(function($line){
+            if($line instanceof InvoiceLine){
+                return $line->getTaxExclusiveAmount();
+            }                
+        });
+    }
+    public function getTaxInclusiveAmountFromLines(){        
+        return $this->invoiceLine->sum(function($line){
+            if($line instanceof InvoiceLine){
+                return $line->getTaxInclusiveAmount();
+            }                
+        });
+    }
+    public function getAllowanceTotalAmountFromLines(){        
+        return $this->invoiceLine->sum(function($line){
+            if($line instanceof InvoiceLine){
+                return $line->getAllowanceTotalAmount();
+            }                
+        });
+    }   
+    public function getChargeTotalAmountFromLines(){        
+        return $this->invoiceLine->sum(function($line){
+            if($line instanceof InvoiceLine){
+                return $line->getChargeTotalAmount();
+            }                
+        });
+    }       
+    public function getPayableAmountFromLines(){        
+        return $this->invoiceLine->sum(function($line){
+            if($line instanceof InvoiceLine){
+                return $line->getPayableAmount();
+            }                
+        });
+    }      
 }
