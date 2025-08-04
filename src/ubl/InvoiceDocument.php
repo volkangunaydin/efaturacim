@@ -399,7 +399,7 @@ class InvoiceDocument extends UblDocument
         return $arr;
     }
     public function getPayableAmount(){
-        return $this->legalMonetaryTotal->toNumber();
+        return $this->legalMonetaryTotal->payableAmount->toNumber();
     }
     public function getLineExtensionAmount(){
         return $this->legalMonetaryTotal->lineExtensionAmount->toNumber();

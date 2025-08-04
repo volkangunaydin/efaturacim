@@ -57,6 +57,9 @@ class EBelge{
     public function getBelgeNo(){
         return $this->ubl->getId();
     }
+    public function getBelgeGuid(){
+       return  $this->ubl->getGUID();
+    }
     public function getBelgeTarihi(){
         return DateUtil::newDate($this->ubl->getIssueDate()." ".$this->ubl->getIssueTime());
     }
