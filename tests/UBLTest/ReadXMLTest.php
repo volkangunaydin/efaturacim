@@ -14,8 +14,7 @@ class ReadXMLTest extends TestCase
     {
         // Buraya örnek XML gelecek
         $exampleXml = '<?xml version="1.0" encoding="UTF-8"?><root><item>test</item></root>';        
-        $result = XMLToArray::toArray($exampleXml, true);
-        print_r($result);die("");
+        $result = XMLToArray::toArray($exampleXml, true);        
         // Array'in boş olmadığını kontrol et
         $this->assertNotEmpty($result);
         
