@@ -176,6 +176,9 @@ abstract class UblDataType{
         }
         return $el;
     }
+    public function getValue(){
+        return $this->textContent;
+    }
     public static function newFromXml($xmlString=null,$debug=false){
         $a = new static();                
         $a->loadFromArray(XmlToArray::xmlStringToArray($xmlString,false,true),0,$debug);

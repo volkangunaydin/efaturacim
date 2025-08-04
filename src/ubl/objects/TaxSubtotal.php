@@ -101,4 +101,26 @@ class TaxSubtotal extends UblDataType
         }
         return null;
     }
+    public function isVat(){
+        if($this->taxCategory && $this->taxCategory->taxScheme && $this->taxCategory->taxScheme->taxTypeCode && $this->taxCategory->taxScheme->taxTypeCode=="0015"){
+            return true;
+        }
+        return false;
+    }
+    public function getPercent(){
+        return $this->percent;
+    }
+    public function getTaxAmount(){
+        return $this->taxAmount->toNumber();
+    }
+    public function getTaxableAmount(){
+        return $this->taxableAmount->toNumber();
+    }
+    public function getTaxExemptionReason(){
+        return $this->taxCategory->taxExemptionReason;
+    }
+    public function getTaxExemptionReasonCode(){
+        return $this->taxCategory->taxExemptionReasonCode;
+    }
 }
+?>

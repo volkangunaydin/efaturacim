@@ -321,4 +321,21 @@ class InvoiceLine extends UblDataType
         $this->ensureOptions();
         $this->options->setValue("context_array",$arr);
     }
+    public function getVatAsArray(){
+        $arr = array();
+        if($this->taxTotal){
+            foreach($this->taxTotal->taxSubtotal->list as $taxSubtotal){
+                if($taxSubtotal instanceof TaxSubtotal && $taxSubtotal->isVat()){
+                    $arr = array(
+                        "percent"=>$taxSubtotal->getPercent()
+                        ,"taxAmount"=>$taxSubtotal->getTaxAmount()
+                        ,"taxableAmount"=>$taxSubtotal->getTaxableAmount()
+                        ,"taxExemptionReason"=>$taxSubtotal->getTaxExemptionReason()
+                        ,"taxExemptionReasonCode"=>$taxSubtotal->getTaxExemptionReasonCode()
+                    );
+                }
+            }
+        }
+        return $arr;
+    }
 }

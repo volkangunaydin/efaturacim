@@ -69,16 +69,25 @@ class LegalMonetaryTotal extends UblDataType
         $this->appendChild($element,$this->allowanceTotalAmount->toDOMElement($document));    
         $this->appendChild($element,$this->chargeTotalAmount->toDOMElement($document));    
         $this->appendChild($element,$this->payableAmount->toDOMElement($document));    
-    
-        /*
-        $this->appendElement($document, $element, 'cbc:LineExtensionAmount', number_format($this->lineExtensionAmount, 2, '.', ''), ['currencyID' => $this->currencyID]);
-        $this->appendElement($document, $element, 'cbc:TaxExclusiveAmount', number_format($this->taxExclusiveAmount, 2, '.', ''), ['currencyID' => $this->currencyID]);
-        $this->appendElement($document, $element, 'cbc:TaxInclusiveAmount', number_format($this->taxInclusiveAmount, 2, '.', ''), ['currencyID' => $this->currencyID]);
-        $this->appendElement($document, $element, 'cbc:AllowanceTotalAmount', number_format($this->allowanceTotalAmount, 2, '.', ''), ['currencyID' => $this->currencyID]);
-        $this->appendElement($document, $element, 'cbc:ChargeTotalAmount', number_format($this->chargeTotalAmount, 2, '.', ''), ['currencyID' => $this->currencyID]);
-        $this->appendElement($document, $element, 'cbc:PayableAmount', number_format($this->payableAmount, 2, '.', ''), ['currencyID' => $this->currencyID]);
-*/
-        //\Vulcan\V::dump($this);
         return $element;
     }
+    public function getPayableAmount(){
+        return $this->payableAmount->toNumber();
+    }
+    public function getLineExtensionAmount(){
+        return $this->lineExtensionAmount->toNumber();
+    }
+    public function getTaxExclusiveAmount(){
+        return $this->taxExclusiveAmount->toNumber();
+    }
+    public function getTaxInclusiveAmount(){
+        return $this->taxInclusiveAmount->toNumber();
+    }
+    public function getAllowanceTotalAmount(){
+        return $this->allowanceTotalAmount->toNumber();
+    }
+    public function getChargeTotalAmount(){
+        return $this->chargeTotalAmount->toNumber();
+    }
 }
+?>

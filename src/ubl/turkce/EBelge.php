@@ -1,6 +1,8 @@
 <?php
 namespace Efaturacim\Util\Ubl\Turkce;
 
+use Efaturacim\Util\DateUtil;
+use Efaturacim\Util\IO\IO_Util;
 use Efaturacim\Util\PreviewUtil;
 use Efaturacim\Util\Ubl\InvoiceDocument;
 use Efaturacim\Util\Ubl\DespatchAdviceDocument;
@@ -8,7 +10,7 @@ use Efaturacim\Util\Ubl\CreditNoteDocument;
 class EBelge{
     /**
      * Summary of ubl
-     * @var InvoiceDocument|DespatchAdviceDocument
+     * @var InvoiceDocument|DespatchAdviceDocument|CreditNoteDocument|null
      */
     public $ubl = null;
     public function __construct($type=null){
@@ -20,8 +22,43 @@ class EBelge{
             $this->ubl = new CreditNoteDocument();
         }
     }
+    public static function fromXmlFile($filePath=null){
+        return self::fromXmlContent(IO_Util::readFileAsString($filePath));
+    }
+    public static function fromXmlContent($xmlString=null){
+        if (is_string($xmlString) && !empty($xmlString)) {
+            if (preg_match('/<([a-zA-Z0-9_:]+)/', $xmlString, $matches)) {
+                $rootTagName = $matches[1];
+                // Remove namespace prefix if present to get the local name.
+                if (strpos($rootTagName, ':') !== false) {
+                    $parts = explode(':', $rootTagName);
+                    $rootTagName = end($parts);
+                }
+                $belge = null;
+                switch ($rootTagName) {
+                    case 'Invoice':
+                        $belge = new EFaturaBelgesi();
+                        break;
+                    case 'DespatchAdvice':
+                        $belge = new EIrsaliyeBelgesi();
+                        break;
+                    case 'CreditNote':
+                        $belge = new EMustahsilBelgesi();
+                        break;
+                }
+                if ($belge) {
+                    $belge->ubl->loadFromXml($xmlString);
+                    return $belge;
+                }
+            }            
+        }
+        return null;
+    }
     public function getBelgeNo(){
         return $this->ubl->getId();
+    }
+    public function getBelgeTarihi(){
+        return DateUtil::newDate($this->ubl->getIssueDate()." ".$this->ubl->getIssueTime());
     }
     public function setSaticiBilgileri($options=null,$clear=false){
         $this->ubl->accountingSupplierParty->loadFromOptions($options,$clear);
@@ -84,6 +121,15 @@ class EBelge{
     }
     public function toXmlString(){
         return $this->ubl->toXml();        
+    }
+    public function debug(){
+        EBelgeDebugger::debug($this);
+    }
+    public function getSatirSayisi(){
+        if($this->ubl && $this->ubl instanceof InvoiceDocument){
+            return $this->ubl->invoiceLine->getCount();        
+        }        
+        return 0;
     }
 }
 ?>

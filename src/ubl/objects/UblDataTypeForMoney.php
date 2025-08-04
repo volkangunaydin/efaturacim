@@ -17,7 +17,9 @@ class UblDataTypeForMoney extends UblDataType{
     public function setPropertyFromOptions($k,$v,$options){        
         return false;
     }    
-
+    public function setCurrencyID($code=null,$updateDeeper=false){
+        $this->attributes["currencyID"] = $code; 
+    }
     public function setValue($number,$decimal=2){
         $this->textContent = NumberUtil::asCleanNumber($number,$decimal);
     }

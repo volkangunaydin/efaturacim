@@ -63,13 +63,13 @@ class Party extends UblDataType
         return $this->partyName->getName();
     }
     public function getVknOrTckn(){
-        $key1 = $this->partyIdentification->getKeyForSchemeID("TCKN");        
-        if(!is_null($key1) && strlen("".$this->partyIdentification[$key1]->getValue())>0 ){
-            return $this->partyIdentification[$key1]->getValue();    
+        $key1 = $this->partyIdentification->getKeyForSchemeID("TCKN");                
+        if(!is_null($key1) && strlen("".$this->partyIdentification->list[$key1]->getValue())>0 ){
+            return $this->partyIdentification->list[$key1]->getValue();    
         }
-        $key2 = $this->partyIdentification->getKeyForSchemeID("VKN");
-        if(!is_null($key2) && strlen("".$this->partyIdentification[$key2]->getValue())>0 ){
-            return $this->partyIdentification[$key2]->getValue();    
+        $key2 = $this->partyIdentification->getKeyForSchemeID("VKN");          
+        if(!is_null($key2) && strlen("".$this->partyIdentification->list[$key2]->getValue())>0 ){
+            return $this->partyIdentification->list[$key2]->getValue();    
         }
         return null;
     }

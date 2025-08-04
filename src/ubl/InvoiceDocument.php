@@ -129,6 +129,12 @@ class InvoiceDocument extends UblDocument
         // Default profile for a commercial invoice. Can be overridden for "TEMELFATURA".
 
     }
+    public function getIssueDate(){
+        return $this->issueDate;
+    }
+    public function getIssueTime(){
+        return $this->issueTime;
+    }
     public function initMe()
     {
         $this->rootElementName = 'Invoice';
@@ -365,5 +371,31 @@ class InvoiceDocument extends UblDocument
         $this->legalMonetaryTotal->allowanceTotalAmount->setValue($totalAllowanceTotalAmount);
         $this->legalMonetaryTotal->chargeTotalAmount->setValue($totalChargeTotalAmount);
         $this->legalMonetaryTotal->payableAmount->setValue($totalPayableAmount);        
+    }
+    public function getVatsAsArray(){
+        $arr = array();
+        foreach($this->invoiceLine->list as $line){
+            if($line instanceof InvoiceLine){
+                $vat = $line->getVatAsArray();
+                if($vat && is_array($vat) && count($vat)>0 && key_exists("percent",$vat)){
+                    $percent = @$vat["percent"];
+                    if(!key_exists($percent,$arr)){
+                        $arr[$percent] = array();
+                    }
+                    foreach($vat as $kk=>$vv){
+                        if($kk=="percent"){ 
+                            $arr[$percent][$kk] = $vv;
+                            continue;
+                        }
+                        if(key_exists($kk,$arr[$percent]) && is_numeric($arr[$percent][$kk])){
+                            $arr[$percent][$kk] += $vv;
+                        }else{
+                            $arr[$percent][$kk] = $vv;
+                        }                        
+                    }
+                }
+            }
+        }
+        return $arr;
     }
 }

@@ -35,4 +35,7 @@ class PartyIdentification extends UblDataType
         }
         return false;        
     }
+    public function getValue(){
+        return $this->id->getValue();
+    }
 }
