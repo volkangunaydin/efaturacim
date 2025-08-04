@@ -32,7 +32,10 @@ class EBelgeDebugger{
                 ,"error"=>"BELGE TÜRÜ ANLAŞILAMADI"
             );            
         }
-        \Vulcan\V::dump($arrDebug);
+        echo "<pre>";
+        print_r($arrDebug);
+        echo "</pre>";
+        die();
     }    
 }
 ?>
