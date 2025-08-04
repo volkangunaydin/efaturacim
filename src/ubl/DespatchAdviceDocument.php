@@ -36,7 +36,7 @@ use Efaturacim\Util\Utils\xml\XmlToArray;
  * This class extends the base UblDocument and implements the specific
  * structure and logic required for generating a UBL Invoice XML.
  */
-class InvoiceDocument extends UblDocument
+class DespatchAdviceDocument extends UblDocument
 {
 
     /**
@@ -131,8 +131,8 @@ class InvoiceDocument extends UblDocument
     }
     public function initMe()
     {
-        $this->rootElementName = 'Invoice';
-        $this->setProfileId('TICARIFATURA');
+        $this->rootElementName = 'DespatchAdvice';
+        $this->setProfileId('TEMELIRSALIYE');
         $this->setIssueDate(date('Y-m-d'));
         $this->setIssueTime(date('H:i:s'));
         $this->setDocumentCurrencyCode("TRY");
@@ -149,6 +149,7 @@ class InvoiceDocument extends UblDocument
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
         $this->paymentMeans = new PaymentMeans();
+        $this->delivery = new Delivery();
         $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
         $this->UBLExtensions = new UBLExtensions();
@@ -287,8 +288,8 @@ class InvoiceDocument extends UblDocument
     public function loadFromXml($xmlString, $debug = false): static
     {
         $arr = XmlToArray::xmlStringToArray($xmlString, false);
-        if ($arr && is_array($arr) && key_exists("Invoice", $arr)) {
-            $this->loadFromArray($arr["Invoice"], 0, $debug);
+        if ($arr && is_array($arr) && key_exists("DespatchAdvice", $arr)) {
+            $this->loadFromArray($arr["DespatchAdvice"], 0, $debug);
             //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
         }
         //\Vulcan\V::dump($arr["Invoice"]["AccountingCustomerParty"]["Party"]);
@@ -300,7 +301,7 @@ class InvoiceDocument extends UblDocument
      */
     protected function setNamespaces(): void
     {
-        UblDocument::setNamespacesFor($this->root, "Invoice");
+        UblDocument::setNamespacesFor($this->root, "DespatchAdvice");
     }
 
     public function addToOrderList($code = null, $date = null)

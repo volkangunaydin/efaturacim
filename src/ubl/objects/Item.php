@@ -33,6 +33,12 @@ class Item extends UblDataType
         }
     }
 
+    public function initMe(){
+        $this->sellersItemIdentification   = new SellersItemIdentification();
+        $this->buyersItemIdentification   = new BuyersItemIdentification();
+        $this->manufacturersItemIdentification   = new ManufacturersItemIdentification();
+    }
+
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         if (in_array($k, ['name', 'ad', 'urun_adi']) && StrUtil::notEmpty($v)) {

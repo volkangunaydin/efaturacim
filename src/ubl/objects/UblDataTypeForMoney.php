@@ -4,7 +4,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
-use Vulcan\Base\Util\MathUtil\NumberUtil;
+use Efaturacim\Util\NumberUtil;
 
 
 class UblDataTypeForMoney extends UblDataType{

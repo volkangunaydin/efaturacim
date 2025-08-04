@@ -11,7 +11,7 @@ class EFaturaBelgesi extends EBelge{
      */
     public $ubl = null;
     public function __construct($faturaNo=null){
-        parent::__construct("efatura");                
+        parent::__construct("invoice");                
     }
     public function getFaturaNo(){
         return $this->ubl->getId();

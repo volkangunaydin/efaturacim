@@ -55,8 +55,7 @@ class AllowanceCharge extends UblDataType
 
     public function isEmpty(): bool
     {
-        // An AllowanceCharge must have an amount and a charge indicator to be valid.
-        return is_null($this->amount) || is_null($this->chargeIndicator);
+        return false;
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement

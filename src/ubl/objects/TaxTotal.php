@@ -7,7 +7,7 @@ use DOMElement;
 use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
-
+use Efaturacim\Util\NumberUtil;
 
 class TaxTotal extends UblDataType
 {
@@ -42,8 +42,8 @@ class TaxTotal extends UblDataType
 
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, ['taxAmount','TaxAmount', 'toplam_vergi_tutari']) && NumberUtil::isNumberString($v)) {
-            $this->taxAmount->setValue((float) $v);
+        if (in_array($k, ['taxAmount', 'vergi_tutari']) && NumberUtil::isNumberString($v)) {
+            $this->taxAmount->setValue((float)$v);
             return true;
         }
 
