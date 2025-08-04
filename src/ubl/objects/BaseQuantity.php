@@ -7,9 +7,9 @@ use DOMElement;
 use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\StrUtil;
 
-class InvoicedQuantity extends UblDataTypeForQuantity{    
+class BaseQuantity extends UblDataTypeForQuantity{    
     public function initMe(){
-       $this->setDefaultTagNameIfNotSet('cbc:InvoicedQuantity');
+       $this->setDefaultTagNameIfNotSet('cbc:BaseQuantity');
        parent::initMe();
     }
 }

@@ -19,7 +19,7 @@ class InvoiceLine extends UblDataType
     public ?TaxInclusiveAmount $taxInclusiveAmount = null;
     public ?AllowanceTotalAmount $allowanceTotalAmount = null;
     public ?ChargeTotalAmount $chargeTotalAmount = null;
-    public ?PayableAmount $payableAmount = null;
+    public ?PayableAmount $payableAmount = null;    
 
 
     /**     
