@@ -247,4 +247,10 @@ class StrUtil{
             if (is_null($str) || !is_scalar($str)) { return 0;}
             return strlen((string)"".$str);
         }        
+        public static function toLowerEng($str){ 
+            if(!function_exists("mb_strtolower")){
+                return str_replace(array("Ğ","Ü","Ş","İ","Ö","Ç","ğ","ü","ş","ı","ö","ç","Ë"), array("G","U","S","I","O","C","g","u","s","i","o","c","E"), "".$str);
+            }            
+            return mb_strtolower(self::removeTurkishChars($str)); 
+        }        
 }
