@@ -165,8 +165,7 @@ class InvoiceDocument extends UblDocument
      */
     public function toXml(): string
     {
-        $this->getGUID();
-        $this->rebuildValues();
+        $this->getGUID();        
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
         $this->setNamespaces();
@@ -332,7 +331,7 @@ class InvoiceDocument extends UblDocument
         ));
     }
     public function rebuildValues()
-    {
+    {        
         $totalLineExtensionAmount = 0;
         $totalTaxExclusiveAmount = 0;
         $totalTaxInclusiveAmount = 0;
@@ -359,12 +358,12 @@ class InvoiceDocument extends UblDocument
         }
 
         // Set LegalMonetaryTotal values
-        $this->legalMonetaryTotal->lineExtensionAmount = $totalLineExtensionAmount;
-        $this->legalMonetaryTotal->taxExclusiveAmount = $totalTaxExclusiveAmount;
-        $this->legalMonetaryTotal->taxInclusiveAmount = $totalTaxInclusiveAmount;
-        $this->legalMonetaryTotal->allowanceTotalAmount = $totalAllowanceTotalAmount;
-        $this->legalMonetaryTotal->chargeTotalAmount = $totalChargeTotalAmount;
-        $this->legalMonetaryTotal->payableAmount = $totalPayableAmount;
-        $this->legalMonetaryTotal->currencyID = $this->documentCurrencyCode;
+        $this->legalMonetaryTotal->setCurrencyID($this->documentCurrencyCode);
+        $this->legalMonetaryTotal->lineExtensionAmount->setValue($totalLineExtensionAmount);
+        $this->legalMonetaryTotal->taxExclusiveAmount->setValue($totalTaxExclusiveAmount);
+        $this->legalMonetaryTotal->taxInclusiveAmount->setValue($totalTaxInclusiveAmount);
+        $this->legalMonetaryTotal->allowanceTotalAmount->setValue($totalAllowanceTotalAmount);
+        $this->legalMonetaryTotal->chargeTotalAmount->setValue($totalChargeTotalAmount);
+        $this->legalMonetaryTotal->payableAmount->setValue($totalPayableAmount);        
     }
 }

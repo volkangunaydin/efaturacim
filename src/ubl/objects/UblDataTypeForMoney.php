@@ -5,18 +5,19 @@ namespace Efaturacim\Util\Ubl\Objects;
 use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\NumberUtil;
-
+use Efaturacim\Util\StrUtil;
 
 class UblDataTypeForMoney extends UblDataType{
     public function initMe(): void{
         $this->attributes["currencyID"] = "TRY"; 
     }
+    public function isEmpty(){        
+        return StrUtil::isEmpty($this->textContent);
+    }    
     public function setPropertyFromOptions($k,$v,$options){        
         return false;
     }    
-    public function setCurrencyID($code=null){
-        $this->attributes["currencyID"] = $code; 
-    }
+
     public function setValue($number,$decimal=2){
         $this->textContent = NumberUtil::asCleanNumber($number,$decimal);
     }

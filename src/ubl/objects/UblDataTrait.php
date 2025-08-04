@@ -32,16 +32,21 @@ trait UblDataTrait{
     public function loadFromArray($arr,$depth=0,$isDebug=false,$dieOnDebug=true){
         if($depth>10){  return; }        
         $debugArray = array("log"=>array());        
-        if(!is_null($arr) && is_array($arr)){            
+        if($isDebug){
+            $debugArray["class"]    = get_class($this);
+            $debugArray["org_data"] = $arr;      
+        }
+        if(!is_null($arr) && is_array($arr)){   
+            if($isDebug){
+                $debugArray["log"][] = "Array found for loadFromArray";
+            }         
             foreach($arr as $k=>$v){           
                 $paramArray = array();     
-                if(!is_null($v)){      
-                                      
+                if(!is_null($v)){                      
                     if($k=="@attributes" && $this instanceof UblDataType && is_array($v)){                                                
                         if(!is_array($this->attributes)){
                             $this->attributes = array();
-                        }
-                        
+                        }                
                         foreach($v as $kk=>$vv){                                                        
                             if($isDebug){                                
                                 $debugArray["log"][] = "Setting attribute named => ".$kk." => ".print_r($vv,true);
@@ -56,14 +61,15 @@ trait UblDataTrait{
                             }
                         }                        
                         continue;
-                    }else if($k=="@value" && $this instanceof UblDataType && is_scalar($v) ){
-                        if($isDebug){
-                            $debugArray["log"][] = "Setting textContent from @value => ".$k." => ".print_r($v,true);
+                    }else if($k=="@value"){                                                
+                        if($this instanceof UblDataType && is_scalar($v)){
+                            if($isDebug){
+                                $debugArray["log"][] = "Setting textContent from @value => ".$k." => ".print_r($v,true);
+                            }
+                            $this->setTextContent($v);
+                            continue;                    
                         }
-                        $this->setTextContent($v);
-                        continue;
-                    }
-                    
+                    }                    
                     $k_safe     = strtolower(substr($k,0,1)).substr($k,1);
                     $k_up       = strtoupper(substr($k,0,1)).substr($k,1);
                     $k_lower    = strtolower($k);
@@ -77,9 +83,12 @@ trait UblDataTrait{
                     $isFound = false;                    
                     foreach($paramArray as $paramName){
                         $key = null;
-                        if($isFound===false && method_exists($this,"getPropertyAlias")){
+                        if($isFound===false && method_exists($this,"getPropertyAlias")){                            
                             $key = $this->getPropertyAlias($k,$v);
                             if(!is_null($key) && strlen("".$key)>0){
+                                if($isDebug){
+                                     $debugArray["log"][] = "getPropertyAlias => ".$k." => ".$key;
+                                }
                                 if(is_array($v)){
                                     $this->loadFromArray( array("".$key => $v),$depth+1);
                                 }
@@ -124,8 +133,7 @@ trait UblDataTrait{
                                     }              
                                 }else{
                                     $this->$paramName->setTextContent($v);
-                                }                      
-                                
+                                }                                                      
                             }
                             if (!$isScalar && is_array($v) && !is_null($this->$paramName) && ( is_object($this->$paramName) && method_exists($this->$paramName,"loadFromArray")  )){                                                                                                                                                            
                                  if($isDebug){  
@@ -158,8 +166,6 @@ trait UblDataTrait{
             }            
         }
         if($isDebug){
-            $debugArray["class"]    = get_class($this);
-            $debugArray["org_data"] = $arr;      
             if(method_exists($this,"showAsXml")){
                 $debugArray["xml"] = $this->getAsXmlString(null);            
             }            

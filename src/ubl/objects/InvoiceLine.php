@@ -117,18 +117,7 @@ class InvoiceLine extends UblDataType
             $this->setVatValue($v);
             return true;
         }
-        // Pass other options to children
-        if(is_array($v)){
-            if ($this->item->setPropertyFromOptions($k, $v, $options)) {
-                return true;
-            }
-            if ($this->price->setPropertyFromOptions($k, $v, $options)) {
-                return true;
-            }
-            if ($this->taxTotal->setPropertyFromOptions($k, $v, $options)) {
-                return true;
-            }
-        }
+        
         return false;
     }
 
@@ -180,7 +169,8 @@ class InvoiceLine extends UblDataType
     public function onBeforeAdd($context=null){
         if(Options::ensureParam($context) && $context instanceof Options){
             if(is_null($this->id)){
-                $nid = $context->getAsInt("nextLineId");
+                $this->id = new ID();
+                $nid = $context->getAsInt("nextLineId");                
                 if($nid>0){
                     $this->id->textContent = $nid;
                 }else{
@@ -188,6 +178,7 @@ class InvoiceLine extends UblDataType
                 }
             }
             if(is_null($this->lineExtensionAmount)){
+                $this->lineExtensionAmount = new LineExtensionAmount();
                 $this->lineExtensionAmount->setValue($this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount,0));
             }
         }        

@@ -10,6 +10,7 @@ use Efaturacim\Util\Options;
 use Efaturacim\Util\PreviewUtil;
 use Efaturacim\Util\Ubl\InvoiceDocument;
 use Efaturacim\Util\Ubl\UblDocument;
+use Efaturacim\Util\Utils\Xml\XmlToArray;
 
 /**
  * Abstract base class for all UBL data objects.
@@ -27,12 +28,21 @@ abstract class UblDataType{
     public $textContent = null;
     public $attributes  = array();
     public $defaultTagName = "";
-    public function __construct($options=null,$debug=false){        
+    public function __construct($options=null,$debug=false,$defaultTagName=null){        
+        if(!is_null($defaultTagName)){
+            $this->defaultTagName = $defaultTagName;
+        }
         $this->initMe();
         if($options!=null){
             $this->options = new Options($options);
             $this->loadFromOptions($this->options,false,$debug);
         }        
+    }
+    public function setDefaultTagNameIfNotSet($tagname){
+        if((is_null($this->defaultTagName) || $this->defaultTagName==="") && !is_null($tagname) && strlen("".$tagname)>0){
+            $this->defaultTagName = $tagname;
+        }
+        return $this;
     }
     public function initMe(){
         
@@ -148,6 +158,9 @@ abstract class UblDataType{
     }
     public function createElement(DOMDocument $document,$tagName){
         $el = $document->createElement($tagName,"".$this->textContent);                
+        if($el===false){
+            return null;
+        }
         if($this->attributes && count($this->attributes)>0){                        
             foreach($this->attributes as $attrName=>$attrValue){
                 if(is_array($attrValue)){
@@ -158,11 +171,14 @@ abstract class UblDataType{
                     }
                 }else if (is_scalar($attrValue)){
                     $el->setAttribute($attrName,$attrValue);
-                }
-                
-                
+                }                                
             }
         }
         return $el;
+    }
+    public static function newFromXml($xmlString=null,$debug=false){
+        $a = new static();                
+        $a->loadFromArray(XmlToArray::xmlStringToArray($xmlString,false,true),0,$debug);
+        return $a;
     }
 }
