@@ -5,8 +5,15 @@ namespace Efaturacim\Util;
 class XMLToArray{
     public static function toArray($xmlStr,$appendObjectTag=false,$options=null){
         try {
-            if($appendObjectTag){
-                $xmlStr = '<object>'.$xmlStr.'</object>';
+            if ($appendObjectTag) {
+                // Check if the XML string contains the XML declaration tag.
+                if (preg_match('/(<\?xml.*?\?>)/i', $xmlStr)) {
+                    // XML declaration found. Add the <object> tag after it.
+                    $xmlStr = preg_replace('/(<\?xml.*?\?>)/i', '$1<object>', $xmlStr, 1) . '</object>';
+                } else {
+                    // No XML declaration, wrap the whole string.
+                    $xmlStr = '<object>' . $xmlStr . '</object>';
+                }
             }
             
             // Namespace'leri temizle

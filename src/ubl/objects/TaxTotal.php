@@ -7,7 +7,7 @@ use DOMElement;
 use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\Options;
 use Efaturacim\Util\StrUtil;
-use Efaturacim\Util\NumberUtil;
+
 
 class TaxTotal extends UblDataType
 {
