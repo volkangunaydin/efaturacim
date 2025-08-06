@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils\Array;
 class ArrayUtil
 {
     public static function arrayGetKey($array, &$keyToReturn, $keyOrKeys, $defVal = null)

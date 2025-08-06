@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils;
 class CookieUtil{
     public static function setCookie($name,$value,$expInDays=null){
         if(is_null($expInDays) || $expInDays<=0){

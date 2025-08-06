@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util\Utils;
+namespace Efaturacim\Util\Utils\String;
     class StrPos{
         public $start = -1;
         public $end   = -1;

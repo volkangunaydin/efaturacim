@@ -1,14 +1,13 @@
 <?php
+
 namespace Efaturacim\Util\Utils\Xml;
 
 use DOMDocument;
 use DOMNode;
+use Efaturacim\Util\Utils\Array\ArrayCopy;
+use Efaturacim\Util\Utils\Options;
 
-/**
- * A utility class to convert XML strings to PHP arrays.
- */
-class XmlToArray
-{
+class XMLToArray{
     public static $LAST_ERRORS = array();
   /**
      * Converts an XML string to a structured PHP array.
@@ -54,7 +53,7 @@ class XmlToArray
         $key = $useNamespacesOnKeys ? $root->nodeName : $root->localName;
         if($root!=null){
             $output[$key] = self::domNodeToArray($root, $useNamespacesOnKeys,$forceNameSpaceRemoval);
-        }        
+        }
         return $output;
     }
 
@@ -86,14 +85,14 @@ class XmlToArray
                     $output['@value'] = $trimmedValue;
                 }
             } elseif ($child->nodeType === XML_ELEMENT_NODE) {
-                $key = $useNamespacesOnKeys ? $child->nodeName : $child->localName;                
+                $key = $useNamespacesOnKeys ? $child->nodeName : $child->localName;
                 if($useNamespacesOnKeys==false && $forceNameSpaceRemoval){
                     $p1 = strpos($key,":",0);
                     if($p1!==false && $p1>0){
                         $key = substr($key,$p1+1);
                     }
                 }
-                $childData = self::domNodeToArray($child, $useNamespacesOnKeys);                                                
+                $childData = self::domNodeToArray($child, $useNamespacesOnKeys);
                 if (isset($output[$key])) {
                     if (!is_array($output[$key]) || !isset($output[$key][0])) {
                         $output[$key] = [$output[$key]];
@@ -114,7 +113,54 @@ class XmlToArray
         }
 
         return $output;
-    }   
-   
+    }
+
+    public static function toArray($xmlStr,$appendObjectTag=false,$options=null){
+        try {
+            if ($appendObjectTag) {
+                // Check if the XML string contains the XML declaration tag.
+                if (preg_match('/(<\?xml.*?\?>)/i', $xmlStr)) {
+                    // XML declaration found. Add the <object> tag after it.
+                    $xmlStr = preg_replace('/(<\?xml.*?\?>)/i', '$1<object>', $xmlStr, 1) . '</object>';
+                } else {
+                    // No XML declaration, wrap the whole string.
+                    $xmlStr = '<object>' . $xmlStr . '</object>';
+                }
+            }
+            
+            // Namespace'leri temizle
+            $xmlStr = preg_replace('/xmlns[^=]*=\"[^\"]*\"/i', '', $xmlStr);
+            
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($xmlStr, "SimpleXMLElement", LIBXML_NOCDATA | LIBXML_NSCLEAN);
+            
+            if ($xml === false) {
+                return array();
+            }
+            
+            $json = json_encode($xml);
+            $array = json_decode($json, TRUE);
+            
+            if(is_array($array)){
+                if(!is_null($options)){
+                    return self::applyOptionsAndReturn($array,$options);
+                }else{
+                    return $array;
+                }
+            }
+        } catch (\Exception $e) {
+        }
+        return array();
+    }
+    public static function applyOptionsAndReturn(&$array,$options=null){
+        if(Options::ensureParam($options) && $options instanceof Options){
+            $retVal = ArrayCopy::copy($array);
+            if($options->getAsBool(array("to_lower_keys","lower_key"))){
+                $retVal = ArrayCopy::copy($retVal,array("to_lower_keys"=>true));
+            }
+            return $retVal;
+        }
+        return $array;
+    }        
+
 }
-?>

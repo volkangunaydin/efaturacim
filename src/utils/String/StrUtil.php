@@ -1,6 +1,6 @@
 <?php
 
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils\String;
 
 class StrUtil{
     public static function notEmpty($str){

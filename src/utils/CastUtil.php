@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils;
 class CastUtil{
         public static  $DATA_STRING    = "string";
         public static  $DATA_INT       = "int";

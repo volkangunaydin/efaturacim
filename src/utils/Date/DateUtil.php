@@ -1,8 +1,9 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils\Date;
 
 use DateTime;
-use Efaturacim\Util\Utils\StringSplitter;
+use Efaturacim\Util\Utils\Number\NumberUtil;
+use Efaturacim\Util\Utils\String\StringSplitter;
 
 class DateUtil{
         public static function now($offsetSec=null,$offsetDay=null){

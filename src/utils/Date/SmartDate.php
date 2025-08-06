@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils\Date;
 
 use DateTime;
 use Exception;

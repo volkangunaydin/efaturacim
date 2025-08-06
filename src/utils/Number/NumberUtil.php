@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils\Number;
                                                 
 class NumberUtil{
     public static function coalesce($arg1=null){

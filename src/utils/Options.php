@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils;
 class Options{    
         /** @var Array */
         public $params = array();

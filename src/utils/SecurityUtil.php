@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils;
 class SecurityUtil{
     public static function getClientKey(){        
         return CookieUtil::getCookie("SECURE_CLIENT_KEY",function(){

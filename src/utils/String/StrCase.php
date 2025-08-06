@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util\Utils;
+namespace Efaturacim\Util\Utils\String;
 class StrCase{
     public static function upper($str){
         return self::toUpperTurkish($str);

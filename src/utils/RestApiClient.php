@@ -1,6 +1,7 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils;
 
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class RestApiClient{
     public static $DEFAULT_BEARER_TOKEN = null;

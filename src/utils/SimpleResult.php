@@ -1,5 +1,6 @@
 <?php
-namespace Efaturacim\Util;
+namespace Efaturacim\Util\Utils;
+
 class SimpleResult{
         public $__isok     = false;
         public $attributes = array();
