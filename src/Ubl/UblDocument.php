@@ -4,8 +4,8 @@ namespace Efaturacim\Util\Ubl;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\Options;
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Ubl\Objects\UblDataTrait;
 use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;

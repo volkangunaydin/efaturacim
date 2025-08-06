@@ -4,9 +4,9 @@ namespace Efaturacim\Util\Ubl;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\ArrayUtil;
-use Efaturacim\Util\Options;
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\Array\ArrayUtil;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
 use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
 use Efaturacim\Util\Ubl\Objects\TaxTotal;

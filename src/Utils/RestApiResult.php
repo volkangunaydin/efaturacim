@@ -1,7 +1,7 @@
 <?php
 namespace Efaturacim\Util\Utils;
 
-use Efaturacim\Util\Results\ResultUtil;
+use Efaturacim\Util\Utils\Results\ResultUtil;
 
 class RestApiResult extends SimpleResult{
         public $statusCode = 200;

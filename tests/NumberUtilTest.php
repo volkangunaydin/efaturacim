@@ -2,7 +2,7 @@
 
 namespace Efaturacim\Util\Tests;
 
-use Efaturacim\Util\NumberUtil;
+use Efaturacim\Util\Utils\Number\NumberUtil;
 use PHPUnit\Framework\TestCase;
 
 class NumberUtilTest extends TestCase

@@ -1,9 +1,9 @@
 <?php
 namespace Efaturacim\Util\Utils\String;
 
-use Efaturacim\Util\Options;
-use Efaturacim\Util\SimpleResult;
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\SimpleResult;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class StrNameSurname{
     

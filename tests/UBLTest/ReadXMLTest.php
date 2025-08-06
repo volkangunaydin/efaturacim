@@ -2,7 +2,7 @@
 
 namespace Efaturacim\Util\Tests;
 
-use Efaturacim\Util\XMLToArray;
+use Efaturacim\Util\Utils\Xml\XMLToArray;
 use PHPUnit\Framework\TestCase;
 
 class ReadXMLTest extends TestCase

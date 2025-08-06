@@ -2,7 +2,7 @@
 
 namespace Efaturacim\Util\Ubl\Objects;
 
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class UblDataTypeListForPartyIdentification extends UblDataTypeList{
     public function initMe(){

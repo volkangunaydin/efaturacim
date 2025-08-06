@@ -4,10 +4,10 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\CastUtil;
-use Efaturacim\Util\NumberUtil;
-use Efaturacim\Util\Options;
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\CastUtil;
+use Efaturacim\Util\Utils\Number\NumberUtil;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class InvoiceLine extends UblDataType
 {

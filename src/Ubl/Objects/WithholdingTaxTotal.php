@@ -4,9 +4,9 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\Options;
-use Efaturacim\Util\StrUtil;
-use Efaturacim\Util\NumberUtil;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\String\StrUtil;
+use Efaturacim\Util\Utils\Number\NumberUtil;
 
 class WithholdingTaxTotal extends UblDataType
 {

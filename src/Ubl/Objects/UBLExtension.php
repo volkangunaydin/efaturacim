@@ -4,7 +4,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\StrUtil;
+
 
 /**
  * UBL Extensions class for handling custom extensions in UBL documents.

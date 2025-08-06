@@ -2,8 +2,8 @@
 
 namespace Efaturacim\Util\Tests;
 
-use Efaturacim\Util\RestApiClient;
-use Efaturacim\Util\RestApiResult;
+use Efaturacim\Util\Utils\RestApiClient;
+use Efaturacim\Util\Utils\RestApiResult;
 use PHPUnit\Framework\TestCase;
 
 /**

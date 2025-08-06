@@ -2,9 +2,10 @@
 
 namespace Efaturacim\Util\Tests\Utils;
 
-use Efaturacim\Util\Options;
-use Efaturacim\Util\Utils\StrNameSurname;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\String\StrNameSurname;
 use PHPUnit\Framework\TestCase;
+
 
 /**
  * @covers \Efaturacim\Util\Utils\StrNameSurname

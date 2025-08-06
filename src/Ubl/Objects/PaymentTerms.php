@@ -4,8 +4,8 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\DateUtil;
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\Date\DateUtil;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class PaymentTerms extends UblDataType
 {

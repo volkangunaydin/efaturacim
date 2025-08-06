@@ -1,6 +1,8 @@
 <?php
 namespace Efaturacim\Util\Utils\Number;
-                                                
+
+use Efaturacim\Util\Utils\CastUtil;
+
 class NumberUtil{
     public static function coalesce($arg1=null){
         $args = func_get_args();            

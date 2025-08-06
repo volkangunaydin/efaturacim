@@ -3,7 +3,6 @@
 namespace Efaturacim\Util\Tests;
 
 use Efaturacim\Util\Ubl\Samples\EFaturaSamples;
-use Efaturacim\Util\Ubl\Turkce\EFaturaBelgesi;
 use PHPUnit\Framework\TestCase;
 
 /**

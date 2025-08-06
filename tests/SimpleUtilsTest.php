@@ -2,8 +2,9 @@
 
 namespace Efaturacim\Util\Tests;
 
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\String\StrUtil;
 use PHPUnit\Framework\TestCase;
+
 
 /**
  * @covers \Efaturacim\Util\StrUtil

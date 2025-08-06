@@ -4,7 +4,6 @@ namespace Efaturacim\Util\Tests;
 
 use Efaturacim\Util\Ubl\Turkce\EIrsaliyeBelgesi;
 use Efaturacim\Util\Utils\Common\EFaturacimLibUtil;
-use Efaturacim\Util\XMLToArray;
 use PHPUnit\Framework\TestCase;
 
 class EirsaliyeXmlTest extends TestCase{

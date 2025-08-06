@@ -4,8 +4,8 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\NumberUtil;
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\Number\NumberUtil;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class UblDataTypeForQuantity extends UblDataType{
     public function initMe(){

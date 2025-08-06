@@ -4,7 +4,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\StrUtil;
+
 
 class LegalMonetaryTotal extends UblDataType
 {

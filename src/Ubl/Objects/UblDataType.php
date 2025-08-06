@@ -6,11 +6,11 @@ use DOMDocument;
 use DOMDocumentFragment;
 use DOMElement;
 use DOMNodeList;
-use Efaturacim\Util\Options;
-use Efaturacim\Util\PreviewUtil;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\PreviewUtil;
 use Efaturacim\Util\Ubl\InvoiceDocument;
 use Efaturacim\Util\Ubl\UblDocument;
-use Efaturacim\Util\Utils\Xml\XmlToArray;
+use Efaturacim\Util\Utils\Xml\XMLToArray;
 
 /**
  * Abstract base class for all UBL data objects.

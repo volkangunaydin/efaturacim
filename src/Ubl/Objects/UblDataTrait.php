@@ -1,7 +1,7 @@
 <?php
 namespace Efaturacim\Util\Ubl\Objects;
 
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Ubl\UblDocument;
 
 trait UblDataTrait{

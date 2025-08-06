@@ -3,8 +3,8 @@
 namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
-use Efaturacim\Util\CastUtil;
-use Efaturacim\Util\StrUtil;
+use Efaturacim\Util\Utils\CastUtil;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class UblDataTypeForBool extends UblDataType{    
     public function setPropertyFromOptions($k,$v,$options){        
