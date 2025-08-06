@@ -4,6 +4,7 @@ namespace Efaturacim\Util\Utils;
 
 class GitUtil{
     public static function getHookParams($secretGuid=null,$isJson=true){
+        // 
         $r = new SimpleResult();
         $signature_header = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? null;        
         if (!$signature_header) {            
