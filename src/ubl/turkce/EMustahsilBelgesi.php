@@ -2,29 +2,19 @@
 namespace Efaturacim\Util\Ubl\Turkce;
 
 use Efaturacim\Util\PreviewUtil;
-use Efaturacim\Util\Ubl\DespatchAdviceDocument;
+use Efaturacim\Util\Ubl\CreditNoteDocument;
 
 class EMustahsilBelgesi extends EBelge{
     /**
      * Summary of ubl
-     * @var DespatchAdviceDocument
+     * @var CreditNoteDocument
      */
     public $ubl = null;
-    
-    public function __construct($irsaliyeNo=null){
+    public function __construct($faturaNo=null){
         parent::__construct("creditNote");                
     }
-    
-    public function getIrsaliyeNo(){
+    public function getFaturaNo(){
         return $this->ubl->getId();
     }
-    
-    public static function fromXmlFile($xmlFile){
-        $a = new EIrsaliyeBelgesi();
-        if($xmlFile && strlen("".$xmlFile)>0 && file_exists($xmlFile) && is_readable($xmlFile)){
-            $a->ubl->loadFromXml(file_get_contents($xmlFile));            
-        }        
-        return $a;
-    }
 }
-?> 
+?>
