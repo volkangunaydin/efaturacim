@@ -140,4 +140,42 @@ class EfaturaXmlTest extends TestCase{
             $this->assertTrue(is_numeric($vatData['taxableAmount']));
         }
     }
+    public function testXmlATM2025000001677()    {
+        $efatura = EFaturaBelgesi::fromXmlFile(EFaturacimLibUtil::getTestPath("xml_data/efatura/ATM2025000001677-satis.xml"));
+        $this->assertSame("ATM2025000001677",$efatura->getBelgeNo());
+        $this->assertSame("cc2285a4-0524-456b-b679-c53fd7b51d05",$efatura->getBelgeGuid());
+        $this->assertSame("2.1",$efatura->ubl->getUBLVersionId());
+        $this->assertSame("TICARIFATURA",$efatura->ubl->getProfileId());
+        $this->assertSame("TRY",$efatura->ubl->getDocumentCurrencyCode());
+        $this->assertSame(1,$efatura->getSatirSayisi());
+        $this->assertEquals("ATMACA DEMIR SAC INS. TAAH. SAN. VE TIC. LTD. STI.",$efatura->ubl->accountingSupplierParty->getName());
+        $this->assertEquals("1030536586",$efatura->ubl->accountingSupplierParty->getVknOrTckn());
+        $this->assertEquals("AYDINLAR METALURJİ SANAYİ VE TİCARET LİMİTED ŞİRKETİ",$efatura->ubl->accountingCustomerParty->getName());
+        $this->assertEquals("1160403231",$efatura->ubl->accountingCustomerParty->getVknOrTckn());
+        $this->assertEquals("2025-07-25 09:20:40",$efatura->getBelgeTarihi());
+
+        $this->assertEquals(7780.5,$efatura->ubl->getLineExtensionAmount());
+        $this->assertEquals(7780.5,$efatura->ubl->getLineExtensionAmountFromLines());
+
+        $this->assertEquals(7780.5,$efatura->ubl->getTaxExclusiveAmount());
+        $this->assertEquals(7780.5,$efatura->ubl->getTaxExclusiveAmountFromLines());
+
+        $this->assertEquals(9336.6,$efatura->ubl->getTaxInclusiveAmount());
+        $this->assertEquals(9336.6,$efatura->ubl->getTaxInclusiveAmountFromLines());
+
+        $this->assertEquals(9336.6,$efatura->ubl->getPayableAmount());
+        $this->assertEquals(9336.6,$efatura->ubl->getPayableAmountFromLines());
+        
+        $vatsArray = $efatura->ubl->getVatsAsArray();
+        foreach ($vatsArray as $vatKey => $vatData) {
+            // percent alanının sayı olduğunu kontrol et
+            $this->assertTrue(is_numeric($vatData['percent']));
+            
+            // taxAmount alanının sayı olduğunu kontrol et
+            $this->assertTrue(is_numeric($vatData['taxAmount']));
+            
+            // taxableAmount alanının sayı olduğunu kontrol et
+            $this->assertTrue(is_numeric($vatData['taxableAmount']));
+        }
+    }
 }

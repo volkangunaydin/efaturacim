@@ -10,21 +10,11 @@ class EIrsaliyeBelgesi extends EBelge{
      * @var DespatchAdviceDocument
      */
     public $ubl = null;
-    
-    public function __construct($irsaliyeNo=null){
-        parent::__construct("deliveryAdvice");                
+    public function __construct($faturaNo=null){
+        parent::__construct("despatchAdvice");                
     }
-    
-    public function getIrsaliyeNo(){
+    public function getFaturaNo(){
         return $this->ubl->getId();
     }
-    
-    public static function fromXmlFile($xmlFile){
-        $a = new EIrsaliyeBelgesi();
-        if($xmlFile && strlen("".$xmlFile)>0 && file_exists($xmlFile) && is_readable($xmlFile)){
-            $a->ubl->loadFromXml(file_get_contents($xmlFile));            
-        }        
-        return $a;
-    }
 }
-?> 
+?>

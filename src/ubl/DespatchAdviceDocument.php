@@ -129,10 +129,16 @@ class DespatchAdviceDocument extends UblDocument
         // Default profile for a commercial invoice. Can be overridden for "TEMELFATURA".
 
     }
+    public function getIssueDate(){
+        return $this->issueDate;
+    }
+    public function getIssueTime(){
+        return $this->issueTime;
+    }
     public function initMe()
     {
         $this->rootElementName = 'DespatchAdvice';
-        $this->setProfileId('TEMELIRSALIYE');
+        $this->setProfileId('TICARIFATURA');
         $this->setIssueDate(date('Y-m-d'));
         $this->setIssueTime(date('H:i:s'));
         $this->setDocumentCurrencyCode("TRY");
@@ -149,8 +155,6 @@ class DespatchAdviceDocument extends UblDocument
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
         $this->paymentMeans = new PaymentMeans();
-        $this->delivery = new Delivery();
-        $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
         $this->UBLExtensions = new UBLExtensions();
     }
@@ -166,14 +170,13 @@ class DespatchAdviceDocument extends UblDocument
      */
     public function toXml(): string
     {
-        $this->getGUID();
-        $this->rebuildValues();
+        $this->getGUID();        
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
         $this->setNamespaces();
         $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
         $this->appendCommonElements();
-        $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
+        $this->appendElement('cbc:DespatchAdviceTypeCode', $this->invoiceTypeCode);
 
         // TODO: Implement and call methods to append other required sections:
         //$this->appendSignature();
@@ -190,7 +193,6 @@ class DespatchAdviceDocument extends UblDocument
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
-        $this->appendLegalMonetaryTotal();
         $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();
     }
@@ -329,43 +331,34 @@ class DespatchAdviceDocument extends UblDocument
         return new Options(array(
             "nextLineId" => $this->invoiceLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "invoiceTypeCode" => $this->invoiceTypeCode
+            "despatchAdvice" => $this->invoiceTypeCode
         ));
     }
-    public function rebuildValues()
-    {
-        $totalLineExtensionAmount = 0;
-        $totalTaxExclusiveAmount = 0;
-        $totalTaxInclusiveAmount = 0;
-        $totalAllowanceTotalAmount = 0;
-        $totalChargeTotalAmount = 0;
-        $totalPayableAmount = 0;
-
-        // Rebuild invoice line values and collect totals
-        foreach ($this->invoiceLine->list as &$invLine) {
-            if ($invLine instanceof InvoiceLine) {
-                $invLine->rebuildValues();
-
-                // Get calculated values from line context
-                $lineContext = $invLine->getContextArray();
-                if ($lineContext instanceof Options) {
-                    $totalLineExtensionAmount += NumberUtil::asMoneyVal($lineContext->getAs("lineExtensionAmount", 0));
-                    $totalTaxExclusiveAmount += NumberUtil::asMoneyVal($lineContext->getAs("taxExclusiveAmount", 0));
-                    $totalTaxInclusiveAmount += NumberUtil::asMoneyVal($lineContext->getAs("taxInclusiveAmount", 0));
-                    $totalAllowanceTotalAmount += NumberUtil::asMoneyVal($lineContext->getAs("allowanceTotalAmount", 0));
-                    $totalChargeTotalAmount += NumberUtil::asMoneyVal($lineContext->getAs("chargeTotalAmount", 0));
-                    $totalPayableAmount += NumberUtil::asMoneyVal($lineContext->getAs("payableAmount", 0));
+   
+    public function getVatsAsArray(){
+        $arr = array();
+        foreach($this->invoiceLine->list as $line){
+            if($line instanceof InvoiceLine){
+                $vat = $line->getVatAsArray();
+                if($vat && is_array($vat) && count($vat)>0 && key_exists("percent",$vat)){
+                    $percent = @$vat["percent"];
+                    if(!key_exists($percent,$arr)){
+                        $arr[$percent] = array();
+                    }
+                    foreach($vat as $kk=>$vv){
+                        if($kk=="percent"){ 
+                            $arr[$percent][$kk] = $vv;
+                            continue;
+                        }
+                        if(key_exists($kk,$arr[$percent]) && is_numeric($arr[$percent][$kk])){
+                            $arr[$percent][$kk] += $vv;
+                        }else{
+                            $arr[$percent][$kk] = $vv;
+                        }                        
+                    }
                 }
             }
         }
-
-        // Set LegalMonetaryTotal values
-        $this->legalMonetaryTotal->lineExtensionAmount = $totalLineExtensionAmount;
-        $this->legalMonetaryTotal->taxExclusiveAmount = $totalTaxExclusiveAmount;
-        $this->legalMonetaryTotal->taxInclusiveAmount = $totalTaxInclusiveAmount;
-        $this->legalMonetaryTotal->allowanceTotalAmount = $totalAllowanceTotalAmount;
-        $this->legalMonetaryTotal->chargeTotalAmount = $totalChargeTotalAmount;
-        $this->legalMonetaryTotal->payableAmount = $totalPayableAmount;
-        $this->legalMonetaryTotal->currencyID = $this->documentCurrencyCode;
+        return $arr;
     }
 }

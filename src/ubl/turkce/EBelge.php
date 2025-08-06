@@ -14,7 +14,7 @@ class EBelge{
      */
     public $ubl = null;
     public function __construct($type=null){
-        if(in_array("".$type,array("irsaliye","eirsaliye","deliveryAdvice"))){
+        if(in_array("".$type,array("irsaliye","eirsaliye","despatchAdvice"))){
             $this->ubl = new DespatchAdviceDocument();
         }else if(in_array("".$type,array("fatura","einvoice","invoice"))){
             $this->ubl = new InvoiceDocument();            
