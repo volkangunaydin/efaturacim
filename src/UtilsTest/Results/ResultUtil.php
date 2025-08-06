@@ -1,7 +1,7 @@
 <?php
-namespace Efaturacim\Util\Results;
+namespace Efaturacim\Util\Utils\Results;
 
-use Efaturacim\Util\CastUtil;
+use Efaturacim\Util\Utils\CastUtil;
 
 class ResultUtil{
     public static function newFromJson($jsonStringOrArray,$class){
