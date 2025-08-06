@@ -6,7 +6,7 @@ use Efaturacim\Util\Utils\SimpleResult;
 
 class IO_Util{
     public static function readFileAsString($path,$options=null){
-            return self::readFile($path, $options)->value;
+        return self::readFile($path, $options)->value;
     }
     public static function readFile($path,$options){
         $r = new SimpleResult();
