@@ -1,7 +1,6 @@
 <?php
 namespace Efaturacim\Util\Utils;
 
-use Efaturacim\Util\SimpleResult;
 
 class GitUtil{
     public static function getHookParams($secretGuid=null,$isJson=true){
