@@ -118,15 +118,29 @@ abstract class UblDocument{
         $this->profileId = $profileId;
         return $this;
     }
+
+    public function getProfileId(){
+        return $this->profileId;
+    }
+
     public function getId(){
         return $this->id;
     }
+
+    
     /**
      * Sets the document ID.
      *
      * @param string $id
      * @return static
      */
+    public function getUBLVersionID(){
+        return $this->ublVersionId;
+    }
+
+    public function getCustomizationId(){
+        return $this->customizationId;
+    }
     public function setId(string $id): static
     {
         $this->id = $id;
@@ -192,6 +206,10 @@ abstract class UblDocument{
     {
         $this->documentCurrencyCode = $currencyCode;
         return $this;
+    }
+
+    public function getDocumentCurrencyCode(){
+        return $this->documentCurrencyCode;
     }
 
     /**
