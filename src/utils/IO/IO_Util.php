@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util\IO;
+namespace Efaturacim\Util\Utils\IO;
 
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\SimpleResult;
