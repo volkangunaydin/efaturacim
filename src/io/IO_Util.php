@@ -1,8 +1,9 @@
 <?php
 namespace Efaturacim\Util\IO;
 
-use Efaturacim\Util\Options;
-use Efaturacim\Util\SimpleResult;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\SimpleResult;
+
 class IO_Util{
     public static function readFileAsString($path,$options=null){
             return self::readFile($path, $options)->value;
