@@ -11,6 +11,7 @@ class Delivery extends UblDataType
 {
     public ?DeliveryAddress $deliveryAddress = null;
     public ?DeliveryTerms $deliveryTerms = null;
+    public ?Shipment $shipment = null;
 
     public function __construct($options = null)
     {
@@ -20,6 +21,7 @@ class Delivery extends UblDataType
     public function initMe(){
         $this->deliveryAddress = new DeliveryAddress();
         $this->deliveryTerms = new DeliveryTerms();
+        $this->shipment = new Shipment();
     }
     
     public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)
@@ -34,12 +36,19 @@ class Delivery extends UblDataType
             $this->deliveryAddress = new DeliveryAddress($v);
         }else if(in_array($k,array("deliveryTerms","DeliveryTerms","delivery_terms")) && StrUtil::notEmpty($v)){
             $this->deliveryTerms = new DeliveryTerms($v);
+        }else if(in_array($k,array("shipment","Shipment","SHIPMENT")) && StrUtil::notEmpty($v)){
+            $this->shipment = new Shipment($v);
         }
     }
     
     public function isEmpty()
     {
-        return is_null($this->deliveryAddress) || is_null($this->deliveryTerms);
+        $deliveryAddressIsEmpty = is_null($this->deliveryAddress) || $this->deliveryAddress->isEmpty();
+        $deliveryTermsIsEmpty = is_null($this->deliveryTerms) || $this->deliveryTerms->isEmpty();
+        $shipmentIsEmpty = is_null($this->shipment) || $this->shipment->isEmpty();
+
+        // Delivery ancak tüm alt öğeler BOŞ ise boş kabul edilmeli
+        return $deliveryAddressIsEmpty && $deliveryTermsIsEmpty && $shipmentIsEmpty;
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
@@ -60,6 +69,13 @@ class Delivery extends UblDataType
             $deliveryTermsElement = $this->deliveryTerms->toDOMElement($document);
             if ($deliveryTermsElement) {
                 $this->appendChild($element, $deliveryTermsElement);
+            }
+        }
+
+        if ($this->shipment && !$this->shipment->isEmpty()) {
+            $shipmentElement = $this->shipment->toDOMElement($document);
+            if ($shipmentElement) {
+                $this->appendChild($element, $shipmentElement);
             }
         }
 

@@ -118,6 +118,11 @@ trait UblDataTrait{
                             }
                             $isScalar = is_scalar($v) && (is_null($this->$paramName) || !is_object($this->$paramName) );                                                        
                             if($isScalar){
+                                if (is_string($v)) {
+                                    $lowerVal = strtolower(trim($v));
+                                    if ($lowerVal === 'true') { $v = true; }
+                                    else if ($lowerVal === 'false') { $v = false; }
+                                }
                                 if($isDebug){
                                     $debugArray["log"][] = "Setting scalar value for ".$paramName." := ".$v;
                                 }                                                              

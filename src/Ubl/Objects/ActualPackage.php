@@ -7,35 +7,33 @@ use DOMElement;
 
 class ActualPackage extends UblDataType
 {
-    public ?ID $id = null;
-    public ?Quantity $quantity = null;
-    public ?PackagingTypeCode $packagingTypeCode = null;
+    public ?string $id = null;
+    public ?int $quantity = null;
+    public ?string $packagingTypeCode = null;
+    
+    public function initMe(){
 
-    public function initMe() {
-        $this->id = new ID();
-        $this->quantity = new Quantity();
-        $this->packagingTypeCode = new PackagingTypeCode();
     }
-
-    public function toDOMElement(DOMDocument $document): ?DOMElement {
-        $element = $document->createElement('cac:ActualPackage');
-        if ($this->id && !$this->id->isEmpty()) {
-            $element->appendChild($this->id->toDOMElement($document));
-        }
-        if ($this->quantity && !$this->quantity->isEmpty()) {
-            $element->appendChild($this->quantity->toDOMElement($document));
-        }
-        if ($this->packagingTypeCode && !$this->packagingTypeCode->isEmpty()) {
-            $element->appendChild($this->packagingTypeCode->toDOMElement($document));
-        }
-        return $element;
-    }
-
-    public function isEmpty(): bool {
-        return is_null($this->id) || $this->id->isEmpty();
-    }
-
-    public function setPropertyFromOptions($k, $v, $options) {
+    public function setPropertyFromOptions($k, $v, $options): bool
+    {                            
         return false;
+    }
+
+    public function isEmpty(): bool
+    {
+        return is_null($this->id);
+    }
+
+    public function toDOMElement(DOMDocument $document): ?DOMElement
+    {
+        if ($this->isEmpty()) {            
+            return null;
+        }
+        $element = $document->createElement('cac:ActualPackage');
+        $this->appendElement($document, $element, 'cbc:ID', $this->id);
+        $this->appendElement($document, $element, 'cbc:Quantity', $this->quantity);
+        $this->appendElement($document, $element, 'cbc:PackagingTypeCode', $this->packagingTypeCode);
+
+        return $element;
     }
 }
