@@ -24,17 +24,17 @@ class PaymentMeans extends UblDataType
     public function setPropertyFromOptions($k,$v,$options){        
         return false;
     }
+    public function isEmpty(){
+        return is_null($this->paymentMeansCode) || is_null($this->paymentDueDate);
+    }
     public function toDOMElement(DOMDocument $document){
-        if($this->isEmpty()){ return null; }
+        if ($this->isEmpty()) {            
+            return null;
+        }
         $element = $this->createElement($document,'cac:PaymentMeans');        
         $element->appendChild($this->paymentMeansCode->toDOMElement($document));
         $this->appendElement($document, $element, 'cbc:PaymentDueDate', $this->paymentDueDate);
         return $element;
     }
-    public function isEmpty(){
-        if(is_null($this->paymentMeansCode) || $this->paymentMeansCode->isEmpty()){
-            return true;
-        }
-        return false;        
-    }
+    
 }

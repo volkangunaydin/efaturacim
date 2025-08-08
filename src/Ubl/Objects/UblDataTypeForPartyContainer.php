@@ -22,7 +22,7 @@ class UblDataTypeForPartyContainer extends UblDataType{
         if ($this->isEmpty()) {
             return null;
         }
-        $element = $document->createElement('cac:AccountingSupplierParty');
+        $element = $document->createElement($this->defaultTagName);
         $partyElement = $this->party->toDOMElement($document);
         if ($partyElement) {
             $this->appendChild($element, $partyElement);

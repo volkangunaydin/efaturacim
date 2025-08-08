@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils\Date;
 
 use DateTime;
+use Efaturacim\Util\Utils\CastUtil;
 use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\String\StringSplitter;
 
