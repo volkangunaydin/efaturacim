@@ -18,6 +18,7 @@ use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
 use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
+use Efaturacim\Util\Ubl\Objects\AllowanceCharge;
 use Efaturacim\Util\Ubl\Objects\Delivery;
 use Efaturacim\Util\Ubl\Objects\BillingReference;
 use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
@@ -75,6 +76,12 @@ class InvoiceDocument extends UblDocument
      * @var WithholdingTaxTotal
      */
     public $withholdingTaxTotal = null;
+
+    
+    /**
+     * @var AllowanceCharge
+     */
+    public $allowanceCharge = null;
 
 
     /**
@@ -152,6 +159,7 @@ class InvoiceDocument extends UblDocument
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note = new UblDataTypeList(Note::class);
         $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
+        $this->allowanceCharge = new AllowanceCharge();
         $this->taxTotal = new TaxTotal();
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
@@ -179,12 +187,8 @@ class InvoiceDocument extends UblDocument
         $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
         $this->appendCommonElements();
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
-
-        // TODO: Implement and call methods to append other required sections:
-        //$this->appendSignature();
         $this->appendElementList($this->billingReference);
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
-
         $this->appendElementList($this->additionalDocumentReference);
         $this->appendElementList($this->orderReference);
         $this->appendElementList($this->despatchDocumentReference);
@@ -194,6 +198,7 @@ class InvoiceDocument extends UblDocument
         $this->appendBuyerCustomerParty();
         $this->appendDelivery();
         $this->appendElementList($this->paymentMeans);
+        $this->appendAllowanceCharge();
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
@@ -225,6 +230,10 @@ class InvoiceDocument extends UblDocument
     public function appendWithholdingTaxTotal()
     {
         $this->appendElement('cac:WithholdingTaxTotal', $this->withholdingTaxTotal->toDOMElement($this->document));
+    }
+    public function appendAllowanceCharge()
+    {
+        $this->appendElement('cac:AllowanceCharge', $this->allowanceCharge->toDOMElement($this->document));
     }
     public function appendPricingExchangeRate()
     {

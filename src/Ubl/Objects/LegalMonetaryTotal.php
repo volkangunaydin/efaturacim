@@ -44,6 +44,54 @@ class LegalMonetaryTotal extends UblDataType
         $this->payableAmount       = new PayableAmount();
     }
     public function setPropertyFromOptions($k, $v, $options): bool {
+        if(in_array($k, ['lineExtensionAmount', 'lineExtensionAmountCurrencyID'])){
+            if($k === 'lineExtensionAmount') {
+                $this->lineExtensionAmount->setValue($v);
+            } else {
+                $this->lineExtensionAmount->setCurrencyID($v);
+            }
+            return true;
+        }
+        if(in_array($k, ['taxExclusiveAmount', 'taxExclusiveAmountCurrencyID'])){
+            if($k === 'taxExclusiveAmount') {
+                $this->taxExclusiveAmount->setValue($v);
+            } else {
+                $this->taxExclusiveAmount->setCurrencyID($v);
+            }
+            return true;
+        }
+        if(in_array($k, ['taxInclusiveAmount', 'taxInclusiveAmountCurrencyID'])){
+            if($k === 'taxInclusiveAmount') {
+                $this->taxInclusiveAmount->setValue($v);
+            } else {
+                $this->taxInclusiveAmount->setCurrencyID($v);
+            }
+            return true;
+        }
+        if(in_array($k, ['allowanceTotalAmount', 'allowanceTotalAmountCurrencyID'])){
+            if($k === 'allowanceTotalAmount') {
+                $this->allowanceTotalAmount->setValue($v);
+            } else {
+                $this->allowanceTotalAmount->setCurrencyID($v);
+            }
+            return true;
+        }
+        if(in_array($k, ['chargeTotalAmount', 'chargeTotalAmountCurrencyID'])){
+            if($k === 'chargeTotalAmount') {
+                $this->chargeTotalAmount->setValue($v);
+            } else {
+                $this->chargeTotalAmount->setCurrencyID($v);
+            }
+            return true;
+        }
+        if(in_array($k, ['payableAmount', 'payableAmountCurrencyID'])){ 
+            if($k === 'payableAmount') {
+                $this->payableAmount->setValue($v);
+            } else {
+                $this->payableAmount->setCurrencyID($v);
+            }
+            return true;
+        }
         return false;
     }
     public function setCurrencyID($code=null){
