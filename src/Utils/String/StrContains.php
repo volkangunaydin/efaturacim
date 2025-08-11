@@ -17,7 +17,7 @@ use Efaturacim\Util\CastUtil;
                     if($p){ return $p; }
                 }
                 return false;
-            }else if(\Vulcan\V::notEmptyString($haystack) && \Vulcan\V::notEmptyString($needle)){
+            }else if(StrUtil::notEmpty($haystack) && StrUtil::notEmpty($needle)){
                 if($minIndex>0){
                     if($caseInsensitive){
                         $p1 = stripos($haystack, $needle);
