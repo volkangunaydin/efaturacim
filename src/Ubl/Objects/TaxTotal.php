@@ -57,8 +57,7 @@ class TaxTotal extends UblDataType
 
     public function isEmpty(): bool
     {
-        return false;
-        //return is_null($this->taxAmount) || $this->taxSubtotal->isEmpty();
+        return is_null($this->taxAmount) || $this->taxSubtotal->isEmpty();
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement

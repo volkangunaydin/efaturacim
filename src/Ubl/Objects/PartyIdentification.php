@@ -21,6 +21,14 @@ class PartyIdentification extends UblDataType
         return $this;
     }
     public function setPropertyFromOptions($k,$v,$options){        
+        if (in_array($k, ['id', 'ID']) && StrUtil::notEmpty($v)) {
+            $this->id->textContent = $v;
+            return true;
+        }
+        if (in_array($k, ['schemeID', 'scheme_id']) && StrUtil::notEmpty($v)) {
+            $this->id->attributes['schemeID'] = $v;
+            return true;
+        }
         return false;
     }
     public function toDOMElement(DOMDocument $document){
