@@ -4,9 +4,6 @@ namespace Efaturacim\Util\Ubl;
 
 use DOMDocument;
 use DOMElement;
-use Efaturacim\Util\ArrayUtil;
-use Efaturacim\Util\Options;
-use Efaturacim\Util\StrUtil;
 use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
 use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
 use Efaturacim\Util\Ubl\Objects\TaxTotal;
@@ -18,15 +15,16 @@ use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\Ubl\Objects\Delivery;
-use Efaturacim\Util\NumberUtil;
 use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Note;
-use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
+use Efaturacim\Util\Utils\Array\ArrayUtil;
+use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Utils\xml\XmlToArray;
 
 
@@ -43,6 +41,7 @@ class DespatchAdviceDocument extends UblDocument
      * Invoice type code. e.g., "SATIS", "IADE"
      * @var string|null
      */
+    
     public ?string $invoiceTypeCode = 'SATIS';
 
     /**

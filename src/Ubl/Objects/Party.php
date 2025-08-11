@@ -17,6 +17,7 @@ class Party extends UblDataType
     public ?PartyTaxScheme $partyTaxScheme = null;
     public ?Contact $contact = null;
     public ?Person $person = null;
+    public ?PartyLegalEntity $partyLegalEntity = null;  
 
     public function __construct($options=null)
     {
@@ -25,6 +26,7 @@ class Party extends UblDataType
     }
     public function initMe(){
         $this->postalAddress       = new Address();
+        $this->partyLegalEntity       = new PartyLegalEntity();
         $this->partyIdentification = new UblDataTypeListForPartyIdentification(PartyIdentification::class);
         $this->partyTaxScheme      = new PartyTaxScheme();
         $this->contact             = new Contact();
@@ -85,12 +87,13 @@ class Party extends UblDataType
         $element = $document->createElement('cac:Party');        
         if(StrUtil::notEmpty($this->websiteURI)){
             $this->appendElement($document, $element, 'cbc:WebsiteURI', $this->websiteURI);
-        }                
+        }       
+        $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
         if(!$this->partyName->isEmpty()){            
             $element->appendChild($this->partyName->toDOMElement($document));
-        }                
-        $this->appendChild($element,$this->partyIdentification->toDOMElement($document));
+        }   
         $this->appendChild($element,$this->postalAddress->toDOMElement($document));
+        $this->appendChild($element,$this->partyLegalEntity->toDOMElement($document));
         $this->appendChild($element,$this->partyTaxScheme->toDOMElement($document));
         $this->appendChild($element,$this->contact->toDOMElement($document));
         if($this->isRealPerson() && $this->person->isEmpty()){

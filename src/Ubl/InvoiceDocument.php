@@ -5,6 +5,7 @@ namespace Efaturacim\Util\Ubl;
 use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Utils\Array\ArrayUtil;
+use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
@@ -18,7 +19,7 @@ use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\Ubl\Objects\Delivery;
-use Efaturacim\Util\NumberUtil;
+use Efaturacim\Util\Ubl\Objects\BillingReference;
 use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
@@ -81,9 +82,6 @@ class InvoiceDocument extends UblDocument
      */
     public $pricingExchangeRate = null;
 
-    /**
-     * @var PaymentMeans
-     */
     public $paymentMeans = null;
 
     /**     
@@ -94,6 +92,8 @@ class InvoiceDocument extends UblDocument
      * @var Delivery
      */
     public $delivery = null;
+
+    public $billingReference = null;
 
     public $orderReference = null;
     /**     
@@ -143,8 +143,9 @@ class InvoiceDocument extends UblDocument
         $this->setIssueTime(date('H:i:s'));
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
-        $this->accountingCustomerParty = new AccountingCustomerParty();
+        $this->billingReference = new UblDataTypeList(BillingReference::class);
         $this->accountingSupplierParty = new AccountingSupplierParty();
+        $this->accountingCustomerParty = new AccountingCustomerParty();
         $this->buyerCustomerParty = new BuyerCustomerParty();
         $this->delivery = new Delivery();
         $this->orderReference = new UblDataTypeList(OrderReference::class);
@@ -154,7 +155,7 @@ class InvoiceDocument extends UblDocument
         $this->taxTotal = new TaxTotal();
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
-        $this->paymentMeans = new PaymentMeans();
+        $this->paymentMeans = new UblDataTypeList(PaymentMeans::class);
         $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
         $this->UBLExtensions = new UBLExtensions();
@@ -181,6 +182,9 @@ class InvoiceDocument extends UblDocument
 
         // TODO: Implement and call methods to append other required sections:
         //$this->appendSignature();
+        $this->appendElementList($this->billingReference);
+        $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
+
         $this->appendElementList($this->additionalDocumentReference);
         $this->appendElementList($this->orderReference);
         $this->appendElementList($this->despatchDocumentReference);
@@ -189,8 +193,7 @@ class InvoiceDocument extends UblDocument
         $this->appendAccountingCustomerParty();
         $this->appendBuyerCustomerParty();
         $this->appendDelivery();
-        $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
-        $this->appendPaymentMeans();
+        $this->appendElementList($this->paymentMeans);
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
@@ -234,6 +237,10 @@ class InvoiceDocument extends UblDocument
     public function appendDelivery()
     {
         $this->appendElement('cac:Delivery', $this->delivery->toDOMElement($this->document));
+    }
+    public function appendBillingReference()
+    {
+        $this->appendElement('cac:BillingReference', $this->billingReference->toDOMElement($this->document));
     }
 
     /**

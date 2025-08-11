@@ -4,9 +4,13 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 
 class ID extends UblDataType{
+    public function isEmpty(){
+        return !StrUtil::notEmpty($this->textContent);
+    }
     public function setPropertyFromOptions($k,$v,$options){        
         return false;
     }    
