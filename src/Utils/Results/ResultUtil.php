@@ -2,9 +2,10 @@
 namespace Efaturacim\Util\Utils\Results;
 
 use Efaturacim\Util\Utils\CastUtil;
-
+use Efaturacim\Util\Utils\SimpleResult;
+use Vulcan\Base\Util\Result\ResultUtil as ResultResultUtil;
 class ResultUtil{
-    public static function newFromJson($jsonStringOrArray,$class){
+    public static function newFromJson($jsonStringOrArray,$class){        
         if(!is_null($class) && class_exists($class)){            
             if(is_array($jsonStringOrArray)){                
                 $r = new $class();                
@@ -32,5 +33,13 @@ class ResultUtil{
         }
         return null;
     }
+    public static function mergeMessages(&$result,$resForMerge){
+        if($result instanceof SimpleResult && $resForMerge instanceof SimpleResult){
+            foreach ($resForMerge->messages as $msg){
+                $result->addMessage($msg["text"],@$msg["type"]);                   
+            }
+        }
+        return $result;
+    }    
 }
 ?>

@@ -3,6 +3,8 @@ namespace Efaturacim\Util\Utils\IO;
 
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\SimpleResult;
+use Efaturacim\Util\Utils\String\StrBase64;
+
 
 class IO_Util{
     public static function readFileAsString($path,$options=null){
@@ -21,6 +23,9 @@ class IO_Util{
             }
         }
         return $r;
-    }    
+    }        
+    public static function readFileAsBase64EncodedString($path,$options=null){
+        return StrBase64::encode(self::readFileAsString($path,$options));
+    }
 }
 ?>

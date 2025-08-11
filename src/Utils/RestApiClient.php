@@ -1,12 +1,22 @@
 <?php
 namespace Efaturacim\Util\Utils;
 
+use Efaturacim\Util\Utils\IO\FileCache;
+use Efaturacim\Util\Utils\Results\ResultUtil;
 use Efaturacim\Util\Utils\String\StrUtil;
+
 
 class RestApiClient{
     public static $DEFAULT_BEARER_TOKEN = null;
+    public static $DEFAULT_API_URL      = null;
+    public static function setDefaultUrl($url){
+        self::$DEFAULT_API_URL = $url;
+    }
     public static function getResult($baseApiUrl,$relPath,$postVars=null,$options=null){        
         $r = new RestApiResult();
+        if(is_null($baseApiUrl) && !is_null(self::$DEFAULT_API_URL) && strlen("".self::$DEFAULT_API_URL)>0){
+            $baseApiUrl = self::$DEFAULT_API_URL;
+        }
         if(StrUtil::notEmpty($baseApiUrl) && StrUtil::notEmpty($relPath) && Options::ensureParam($options) && $options instanceof Options){
             if(function_exists("curl_init")){
                 $url = $baseApiUrl;
@@ -60,6 +70,27 @@ class RestApiClient{
         }
         return $r;
     }    
+    public static function getJsonResultCached($cacheFolder,$cacheTimeout,$baseApiUrl,$relPath,$postParams=null,$options=null){      
+        if(is_null($cacheFolder)){
+            $cacheFolder = "../content_cache/servis_cache/";            
+        }          
+        if(strlen("".$cacheFolder)>0 && is_dir($cacheFolder)){
+            if(substr($cacheFolder,-1)!=="/"){
+                $cacheFolder = $cacheFolder."/";
+            }
+            $rr = FileCache::getCached($cacheFolder,array("url"=>$baseApiUrl,"relPath"=>$relPath,"postParams"=>$postParams,"options"=>$options),function() use($baseApiUrl,$relPath,$postParams,$options){
+                return self::getJsonResult($baseApiUrl,$relPath,$postParams,$options);
+            },$cacheTimeout);
+            if($rr->isOK() && !is_null($rr->value) && $rr->value instanceof SimpleResult){                
+                $rr->value->setAttribute("__cache_age",$rr->getAttribute("cache_age"));
+                $rr->value->setAttribute("__cache_file",$rr->getAttribute("cache_file"));
+                $rr->value->setAttribute("__cache_status",$rr->getAttribute("cache_status"));
+                return $rr->value;
+            }
+        }
+        $r = self::getJsonResult($baseApiUrl,$relPath,$postParams,$options);
+        return $r;
+    }
     public static function getJsonResult($baseApiUrl,$relPath,$postParams=null,$options=null){        
         $postVars  = array();
         if($postParams && is_array($postParams)){
@@ -92,6 +123,7 @@ class RestApiClient{
     public static function getLogin($baseApiUrl,$relPath,$postParams=null,$options=null){        
         $r = new RestApiResult();
         $res = static::getJsonResult($baseApiUrl,$relPath,$postParams,$options);
+        //\Vulcan\V::dump($res);
         if($res->isOK()){
             $bearer  =  $res->getAttribute("bearer");
             $userRef =  $res->getAttribute("user_reference",0,"int");
@@ -103,10 +135,39 @@ class RestApiClient{
             $res->statusCode = 401;
         }   
         $r->addError("Kullanıcı doğrulanamadı.");     
+        if($res->hasError()){
+            ResultUtil::mergeMessages($r,$res);
+        }
         return $r;
     }   
     public static function setBearer($bearer){
         self::$DEFAULT_BEARER_TOKEN = $bearer;
+    }
+    public static function ensureLoginAndGetBearer($baseApiUrl,$customer,$user,$pass,$funcGetBearer,$funcSetBearer,$setAsDefault=false){        
+        if(!is_null($funcGetBearer) && is_callable($funcGetBearer)){
+            $bearer = call_user_func_array($funcGetBearer,array());
+            if(strlen("".$bearer)>0){
+                $r2 = self::getJsonResult($baseApiUrl,"EFaturacim/Ping",array("bearer"=>$bearer));
+                if($r2->isOK() && $r2->getAttribute("loggedin",false,CastUtil::$DATA_BOOL)){
+                    if($setAsDefault){
+                        self::$DEFAULT_BEARER_TOKEN = $bearer;
+                    }
+                    return $bearer;
+                }                
+            }
+        }
+        $r = self::getLogin($baseApiUrl,"EFaturacim/Login",array("customer"=>$customer,"user"=>$user,"pass"=>$pass,"clientInfo"=>@$_SERVER["HTTP_USER_AGENT"],"clientSecret"=>SecurityUtil::getClientKey()));                    
+        $bearer = ($r && $r->isOK()) ?  $r->getAttribute("bearer") : null;
+        if($r->isOK() && strlen("".$bearer)>0){
+            if(!is_null($funcSetBearer) && is_callable($funcSetBearer)){
+                call_user_func_array($funcSetBearer,array($bearer,$r));
+            }
+            if($setAsDefault){
+                self::$DEFAULT_BEARER_TOKEN = $bearer;
+            }
+            return $bearer;
+        }
+        return null;
     }
 }
 ?>
