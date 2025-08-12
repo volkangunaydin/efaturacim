@@ -6,7 +6,7 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
-use Efaturacim\Util\Utils\StrNameSurname;
+use Efaturacim\Util\Utils\String\StrNameSurname;
 
 class Party extends UblDataType
 {

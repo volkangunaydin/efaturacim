@@ -43,5 +43,4 @@ class StrSerialize{
             return CastUtil::getAs(self::unserializeBase64($dataStr),array(),CastUtil::$DATA_ARRAY);
         }
     }
-}
 ?>

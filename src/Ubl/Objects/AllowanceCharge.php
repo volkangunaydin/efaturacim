@@ -4,6 +4,7 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\String\StrUtil;
 
 class AllowanceCharge extends UblDataType
@@ -21,7 +22,7 @@ class AllowanceCharge extends UblDataType
      */    
     public $multiplierFactorNumeric = null; // e.g., 0.15 for 15%
     /**    
-     * @var UblDataTypeForMoney
+     * @var Amount
      */    
     public  $amount = null;
     /**    
@@ -34,22 +35,37 @@ class AllowanceCharge extends UblDataType
         $this->chargeIndicator         = new UblDataTypeForBool(null,false,"cbc:ChargeIndicator");
         $this->allowanceChargeReason   = new UblDataTypeForString(null,false,"cbc:AllowanceChargeReason");
         $this->multiplierFactorNumeric = new UblDataTypeForNumeric(null,false,"cbc:MultiplierFactorNumeric");
-        $this->amount                  = new UblDataTypeForMoney(null,false,"cbc:Amount");
+        $this->amount                  = new Amount();
         $this->baseAmount              = new UblDataTypeForMoney(null,false,"cbc:BaseAmount");
     }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
+        if (in_array($k, ['amount', 'tutar']) && NumberUtil::isNumberString($v)) {
+            $this->amount->setValue((float)$v);
+            return true;
+        }
+
+        if (in_array($k, ['baseAmount', 'taban_tutar']) && NumberUtil::isNumberString($v)) {
+            $this->baseAmount->setValue((float)$v);
+            return true;
+        }
+
+        if (in_array($k, ['currency', 'currencyID', 'para_birimi']) && StrUtil::notEmpty($v)) {
+            $this->amount->setCurrencyID($v);
+            $this->baseAmount->setCurrencyID($v);
+            return true;
+        }
+
         return false;
     }
 
     public function isEmpty(): bool
     {
-        return false;
+        return is_null($this->amount) || $this->amount->isEmpty();
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
-        $element = null;
         if ($this->isEmpty()) {
             return null;
         }        
