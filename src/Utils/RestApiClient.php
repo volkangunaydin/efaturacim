@@ -9,8 +9,12 @@ use Efaturacim\Util\Utils\String\StrUtil;
 class RestApiClient{
     public static $DEFAULT_BEARER_TOKEN = null;
     public static $DEFAULT_API_URL      = null;
+    public static $SERVER_SECURE_KEY    = null;
     public static function setDefaultUrl($url){
         self::$DEFAULT_API_URL = $url;
+    }
+    public static function setServerSecureKey($key){
+        self::$SERVER_SECURE_KEY = $key;
     }
     public static function getResult($baseApiUrl,$relPath,$postVars=null,$options=null){        
         $r = new RestApiResult();
@@ -98,6 +102,7 @@ class RestApiClient{
         }
         $postVars["clientSecret"] = SecurityUtil::getClientKey();
         $postVars["clientInfo"]   = SecurityUtil::getUserAgent();
+        $postVars["serverKey"]    = self::$SERVER_SECURE_KEY;
         $postVars["ip"]           = SecurityUtil::getIp();
         if(self::$DEFAULT_BEARER_TOKEN && strlen("".self::$DEFAULT_BEARER_TOKEN)>0){
             $postVars["bearer"] = self::$DEFAULT_BEARER_TOKEN;
