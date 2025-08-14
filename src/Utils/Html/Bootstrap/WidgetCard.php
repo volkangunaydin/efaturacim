@@ -120,8 +120,7 @@ class WidgetCard extends HtmlComponent
     {
         return (new static($options));
     }
-
-    // Hazır tema fonksiyonları
+    
     public function danger()
     {
         $this->setBg1('#dc3545')
