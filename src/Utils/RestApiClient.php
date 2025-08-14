@@ -102,7 +102,7 @@ class RestApiClient{
         }
         $postVars["clientSecret"] = SecurityUtil::getClientKey();
         $postVars["clientInfo"]   = SecurityUtil::getUserAgent();
-        $postVars["serverKey"]    = self::$SERVER_SECURE_KEY;
+        $postVars["apiKey"]       = self::$SERVER_SECURE_KEY;
         $postVars["ip"]           = SecurityUtil::getIp();
         if(self::$DEFAULT_BEARER_TOKEN && strlen("".self::$DEFAULT_BEARER_TOKEN)>0){
             $postVars["bearer"] = self::$DEFAULT_BEARER_TOKEN;
