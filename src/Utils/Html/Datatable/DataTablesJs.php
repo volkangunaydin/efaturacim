@@ -3,66 +3,88 @@ namespace Efaturacim\Util\Utils\Html\Datatable;
 use Efaturacim\Util\Utils\Html\HtmlComponent;
 use Efaturacim\Util\Utils\Html\HtmlTag;
 
-class DataTablesJs extends HtmlComponent{
+class DataTablesJs extends HtmlComponent
+{
     /**
      * @var HtmlTag
      */
     protected $tableTag = null;
-    protected $caps     = [];
-    public function initMe(){
+    protected $caps = [];
+    protected $data = [];
+    public function initMe()
+    {
         $this->tableTag = HtmlTag::table()->initID();
     }
-    public function getDefaultOptions(){
+    public function getDefaultOptions()
+    {
         return [
-            'asset_dir'=>'',
-            'css' => 'https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css',            
-            'js' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js',            
+            'asset_dir' => '',
+            'css' => 'https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css',
+            'js' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js',
         ];
     }
-    public function toHtmlAsString(){
+    public function toHtmlAsString()
+    {
         $body = '';
-        if(count($this->caps) > 0){            
+        if (count($this->caps) > 0) {
             $body .= '<thead><tr>';
-            foreach($this->caps as $cap){
-                if(is_array($cap)){                                        
-                    $body .= '<th>'.@$cap['text'].'</th>';
+            foreach ($this->caps as $cap) {
+                if (is_array($cap)) {
+                    $body .= '<th>' . @$cap['text'] . '</th>';
                 }
             }
-            $body .= '</tr></thead>';    
+            $body .= '</tr></thead>';
+        }
+        if (count($this->data) > 0) {
+            $body .= '<tbody>';
+            foreach ($this->data as $row) {
+                if (is_array($row)) {
+                    $body .= '<tr>';
+                    foreach ($row as $cell) {
+                        $body .= '<td>' . $cell . '</td>';
+                    }
+                    $body .= '</tr>';
+                }
+            }
+            $body .= '</tr></thead>';
         }
         $this->tableTag->setInnerHtml($body);
         $s = $this->tableTag->render();
         return $s;
     }
-    public function getJsLines(){
-    
-    }    
-    public function addStaticData($dataAsArray){
-        if(!is_null($dataAsArray) && is_array($dataAsArray)){
-            // TODO: Implement addStaticData
-        }        
+    public function getJsLines()
+    {
+
+    }
+    public function addStaticData($dataAsArray)
+    {
+        if (!is_null($dataAsArray) && is_array($dataAsArray)) {
+            $this->data = $dataAsArray;
+        }
         return $this;
     }
-    public function addCaption($caption){
-        if(!is_null($caption) && !empty($caption)){
-            if(is_scalar($caption)){
-               $this->caps[] = array("text"=>$caption); 
-            }else if(is_array($caption)){
+    public function addCaption($caption)
+    {
+        if (!is_null($caption) && !empty($caption)) {
+            if (is_scalar($caption)) {
+                $this->caps[] = array("text" => $caption);
+            } else if (is_array($caption)) {
                 $this->caps[] = $caption;
             }
         }
         return $this;
     }
 
-    public static function newTable($caps){
+    public static function newTable($caps)
+    {
         $table = new static();
         $args = func_get_args();
-        if(count($args) > 0){
-            foreach($args as $arg){
+        if (count($args) > 0) {
+            foreach ($args as $arg) {
                 $table->addCaption($arg);
             }
         }
         return $table;
     }
 }
-?>  
+?>
