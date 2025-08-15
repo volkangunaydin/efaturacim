@@ -20,6 +20,11 @@ class HtmlTag
     protected array $attributes = [];
     
     /**
+     * @var HtmlStyle CSS styles object
+     */
+    public HtmlStyle $styleObject;
+    
+    /**
      * @var mixed The content of the HTML element
      */
     protected $content = null;
@@ -95,6 +100,7 @@ class HtmlTag
     public function __construct(string $tagName = 'div', array $attributes = [], $content = null)
     {
         $this->setTagName($tagName);
+        $this->styleObject = new HtmlStyle();
         $this->setAttributes($attributes);
         $this->setContent($content);
     }
@@ -327,20 +333,280 @@ class HtmlTag
     /**
      * Set inline styles
      * 
-     * @param array|string $styles
+     * @param array|string|HtmlStyle $styles
      * @return self
      */
     public function setStyle($styles): self
     {
-        if (is_array($styles)) {
-            $styleString = '';
-            foreach ($styles as $property => $value) {
-                $styleString .= $property . ':' . $value . ';';
-            }
-            $styles = $styleString;
+        if ($styles instanceof HtmlStyle) {
+            $this->styleObject = $styles;
+        } elseif (is_array($styles)) {
+            $this->styleObject = new HtmlStyle($styles);
+        } else {
+            $this->styleObject = new HtmlStyle($styles);
         }
-        $this->setAttribute('style', $styles);
         return $this;
+    }
+    
+    /**
+     * Add styles using HtmlStyle object
+     * 
+     * @param HtmlStyle $style
+     * @return self
+     */
+    public function addStyle(HtmlStyle $style): self
+    {
+        $this->styleObject->setProperties($style);
+        return $this;
+    }
+    
+    /**
+     * Set a single CSS property
+     * 
+     * @param string $property
+     * @param mixed $value
+     * @return self
+     */
+    public function setCssProperty(string $property, $value): self
+    {
+        $this->styleObject->setProperty($property, $value);
+        return $this;
+    }
+    
+    /**
+     * Get a CSS property value
+     * 
+     * @param string $property
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getCssProperty(string $property, $default = null)
+    {
+        return $this->styleObject->getProperty($property, $default);
+    }
+    
+    /**
+     * Remove a CSS property
+     * 
+     * @param string $property
+     * @return self
+     */
+    public function removeCssProperty(string $property): self
+    {
+        $this->styleObject->removeProperty($property);
+        return $this;
+    }
+    
+    /**
+     * Check if a CSS property exists
+     * 
+     * @param string $property
+     * @return bool
+     */
+    public function hasCssProperty(string $property): bool
+    {
+        return $this->styleObject->hasProperty($property);
+    }
+    
+    /**
+     * Get all CSS properties as HtmlStyle object
+     * 
+     * @return HtmlStyle
+     */
+    public function getHtmlStyle(): HtmlStyle
+    {
+        return $this->styleObject;
+    }
+    
+    /**
+     * Apply common style presets
+     */
+    
+    /**
+     * Apply flexbox styles
+     * 
+     * @param string $direction
+     * @param string $justify
+     * @param string $align
+     * @return self
+     */
+    public function flex(string $direction = 'row', string $justify = 'flex-start', string $align = 'stretch'): self
+    {
+        $style = HtmlStyle::flex($direction, $justify, $align);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply grid styles
+     * 
+     * @param string $template
+     * @param string $gap
+     * @return self
+     */
+    public function grid(string $template = '1fr', string $gap = '0'): self
+    {
+        $style = HtmlStyle::grid($template, $gap);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply centered styles
+     * 
+     * @return self
+     */
+    public function centered(): self
+    {
+        $style = HtmlStyle::centered();
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply hidden styles
+     * 
+     * @return self
+     */
+    public function hidden(): self
+    {
+        $style = HtmlStyle::hidden();
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply visible styles
+     * 
+     * @return self
+     */
+    public function visible(): self
+    {
+        $style = HtmlStyle::visible();
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply border styles
+     * 
+     * @param string $width
+     * @param string $style
+     * @param string $color
+     * @return self
+     */
+    public function border(string $width = '1px', string $style = 'solid', string $color = '#000'): self
+    {
+        $borderStyle = HtmlStyle::border($width, $style, $color);
+        return $this->addStyle($borderStyle);
+    }
+    
+    /**
+     * Apply rounded corners
+     * 
+     * @param string $radius
+     * @return self
+     */
+    public function rounded(string $radius = '4px'): self
+    {
+        $style = HtmlStyle::rounded($radius);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply shadow
+     * 
+     * @param string $shadow
+     * @return self
+     */
+    public function shadow(string $shadow = '0 2px 4px rgba(0,0,0,0.1)'): self
+    {
+        $style = HtmlStyle::shadow($shadow);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply text styles
+     * 
+     * @param string $size
+     * @param string $weight
+     * @param string $color
+     * @return self
+     */
+    public function text(string $size = '16px', string $weight = 'normal', string $color = '#000'): self
+    {
+        $style = HtmlStyle::text($size, $weight, $color);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply margin
+     * 
+     * @param string $margin
+     * @return self
+     */
+    public function margin(string $margin = '0'): self
+    {
+        $style = HtmlStyle::margin($margin);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply padding
+     * 
+     * @param string $padding
+     * @return self
+     */
+    public function padding(string $padding = '0'): self
+    {
+        $style = HtmlStyle::padding($padding);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply background color
+     * 
+     * @param string $color
+     * @return self
+     */
+    public function background(string $color = '#fff'): self
+    {
+        $style = HtmlStyle::background($color);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply position
+     * 
+     * @param string $position
+     * @return self
+     */
+    public function position(string $position = 'static'): self
+    {
+        $style = HtmlStyle::position($position);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply width and height
+     * 
+     * @param string $width
+     * @param string $height
+     * @return self
+     */
+    public function size(string $width = 'auto', string $height = 'auto'): self
+    {
+        $style = HtmlStyle::size($width, $height);
+        return $this->addStyle($style);
+    }
+    
+    /**
+     * Apply transition
+     * 
+     * @param string $property
+     * @param string $duration
+     * @param string $timing
+     * @return self
+     */
+    public function transition(string $property = 'all', string $duration = '0.3s', string $timing = 'ease'): self
+    {
+        $style = HtmlStyle::transition($property, $duration, $timing);
+        return $this->addStyle($style);
     }
     
     /**
@@ -390,6 +656,14 @@ class HtmlTag
                 $html .= ' ' . $key . '="' . $escapedValue . '"';    
             }
             // Escape attribute values
+        }
+        
+        // Add style attribute from HtmlStyle object if it has properties
+        if (!empty($this->styleObject->getProperties())) {
+            $styleString = $this->styleObject->toString();
+            if (!empty($styleString)) {
+                $html .= ' style="' . htmlspecialchars($styleString, ENT_QUOTES, 'UTF-8') . '"';
+            }
         }
         
         if ($this->selfClosing) {

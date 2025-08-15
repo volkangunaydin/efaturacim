@@ -10,7 +10,8 @@ use Efaturacim\Util\Utils\Html\PrettyPrint\PrettyPrint;
 class DataTableUsage{
     public static function getDemoHtml(&$doc){
         $s = '';
-        $s .= self::getDemoHtmlForStaticDataTable($doc);
+        //$s .= self::getDemoHtmlForStaticDataTable($doc);
+        $s .= self::getDemoHtmlForServerSideDataTable($doc);
         return $s;
     }
     public static function getDemoHtmlForStaticDataTable(&$doc){
@@ -31,5 +32,23 @@ class DataTableUsage{
         // END OF STATIC DATA TABLE
         return $s;
     }
+    public static function getDemoHtmlForServerSideDataTable(&$doc){
+        $s = '';
+    
+        // STATIC DATA TABLE
+        $s .= '<h3>SUNUCU TABLOSU</h3>';
+        $dataTable = DataTablesJs::newServerSideTable(null,array("#","AD","SOYAD","YAS","DOGUM TARIHI","HTML"));           
+        $dataTable->setFullWidth();
+        $dataTable->setColumnDef(0,"#",30,true);
+        $dataTable->setColumnDef(1,"AD (UZUN)",100,true);
+        
+        $dataTable->setLanguage("tr");        
+        $s .= ($dataTableHtml = $dataTable->toHtml($doc));        
+        $strHtml = ''.PrettyPrint::html($doc,$dataTableHtml,null,400,"purebasic");
+        $strJs   = ''.PrettyPrint::js($doc,$dataTable->getJsLinesForDebug(),null,400);
+        $s .= "".Row::newRow()->col6($strHtml)->col6($strJs);
+        // END OF STATIC DATA TABLE
+        return $s;
+    }    
 }
 ?>

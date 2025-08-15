@@ -3,6 +3,7 @@ namespace Efaturacim\Util\Utils\Html\Datatable;
 use Efaturacim\Util\Utils\Html\HtmlComponent;
 use Efaturacim\Util\Utils\Html\HtmlTag;
 use Efaturacim\Util\Utils\Html\Js\JsOptions;
+use Efaturacim\Util\Utils\Url\UrlUtil;
 
 class DataTablesJs extends HtmlComponent{
     /**
@@ -10,6 +11,7 @@ class DataTablesJs extends HtmlComponent{
      */
     protected $tableTag = null;
     protected $caps     = [];
+    protected $columnDefs = [];
     protected $staticData = [];
     /** @var JsOptions */
     public    $jsOption   = null;
@@ -26,7 +28,42 @@ class DataTablesJs extends HtmlComponent{
             'js1' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js',                        
         ];
     }
+    protected function getColumnsAsArray(){
+        $columns = [];
+        if(count($this->caps)>0){
+            $i=0;
+            foreach($this->caps as $cap){
+                if(!key_exists($i,$this->columnDefs)){
+                    $this->setColumnDef($i,@$cap["text"]);
+                }
+                $i++;
+            }
+        }        
+        foreach($this->columnDefs as $column){
+            $index = 0 + $column["index"];
+            $columns[] = array("data"=>$index,"title"=>@$column["title"]);
+        }
+        return $columns;
+    }
+    protected function getColumnDefsAsArray(){
+        $columnDefs = [];
+        foreach($this->columnDefs as $column){
+            $prop = array("targets"=>array($column["index"]));
+            if(is_numeric($column["width"])){
+                $prop["width"] = $column["width"]."px";
+            }
+            if(is_bool($column["orderable"])){
+                $prop["orderable"] = $column["orderable"];
+            }
+            $columnDefs[] = $prop;
+        }
+        return $columnDefs;
+    }
     public function getJsLines(){
+        if(count($this->columnDefs)>0){
+            $this->jsOption->setOption("columns",$this->getColumnsAsArray());
+            $this->jsOption->setOption("columnDefs",$this->getColumnDefsAsArray());
+        }
         return ['let '.$this->tableTag->getId().' = new DataTable("#'.$this->tableTag->getId().'",'.$this->jsOption->toJson().');'];
     }   
     public function getJsFiles(){
@@ -67,16 +104,18 @@ class DataTablesJs extends HtmlComponent{
     public function toHtmlAsString(){
         $body = '';
         $nl = "\r\n";
-        if(count($this->caps) > 0){            
-            $body .= $nl.'<thead><tr>';
-            foreach($this->caps as $cap){
-                if(is_array($cap)){                                        
-                    $body .= '<th>'.@$cap['text'].'</th>';
-                } else {
-                    $body .= '<th>'.$cap.'</th>';
+        if(count($this->columnDefs)==0){
+            if(count($this->caps) > 0){            
+                $body .= $nl.'<thead><tr>';
+                foreach($this->caps as $cap){
+                    if(is_array($cap)){                                        
+                        $body .= '<th>'.@$cap['text'].'</th>';
+                    } else {
+                        $body .= '<th>'.$cap.'</th>';
+                    }
                 }
-            }
-            $body .= $nl.'</tr></thead>';    
+                $body .= $nl.'</tr></thead>';    
+            }    
         }
         if(count($this->staticData) > 0){            
             $body .= $nl.'<tbody>';
@@ -133,6 +172,18 @@ class DataTablesJs extends HtmlComponent{
         }
         return $table;
     }
+    public static function newServerSideTable($url=null,$capsAsArray=null,$options=null){
+        $table = new static($options);        
+        if($capsAsArray && is_array($capsAsArray) && count($capsAsArray)){
+            $table->setCaptions($capsAsArray);            
+        }        
+        if(is_null($url)){
+            $url = UrlUtil::getUrl(null,array("__dtaction"=>"data"))->toUrlString();
+        }
+        $table->jsOption->setOption("serverSide",true);
+        $table->jsOption->setOption("ajax",$url);
+        return $table;
+    }
     
     /**
      * Get all captions
@@ -176,6 +227,14 @@ class DataTablesJs extends HtmlComponent{
             $this->jsOption->setOption("language",(object)array("url"=>$langOrUrl));
         }
         
+        return $this;
+    }
+    public function setFullWidth(){
+        $this->tableTag->styleObject->setProperty("width","100%");
+        return $this;
+    }
+    public function setColumnDef($index,$caption=null,$width=null,$orderable=null){
+        $this->columnDefs[$index] = array("index"=>$index,"title"=>$caption,"width"=>$width,"orderable"=>$orderable);
         return $this;
     }
 }
