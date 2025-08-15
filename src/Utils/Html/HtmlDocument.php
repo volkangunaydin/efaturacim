@@ -20,11 +20,14 @@ class HtmlDocument
     protected $jsLinesOnDomReady = [];
     protected $cssFiles = [];
     protected $options  = [];    
+    public static function hasDefaultDoc(){
+        return !is_null(HtmlDocument::$instance);
+    }
     public static function getDoc($optionsArray=null){
-        if(is_null(self::$instance)){
+        if(is_null(HtmlDocument::$instance)){
             self::$instance = new static($optionsArray);
         }
-        return self::$instance;
+        return HtmlDocument::$instance;
     }
     public function __construct($optionsArray=null){
         $this->bodyTag = new HtmlTag('body');
@@ -206,7 +209,14 @@ class HtmlDocument
         return $this;
     }
     public function ensureJQuery(){
-        return $this->addJsFilesOnEnd(array('jquery'=>'https://code.jquery.com/jquery-3.7.1.min.js'),false);
+        if(!key_exists('jquery',$this->jsFilesOnEnd)){
+            if(HtmlComponent::isPathDefined("jquery")){
+                return $this->addJsFilesOnEnd(array('jquery'=>''.HtmlComponent::getPathDefined("jquery").'jquery.min.js'),false);
+            }else{
+                return $this->addJsFilesOnEnd(array('jquery'=>'https://code.jquery.com/jquery-3.7.1.min.js'),false);
+            }
+            
+        }        
     }
 }
 ?>

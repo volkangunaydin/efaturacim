@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils\Html\Bootstrap;
 
 use Efaturacim\Util\Utils\Html\Datatable\DataTablesJs;
+use Efaturacim\Util\Utils\Html\HtmlComponent;
 use Efaturacim\Util\Utils\Html\HtmlDocument;
 // SAMPLE USAGES
 // $doc = new Bootstrap5Document(); 
@@ -16,9 +17,15 @@ use Efaturacim\Util\Utils\Html\HtmlDocument;
 
 
 class BootstrapDocument extends HtmlDocument{
-    public function initMe(){
-        $this->addCss('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css','bootstrap');
-        $this->addJsFileOnEnd('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js','bootstrap');
+    public function initMe(){        
+        if(HtmlComponent::isPathDefined("bootstrap")){            
+            $assetPath = HtmlComponent::getPathDefined("bootstrap");
+            $this->addCss($assetPath.'css/bootstrap.min.css','bootstrap');
+            $this->addJsFileOnEnd($assetPath.'js/bootstrap.bundle.min.js','bootstrap');    
+        }else{
+            $this->addCss('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css','bootstrap');
+            $this->addJsFileOnEnd('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js','bootstrap');    
+        }
         $this->ensureJQuery();
     }
     public static function alert($type="error",$message="",$options=null){

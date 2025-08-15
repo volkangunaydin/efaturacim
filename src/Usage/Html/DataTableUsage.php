@@ -18,13 +18,14 @@ class DataTableUsage{
     
         // STATIC DATA TABLE
         $s .= '<h3>SABİT VERİLER İLE DATATABE OLUŞTURMA</h3>';
-        $dataTableStatic = DataTablesJs::newTable("#","İl Adı","Plaka","Enlem","Boylam","HTML");        
+        $dataTableStatic = DataTablesJs::newTable("#","İl Adı","Plaka","Enlem","Boylam","HTML");   
+        $dataTableStatic->setLanguage("tr");
         $dataTableStatic->addStaticData(Iller::getIller(),function($index,$row){
             $htmlStr = '-';
             return [$index,@$row["adi"],@$row["plaka"],@$row["lat"],@$row["long"],$htmlStr];
         });
-        $s .= ($dataTableHtml = $dataTableStatic->toHtml($doc));
-        $strHtml = ''.PrettyPrint::html($doc,$dataTableHtml,null,400);
+        $s .= ($dataTableHtml = $dataTableStatic->toHtml($doc));        
+        $strHtml = ''.PrettyPrint::html($doc,$dataTableHtml,null,400,"purebasic");
         $strJs   = ''.PrettyPrint::js($doc,$dataTableStatic->getJsLinesForDebug(),null,400);
         $s .= "".Row::newRow()->col6($strHtml)->col6($strJs);
         // END OF STATIC DATA TABLE

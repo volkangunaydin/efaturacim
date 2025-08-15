@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils\Html\Datatable;
 use Efaturacim\Util\Utils\Html\HtmlComponent;
 use Efaturacim\Util\Utils\Html\HtmlTag;
+use Efaturacim\Util\Utils\Html\Js\JsOptions;
 
 class DataTablesJs extends HtmlComponent{
     /**
@@ -10,25 +11,38 @@ class DataTablesJs extends HtmlComponent{
     protected $tableTag = null;
     protected $caps     = [];
     protected $staticData = [];
+    /** @var JsOptions */
+    public    $jsOption   = null;
     public function initMe(){
         $this->tableTag = HtmlTag::table()->initID();
         $this->tableTag->addClass("display");
+        $this->assetPathKey = "datatable";
+        $this->jsOption = new JsOptions();
+
     }
     public function getDefaultOptions(){
         return [            
             'css1' => 'https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css',            
-            'js1' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js',            
-            'jquery'=>'https://code.jquery.com/jquery-3.7.1.min.js',
+            'js1' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js',                        
         ];
     }
     public function getJsLines(){
-        return ['let '.$this->tableTag->getId().' = new DataTable("#'.$this->tableTag->getId().'");'];
+        return ['let '.$this->tableTag->getId().' = new DataTable("#'.$this->tableTag->getId().'",'.$this->jsOption->toJson().');'];
     }   
     public function getJsFiles(){
-        return ['jquery'=>@$this->options['jquery'],'datatable'=>@$this->options['js']];
+        if($this->hasAssetPath()){
+            return ['jquery'=>null,'datatable'=>$this->assetPath."datatables.min.js"];   
+        }else{
+            return ['jquery'=>@$this->options['jquery'],'datatable'=>@$this->options['js']];
+        }        
     }
     public function getCssFiles(){
-        return ['bootstrap'=>null,'datatable'=>@$this->options['css']];
+        if($this->hasAssetPath()){
+            return ['bootstrap'=>null,'datatable'=>$this->assetPath."datatables.min.css"];
+        }else{
+            return ['bootstrap'=>null,'datatable'=>@$this->options['css']];
+        }
+        
     }
     public function toHtml($doc)
     {
@@ -153,6 +167,15 @@ class DataTablesJs extends HtmlComponent{
         foreach ($captions as $caption) {
             $this->addCaption($caption);
         }
+        return $this;
+    }
+    public function setLanguage($langOrUrl){
+        if(strlen("".$langOrUrl)>0 && strlen("".$langOrUrl)<=3){
+            $this->jsOption->setOption("language",(object)array("url"=>HtmlComponent::getPathDefined("datatable")."".$langOrUrl.".json"));
+        }else if(strlen("".$langOrUrl)>0 && strlen("".$langOrUrl)>3){
+            $this->jsOption->setOption("language",(object)array("url"=>$langOrUrl));
+        }
+        
         return $this;
     }
 }
