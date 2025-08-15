@@ -132,7 +132,7 @@ class StrUtil{
         public static function coalesce($arg1=null){
             $args = func_get_args();
             foreach ($args as $v){
-                if(\Vulcan\V::notEmpty($v)){ return $v;
+                if(self::notEmpty($v)){ return $v;
                 }else if($v && is_int($v)){ return $v; }
             }
             return null;
@@ -140,7 +140,7 @@ class StrUtil{
         public static function getNotEmpty($arg1=null){
             $args = func_get_args();
             foreach ($args as $v){                
-                if(\Vulcan\V::notEmpty($v)){ return $v; 
+                if(self::notEmpty($v)){ return $v; 
                 }else if($v && is_int($v)){ return $v; }
             }
             return null;

@@ -23,6 +23,21 @@ class AssocArray{
         }
         return $r;
     }
+    public static function &getValByRef(&$arr,$keyOrArray,$defVal=null){
+        $r = $defVal;
+        if(is_array($arr)){
+            if(is_array($keyOrArray)){
+                foreach($keyOrArray as $key){
+                    if(key_exists($key,$arr)){
+                        return self::getValByRef($arr,$key,$defVal,$typeForCast);
+                    }
+                }
+            }else if(is_scalar($keyOrArray) && key_exists($keyOrArray,$arr)){
+                return  $arr[$keyOrArray];
+            }            
+        }
+        return $r;
+    }
     public static function getVal($arr,$keyOrArray,$defVal=null,$typeForCast=null){
         $r = $defVal;
         if(is_array($arr)){

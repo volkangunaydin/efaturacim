@@ -163,5 +163,8 @@ class UrlObject{
     public function getOriginalUrl(){
         return $this->url;
     }
+    public static function newUrl($url=null,$newParams=null,$excludeParams=null){
+        return new UrlObject($url,$newParams,$excludeParams);
+    }
 }
 ?>

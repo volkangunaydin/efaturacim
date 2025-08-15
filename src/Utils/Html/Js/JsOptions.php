@@ -22,6 +22,11 @@ class JsOptions{
     public function getOption($key,$defVal=null,$type=null){
         return AssocArray::getVal($this->options,$key,$defVal,$type);
     }
+    public function     getOptionAsRef($key){
+        return AssocArray::getValByRef($this->options,$key);
+    }
+
+
     public function toJson(){
         return JsonUtil::toJsonStringWithOptions((object)$this->options,array('pretty'=>$this->printPretty,'js_function'=>true,'jquery_selector'=>true));
     }

@@ -15,6 +15,7 @@ class DataTablesJs extends HtmlComponent{
     protected $staticData = [];
     /** @var JsOptions */
     public    $jsOption   = null;
+    protected $postData   = [];
     public function initMe(){
         $this->tableTag = HtmlTag::table()->initID();
         $this->tableTag->addClass("display");
@@ -41,7 +42,7 @@ class DataTablesJs extends HtmlComponent{
         }        
         foreach($this->columnDefs as $column){
             $index = 0 + $column["index"];
-            $columns[] = array("data"=>$index,"title"=>@$column["title"]);
+            $columns[] = array("data"=>"col".$index,"title"=>@$column["title"]);
         }
         return $columns;
     }
@@ -59,12 +60,31 @@ class DataTablesJs extends HtmlComponent{
         }
         return $columnDefs;
     }
+    public function getJsLinesForInit(){
+        return ['init_csrf'=>'let csrfToken = $(\'meta[name="csrf-token"]\').attr(\'content\'); if (csrfToken) { $.ajaxSetup({headers: {\'X-CSRF-TOKEN\': csrfToken } }); }' ];
+    }
     public function getJsLines(){
-        if(count($this->columnDefs)>0){
-            $this->jsOption->setOption("columns",$this->getColumnsAsArray());
-            $this->jsOption->setOption("columnDefs",$this->getColumnDefsAsArray());
+        if(count($this->postData)>0){
+            $ajax = $this->jsOption->getOptionAsRef("ajax");    
+            if(is_array($ajax) ){
+                $ajax["data"] = "function(d){";
+                foreach($this->postData as $key=>$value){
+                    if(in_array($key,array("_token","_dtaction"))){
+                        continue;
+                    }
+                    $ajax["data"] .= " d.".$key." = '".json_encode($value,JSON_UNESCAPED_UNICODE)."'; ";
+                }
+                $ajax["data"] .= "}";
+            }
+            $this->jsOption->setOption("ajax",$ajax);
         }
-        return ['let '.$this->tableTag->getId().' = new DataTable("#'.$this->tableTag->getId().'",'.$this->jsOption->toJson().');'];
+        $this->jsOption->setOption("columns",$this->getColumnsAsArray());            
+        if(count($this->columnDefs)>0){
+            $this->jsOption->setOption("columnDefs",$this->getColumnDefsAsArray());            
+        }
+        $arr = array();        
+        $arr[] = 'let '.$this->tableTag->getId().' = new DataTable("#'.$this->tableTag->getId().'",'.$this->jsOption->toJson().');';        
+        return $arr;
     }   
     public function getJsFiles(){
         if($this->hasAssetPath()){
@@ -103,20 +123,19 @@ class DataTablesJs extends HtmlComponent{
     }
     public function toHtmlAsString(){
         $body = '';
-        $nl = "\r\n";
-        if(count($this->columnDefs)==0){
-            if(count($this->caps) > 0){            
-                $body .= $nl.'<thead><tr>';
-                foreach($this->caps as $cap){
-                    if(is_array($cap)){                                        
-                        $body .= '<th>'.@$cap['text'].'</th>';
-                    } else {
-                        $body .= '<th>'.$cap.'</th>';
-                    }
+        $nl = "\r\n";        
+        if(count($this->caps) > 0){            
+            $body .= $nl.'<thead><tr>';
+            foreach($this->caps as $cap){
+                if(is_array($cap)){                                        
+                    $body .= '<th>'.@$cap['text'].'</th>';
+                } else {
+                    $body .= '<th>'.$cap.'</th>';
                 }
-                $body .= $nl.'</tr></thead>';    
-            }    
-        }
+            }
+            $body .= $nl.'</tr></thead>';    
+        }    
+        
         if(count($this->staticData) > 0){            
             $body .= $nl.'<tbody>';
             foreach($this->staticData as $row){
@@ -181,7 +200,7 @@ class DataTablesJs extends HtmlComponent{
             $url = UrlUtil::getUrl(null,array("__dtaction"=>"data"))->toUrlString();
         }
         $table->jsOption->setOption("serverSide",true);
-        $table->jsOption->setOption("ajax",$url);
+        $table->jsOption->setOption("ajax",array("url"=>$url,"type"=>"POST"));
         return $table;
     }
     
@@ -230,11 +249,24 @@ class DataTablesJs extends HtmlComponent{
         return $this;
     }
     public function setFullWidth(){
-        $this->tableTag->styleObject->setProperty("width","100%");
+        $this->tableTag->styleObject->setProperty("width","100%")->setProperty("table-layout","fixed");
         return $this;
     }
     public function setColumnDef($index,$caption=null,$width=null,$orderable=null){
+        if(is_null($caption) && key_exists($index,$this->caps)){
+            $caption = @$this->caps[$index]["text"];
+        }
         $this->columnDefs[$index] = array("index"=>$index,"title"=>$caption,"width"=>$width,"orderable"=>$orderable);
+        return $this;
+    }
+    public function addAllPostData(){
+        foreach($_POST as $key=>$value){
+            $this->addPostData($key,$value);
+        }
+        return $this;
+    }
+    public function addPostData($key,$value){
+        $this->postData[$key] = $value;
         return $this;
     }
 }

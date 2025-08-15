@@ -60,6 +60,13 @@ class JsonUtil{
             }
         }
     }           
-
+    public static function toJsonOutput($arrOrObject,$context=null){
+        if(!(php_sapi_name() === 'cli')){
+            @header("HTTP/1.1 200 OK");
+            header('Content-Type: application/json');                
+        }
+        echo self::toJsonStringWithOptions($arrOrObject,$context);            
+        die("");        
+    } 
 }
 ?>

@@ -9,6 +9,7 @@ use Efaturacim\Util\Utils\SimpleResult;
  */
 class HtmlTag
 {
+    public static $nl = "\r\n";
     /**
      * @var string The HTML tag name (e.g., 'div', 'span', 'input')
      */
@@ -27,7 +28,7 @@ class HtmlTag
     /**
      * @var mixed The content of the HTML element
      */
-    protected $content = null;
+    protected $content = [];
     protected $innerHtml = null;
     
     
@@ -231,7 +232,10 @@ class HtmlTag
      */
     public function setContent($content): self
     {
-        $this->content = $content;
+        if(is_null($content) || is_array($content)){
+            $this->content = array($content);    
+        }
+        
         return $this;
     }
     
@@ -253,12 +257,16 @@ class HtmlTag
      */
     public function addContent($content,$key=null): self
     {
-        if ($this->content === null) {
-            $this->content = $content;
-        } elseif (is_array($this->content)) {
-            $this->content[] = $content;
+        if (!is_null($key)) {
+            $this->content[$key] = $content;
+            return $this;
+        }else if ($this->content === null) {
+            return $this;
         } else {
-            $this->content = [$this->content, $content];
+            if(!is_array($this->content)){
+                $this->content = array();
+            }
+            $this->content[] = $content;
         }
         return $this;
     }
@@ -698,7 +706,7 @@ class HtmlTag
      * 
      * @return string
      */
-    public function render(): string
+    public function render($doc=null): string
     {
         $html = $this->printStartingTag();    
         if (!$this->selfClosing) {
@@ -706,10 +714,10 @@ class HtmlTag
             if ($this->content !== null) {
                 if (is_array($this->content)) {
                     foreach ($this->content as $item) {
-                        $html .= $this->renderContent($item);
-                    }
+                        $html .= HtmlTag::$nl.$this->renderContent($item,$doc);
+                    }   
                 } else {
-                    $html .= $this->renderContent($this->content);
+                    $html .= HtmlTag::$nl.$this->renderContent($this->content,$doc);
                 }
             }
             if(!is_null($this->innerHtml) && !empty($this->innerHtml)){
@@ -726,10 +734,12 @@ class HtmlTag
      * @param mixed $content
      * @return string
      */
-    protected function renderContent($content): string
+    protected function renderContent($content,$doc=null): string
     {
         if ($content instanceof HtmlTag) {
-            return $content->render();
+            return $content->render($doc);
+        }else if ($content instanceof HtmlComponent) {
+            return $content->toHtml($doc);
         } elseif (is_string($content)) {
             return (string)$content;
             //return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');

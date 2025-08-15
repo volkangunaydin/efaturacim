@@ -33,6 +33,9 @@ class HtmlComponent{
     public function getJsLines(){
         return null;
     }
+    public function getJsLinesForInit(){
+        return null;
+    }
     public function getJsFiles(){
         return null;
     }
@@ -48,6 +51,7 @@ class HtmlComponent{
         if($doc && $doc instanceof HtmlDocument){
             $doc->addCssFiles($this->getCssFiles(),false);
             $doc->addJsFilesOnEnd($this->getJsFiles(),false);
+            $doc->addJsLineToDomReady($this->getJsLinesForInit(),null,true);
             $doc->addJsLineToDomReady($this->getJsLines());
         }
         return $s;
@@ -56,6 +60,15 @@ class HtmlComponent{
         $s  = '';
         $nl = "\r\n";
         $jsLines = $this->getJsLines();
+        $jsLinesForInit = $this->getJsLinesForInit();
+        if(!is_null($jsLinesForInit) && is_array($jsLinesForInit) && count($jsLinesForInit)>0){
+            $s .= $nl."// Js Lines For Init Ensurance";
+            foreach($jsLinesForInit as $jsLine){
+                $s .= $nl.$jsLine;    
+            }            
+            $s .= $nl."// End of Js Lines For Init";
+
+        }
         if(!is_null($jsLines) && is_array($jsLines) && count($jsLines)>0){
             foreach($jsLines as $jsLine){
                 $s .= $nl.$jsLine;

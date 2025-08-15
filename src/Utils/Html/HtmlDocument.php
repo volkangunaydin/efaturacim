@@ -20,6 +20,7 @@ class HtmlDocument
     protected $jsLinesOnDomReady = [];
     protected $cssFiles = [];
     protected $options  = [];    
+    public    $csrf     = null;
     public static function hasDefaultDoc(){
         return !is_null(HtmlDocument::$instance);
     }
@@ -89,6 +90,9 @@ class HtmlDocument
         $s .= $this->nl.'<html lang="'.$this->lang.'">';
         $s .= $this->nl.'<head>';
         $s .= $this->nl.'<meta charset="'.$this->charset.'">';
+        if(!is_null($this->csrf)){
+            $s .= $this->nl.'<meta name="csrf-token" content="'.$this->csrf.'" />';
+        }
         if(!is_null($this->viewport) && !empty($this->viewport)){
             $s .= $this->nl.'<meta name="viewport" content="'.$this->viewport.'">';
         }        
@@ -169,14 +173,18 @@ class HtmlDocument
         $s .= $this->nl.'</html>';
         return $s;
     }
-    public function addJsLineToDomReady($jsLineOrLines,$key=null){
+    public function addJsLineToDomReady($jsLineOrLines,$key=null,$override=false){
         // TODO: Implement addJsLineToDomReady
         if($jsLineOrLines && is_array($jsLineOrLines)){
             $i = 0;
             if(is_null($key)){ $key = "id".md5(serialize($jsLineOrLines)); }
-            foreach($jsLineOrLines as $jsLine){
+            foreach($jsLineOrLines as $k2=>$jsLine){
                 $i++;                
-                $key2 = $key."_".$i;
+                if($override==true && !is_numeric($k2)){
+                    $key2 = $k2;
+                }else{
+                    $key2 = $key."_".$i;
+                }                
                 $this->addToArray($this->jsLinesOnDomReady,$jsLine,$key2);       
             }
         }else if ($jsLineOrLines && is_string($jsLineOrLines) && strlen($jsLineOrLines)>0){
