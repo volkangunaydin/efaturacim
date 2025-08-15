@@ -25,6 +25,7 @@ use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Note;
+use Efaturacim\Util\Ubl\Objects\InvoicePeriod;
 use Efaturacim\Util\Ubl\Objects\Party;
 use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
@@ -45,7 +46,9 @@ class InvoiceDocument extends UblDocument
      * Invoice type code. e.g., "SATIS", "IADE"
      * @var string|null
      */
-    public ?string $invoiceTypeCode = 'SATIS';
+    public ?string $invoiceTypeCode = null;
+
+    public ?string $accountingCost = null;
 
     /**
      * @var AccountingCustomerParty
@@ -82,6 +85,11 @@ class InvoiceDocument extends UblDocument
      * @var AllowanceCharge
      */
     public $allowanceCharge = null;
+
+        /**
+     * @var InvoicePeriod
+     */
+    public $invoicePeriod = null;
 
 
     /**
@@ -148,6 +156,7 @@ class InvoiceDocument extends UblDocument
         $this->setProfileId('TICARIFATURA');
         $this->setIssueDate(date('Y-m-d'));
         $this->setIssueTime(date('H:i:s'));
+        $this->invoicePeriod = new InvoicePeriod();
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
         $this->billingReference = new UblDataTypeList(BillingReference::class);
@@ -186,7 +195,9 @@ class InvoiceDocument extends UblDocument
         $this->setNamespaces();
         $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
         $this->appendCommonElements();
+        $this->appendInvoicePeriod();
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
+        $this->appendElement('cbc:AccountingCost', $this->accountingCost);
         $this->appendElementList($this->billingReference);
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
         $this->appendElementList($this->additionalDocumentReference);
@@ -202,6 +213,7 @@ class InvoiceDocument extends UblDocument
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
+        
         $this->appendLegalMonetaryTotal();
         $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();
@@ -238,6 +250,10 @@ class InvoiceDocument extends UblDocument
     public function appendPricingExchangeRate()
     {
         $this->appendElement('cac:PricingExchangeRate', $this->pricingExchangeRate->toDOMElement($this->document));
+    }
+    public function appendInvoicePeriod()
+    {
+        $this->appendElement('cac:InvoicePeriod', $this->invoicePeriod->toDOMElement($this->document));
     }
     public function appendPaymentMeans()
     {
@@ -349,7 +365,8 @@ class InvoiceDocument extends UblDocument
         return new Options(array(
             "nextLineId" => $this->invoiceLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "invoiceTypeCode" => $this->invoiceTypeCode
+            "invoiceTypeCode" => $this->invoiceTypeCode,
+            "accountingCost" => $this->accountingCost
         ));
     }
     public function rebuildValues()

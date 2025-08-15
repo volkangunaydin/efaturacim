@@ -12,18 +12,21 @@ class AdditionalDocumentReference extends UblDataType
 {
     public ?string $id = null;
     public ?string $issueDate = null;
+    public ?string $documentTypeCode = null;
     public ?string $documentType = null;
+    public ?string $documentDescription = null;
     /**
      * Summary of attachment
      * @var UblDataTypeList
      */
-    public  $attachment = null;
+    public $attachment = null;
 
     public function __construct($options = null)
     {
         parent::__construct($options);
     }
-    public function initMe(){
+    public function initMe()
+    {
         $this->attachment = new UblDataTypeList(Attachment::class);
     }
     public function setPropertyFromOptions($k, $v, $options): bool
@@ -36,16 +39,24 @@ class AdditionalDocumentReference extends UblDataType
             $this->issueDate = DateUtil::getAsDbDate($v);
             return true;
         }
+        if (in_array($k, ['documentTypeCode', 'belge_tipi_kodu']) && StrUtil::notEmpty($v)) {
+            $this->documentTypeCode = $v;
+            return true;
+        }
         if (in_array($k, ['documentType', 'belge_tipi']) && StrUtil::notEmpty($v)) {
             $this->documentType = $v;
             return true;
         }
-
+        if (in_array($k, ['documentDescription', 'belge_aciklama']) && StrUtil::notEmpty($v)) {
+            $this->documentDescription = $v;
+            return true;
+        }
         return false;
     }
-    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true){
+    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)
+    {
         //\Vulcan\V::dump($arr);
-        return parent::loadFromArray($arr,$depth,$isDebug,$dieOnDebug);
+        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);
     }
     public function isEmpty(): bool
     {
@@ -63,8 +74,10 @@ class AdditionalDocumentReference extends UblDataType
 
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
         $this->appendElement($document, $element, 'cbc:IssueDate', $this->issueDate);
+        $this->appendElement($document, $element, 'cbc:DocumentTypeCode', $this->documentTypeCode);
         $this->appendElement($document, $element, 'cbc:DocumentType', $this->documentType);
-        $this->appendElementList($document, $this->attachment,$element);
+        $this->appendElement($document, $element, 'cbc:DocumentDescription', $this->documentDescription);
+        $this->appendElementList($document, $this->attachment, $element);
 
         return $element;
     }

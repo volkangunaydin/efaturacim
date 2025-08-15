@@ -9,6 +9,7 @@ use Efaturacim\Util\Utils\String\StrUtil;
 class DeliveryAddress extends UblDataType
 {
     public ?string $streetName = null;
+    public ?string $buildingName = null;
     public ?string $buildingNumber = null;
     public ?string $cityName = null;
     public ?string $postalZone = null;
@@ -30,6 +31,9 @@ class DeliveryAddress extends UblDataType
     {
         if(in_array($k,array("sokak")) && StrUtil::notEmpty($v)){
             $this->streetName = $v;
+            return true;
+        }else if(in_array($k,array("bina_adi")) && StrUtil::notEmpty($v)){
+            $this->buildingName = $v;
             return true;
         }else if(in_array($k,array("bina")) && StrUtil::notEmpty($v)){
             $this->buildingNumber = $v;
@@ -69,6 +73,7 @@ class DeliveryAddress extends UblDataType
         $element = $document->createElement('cac:DeliveryAddress');
         
         $this->appendElement($document, $element, 'cbc:StreetName', $this->streetName);
+        $this->appendElement($document, $element, 'cbc:BuildingName', $this->buildingName);
         $this->appendElement($document, $element, 'cbc:BuildingNumber', $this->buildingNumber);
         $this->appendElement($document, $element, 'cbc:CitySubdivisionName', $this->citySubdivisionName);
         $this->appendElement($document, $element, 'cbc:CityName', $this->cityName);
