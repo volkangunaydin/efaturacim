@@ -283,8 +283,7 @@ abstract class UblDocument{
         $this->appendElement('cbc:CopyIndicator', $this->copyIndicator ? 'true' : 'false');
         $this->appendElement('cbc:UUID', $this->uuid);
         $this->appendElement('cbc:IssueDate', $this->issueDate);
-        $this->appendElement('cbc:IssueTime', $this->issueTime);        
-        $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);        
+        $this->appendElement('cbc:IssueTime', $this->issueTime);
     }
     public function appendSignature(){
 

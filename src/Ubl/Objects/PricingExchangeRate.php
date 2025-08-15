@@ -43,11 +43,21 @@ class PricingExchangeRate extends UblDataType
         return is_null($this->calculationRate);
     }
 
+    public function isTry(): bool
+    {
+        return $this->sourceCurrencyCode === 'TRY';
+    }
+
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
         if ($this->isEmpty()) {
             return null;
         }
+
+        if ($this->isTry()) {
+            return null;
+        }
+
         $element = $document->createElement('cac:PricingExchangeRate');
 
         $this->appendElement($document, $element, 'cbc:SourceCurrencyCode', $this->sourceCurrencyCode);
