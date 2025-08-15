@@ -13,7 +13,7 @@ class HtmlTag
      * @var string The HTML tag name (e.g., 'div', 'span', 'input')
      */
     protected string $tagName;
-    
+        
     /**
      * @var array HTML attributes
      */
@@ -25,12 +25,13 @@ class HtmlTag
     protected $content = null;
     protected $innerHtml = null;
     
+    
     /**
      * @var bool Whether this is a self-closing tag
      */
     protected bool $selfClosing = false;
     
-    /**
+    /** 
      * @var array List of self-closing HTML tags
      */
     protected static array $selfClosingTags = [
@@ -139,11 +140,11 @@ class HtmlTag
     /**
      * Set a single attribute
      * 
-     * @param string $key
+     * @param string|array $key
      * @param mixed $value
      * @return self
      */
-    public function setAttribute(string $key, $value): self
+    public function setAttribute($key, $value): self
     {
         $key = strtolower(trim($key));
         
@@ -162,8 +163,11 @@ class HtmlTag
             unset($this->attributes[$key]);
             return $this;
         }
-        
-        $this->attributes[$key] = (string)$value;
+        if(is_array($value)){
+            $this->attributes[$key] = $value;
+        }else{
+            $this->attributes[$key] = (string)$value;
+        }        
         return $this;
     }
     
@@ -209,7 +213,9 @@ class HtmlTag
         return $this;
     }
     public function getInnerHtml(){
-        return $this->innerHtml;
+        $s = 'dede';
+        $s .= $this->innerHtml;
+        return $s;
     }
     /**
      * Set the content of the element
@@ -239,7 +245,7 @@ class HtmlTag
      * @param mixed $content
      * @return self
      */
-    public function addContent($content): self
+    public function addContent($content,$key=null): self
     {
         if ($this->content === null) {
             $this->content = $content;
@@ -269,17 +275,21 @@ class HtmlTag
     /**
      * Add CSS class
      * 
-     * @param string $class
+     * @param string|array $class
      * @return self
      */
-    public function addClass(string $class): self
+    public function addClass($class,$key=null): self
     {
-        $existingClasses = $this->getAttribute('class', '');
-        $classes = array_filter(array_merge(
-            explode(' ', $existingClasses),
-            explode(' ', $class)
-        ));
-        $this->setAttribute('class', implode(' ', $classes));
+        $existingClasses = $this->getAttribute('class', array());
+        if(!is_array($existingClasses)){
+            $existingClasses = array();
+        }
+        if(!is_null($key)){
+            $existingClasses[$key] = $class;
+        }else if(!in_array($class,$existingClasses)){
+            $existingClasses[] = $class;
+        }        
+        $this->setAttribute('class', $existingClasses);
         return $this;
     }
     
@@ -291,10 +301,14 @@ class HtmlTag
      */
     public function removeClass(string $class): self
     {
-        $existingClasses = $this->getAttribute('class', '');
-        $classes = array_filter(explode(' ', $existingClasses));
-        $classes = array_diff($classes, explode(' ', $class));
-        $this->setAttribute('class', implode(' ', $classes));
+        $existingClasses = $this->getAttribute('class', array());
+        if(!is_array($existingClasses)){
+            $existingClasses = array();
+        }
+        if(in_array($class,$existingClasses)){
+            $existingClasses = array_diff($existingClasses, [$class]);
+        }
+        $this->setAttribute('class', $existingClasses);
         return $this;
     }
     
@@ -368,10 +382,14 @@ class HtmlTag
             if ($value === null || $value === '') {
                 continue;
             }
-            
+            if(is_array($value)){
+                $escapedValue = implode(' ',$value);
+                $html .= ' ' . $key . '="' . $escapedValue . '"';            
+            }else{
+                $escapedValue = htmlspecialchars("".$value, ENT_QUOTES, 'UTF-8');
+                $html .= ' ' . $key . '="' . $escapedValue . '"';    
+            }
             // Escape attribute values
-            $escapedValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-            $html .= ' ' . $key . '="' . $escapedValue . '"';
         }
         
         if ($this->selfClosing) {
@@ -386,6 +404,13 @@ class HtmlTag
             return '</' . $this->tagName . '>';
         }
         return '';
+    }
+    public function getId($ensureId=true){
+        $id = $this->getAttribute("id",null);
+        if((is_null($id) || empty($id)) && $ensureId){            
+            $id = $this->initID()->getAttribute("id",null);
+        }
+        return $id;
     }
     public function initID(){
         $id = $this->getAttribute("id",null);
@@ -432,7 +457,8 @@ class HtmlTag
         if ($content instanceof HtmlTag) {
             return $content->render();
         } elseif (is_string($content)) {
-            return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+            return (string)$content;
+            //return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
         } elseif (is_numeric($content)) {
             return (string)$content;
         } elseif (is_bool($content)) {

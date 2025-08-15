@@ -21,10 +21,33 @@ class HtmlComponent{
     public function getJsLines(){
         return null;
     }
+    public function getJsFiles(){
+        return null;
+    }
+    public function getCssFiles(){
+        return null;
+    }
+    public function __toString()
+    {
+        return $this->toHtmlAsString();
+    }
     public function toHtml($doc){
         $s = $this->toHtmlAsString();        
         if($doc && $doc instanceof HtmlDocument){
+            $doc->addCssFiles($this->getCssFiles(),false);
+            $doc->addJsFilesOnEnd($this->getJsFiles(),false);
             $doc->addJsLineToDomReady($this->getJsLines());
+        }
+        return $s;
+    }
+    public function getJsLinesForDebug(){
+        $s  = '';
+        $nl = "\r\n";
+        $jsLines = $this->getJsLines();
+        if(!is_null($jsLines) && is_array($jsLines) && count($jsLines)>0){
+            foreach($jsLines as $jsLine){
+                $s .= $nl.$jsLine;
+            }
         }
         return $s;
     }

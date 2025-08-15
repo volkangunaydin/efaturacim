@@ -4,11 +4,23 @@ use Efaturacim\Util\Utils\Html\HtmlComponent;
 
 class Alert extends HtmlComponent{
     public function toHtmlAsString(){
-        $s = '<div class="alert alert-'.@$this->options['type'].'" role="alert">';
+        $type = @$this->options['type'];
+        if(in_array($type,array("error","err","danger"))){
+            $type = 'danger';
+        }elseif(in_array($type,array("succ","ok"))){
+            $type = 'success';
+        }elseif(in_array($type,array("warn"))){
+            $type = 'warning';
+        }
+        $s = '<div class="alert alert-'.$type.'" role="alert">';
         $s .= @$this->options['message'];
         $s .= '</div>';
         return $s;
     }
+    public function getDefaultOptions(){
+        return array('type'=>'danger','message'=>'');
+    }
+
     public function getJsLines(){
         return null;
     }
