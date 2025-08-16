@@ -3,7 +3,7 @@ namespace Efaturacim\Util\Utils\Html\Bootstrap;
 use Efaturacim\Util\Utils\Html\HtmlComponent;
 
 class Alert extends HtmlComponent{
-    public function toHtmlAsString(){
+    public function toHtmlAsString($doc = null){
         $type = @$this->options['type'];
         if(in_array($type,array("error","err","danger"))){
             $type = 'danger';
@@ -31,6 +31,9 @@ class Alert extends HtmlComponent{
     public static function error($message,$options=null){
         return self::alert('danger',$message,$options);   
     }
+    public static function danger($message,$options=null){
+        return self::alert('danger',$message,$options);   
+    }    
     public static function success($message,$options=null){
         return self::alert('success',$message,$options);   
     }

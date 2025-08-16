@@ -72,7 +72,7 @@ class DataTablesJs extends HtmlComponent{
                     if(in_array($key,array("_token","_dtaction"))){
                         continue;
                     }
-                    $ajax["data"] .= " d.".$key." = '".json_encode($value,JSON_UNESCAPED_UNICODE)."'; ";
+                    $ajax["data"] .= " d.".$key." = ".json_encode($value,JSON_UNESCAPED_UNICODE)."; ";
                 }
                 $ajax["data"] .= "}";
             }
@@ -121,7 +121,7 @@ class DataTablesJs extends HtmlComponent{
         }
         return $this;
     }
-    public function toHtmlAsString(){
+    public function toHtmlAsString($doc = null){
         $body = '';
         $nl = "\r\n";        
         if(count($this->caps) > 0){            

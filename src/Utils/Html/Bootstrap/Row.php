@@ -10,7 +10,7 @@ class Row extends HtmlComponent{
     public function initMe(){
         $this->tag = HtmlTag::div()->addClass("row");
     }
-    public function toHtmlAsString(){
+    public function toHtmlAsString($doc = null){
         return $this->tag->render();
     }    
     public static function newRow($options=null,$defVals=null){

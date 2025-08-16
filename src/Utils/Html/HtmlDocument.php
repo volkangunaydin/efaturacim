@@ -226,5 +226,13 @@ class HtmlDocument
             
         }        
     }
+    public function handlePage($callBack){
+        $s = '';
+        if($callBack && is_callable($callBack)){
+            $s = call_user_func_array($callBack,array(&$this));
+        }
+        $this->setBodyContent($s);
+        $this->toHtml();    
+    }
 }
 ?>

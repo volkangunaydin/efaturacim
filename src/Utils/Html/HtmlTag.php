@@ -9,7 +9,7 @@ use Efaturacim\Util\Utils\SimpleResult;
  */
 class HtmlTag
 {
-    public static $nl = "\r\n";
+    public static $sep = "\r\n";
     /**
      * @var string The HTML tag name (e.g., 'div', 'span', 'input')
      */
@@ -98,11 +98,13 @@ class HtmlTag
      * @param array $attributes HTML attributes
      * @param mixed $content The content of the element
      */
-    public function __construct(string $tagName = 'div', array $attributes = [], $content = null)
+    public function __construct(string $tagName = 'div', $attributes = [], $content = null)
     {
         $this->setTagName($tagName);
         $this->styleObject = new HtmlStyle();
-        $this->setAttributes($attributes);
+        if(is_array($attributes)){
+            $this->setAttributes($attributes);
+        }
         $this->setContent($content);
     }
     
@@ -231,11 +233,12 @@ class HtmlTag
      * @return self
      */
     public function setContent($content): self
-    {
-        if(is_null($content) || is_array($content)){
-            $this->content = array($content);    
-        }
-        
+    {        
+        if(!is_null($content) ){
+            $this->content = array($content);                        
+        }else{
+            $this->content = array();    
+        }        
         return $this;
     }
     
@@ -714,10 +717,10 @@ class HtmlTag
             if ($this->content !== null) {
                 if (is_array($this->content)) {
                     foreach ($this->content as $item) {
-                        $html .= HtmlTag::$nl.$this->renderContent($item,$doc);
+                        $html .= HtmlTag::$sep.$this->renderContent($item,$doc);
                     }   
                 } else {
-                    $html .= HtmlTag::$nl.$this->renderContent($this->content,$doc);
+                    $html .= HtmlTag::$sep.$this->renderContent($this->content,$doc);
                 }
             }
             if(!is_null($this->innerHtml) && !empty($this->innerHtml)){

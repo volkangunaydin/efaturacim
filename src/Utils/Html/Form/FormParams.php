@@ -12,7 +12,7 @@ class FormParams{
         return AssocArray::getVal($_POST,$nameOrNames,$defVal,$type);
     }
     public static function getRequestParam($nameOrNames,$defVal=null,$type=null){
-        $post = self::getPostParam($nameOrNames,null,$type);
+        $post = self::getPostParam($nameOrNames,null,$type);        
         if(is_null($post)){
             $get = self::getGetParam($nameOrNames,$defVal,$type);
             if(is_null($get)){

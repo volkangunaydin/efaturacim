@@ -4,7 +4,7 @@ use Efaturacim\Util\Utils\Html\HtmlComponent;
 
 class WidgetCard extends HtmlComponent
 {
-    public function toHtmlAsString()
+    public function toHtmlAsString($doc=null)
     {
         $this->options['bg1'] = isset($this->options['bg1']) ? $this->options['bg1'] : null;
         $this->options['bg2'] = isset($this->options['bg2']) ? $this->options['bg2'] : null;

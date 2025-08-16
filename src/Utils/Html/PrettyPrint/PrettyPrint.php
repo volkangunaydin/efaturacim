@@ -20,6 +20,9 @@ class PrettyPrint extends HtmlComponent{
     public static function js($doc,$js,$options=null,$maxHeight=null){
         return (new static($options))->setCode($js,"js")->setMaxHeight($maxHeight)->toHtml($doc);
     }    
+    public static function php($doc,$code,$options=null,$maxHeight=null){
+        return (new static($options))->setCode($code,"php")->setMaxHeight($maxHeight)->toHtml($doc);
+    }
 
     public function initMe(){
         $this->tag = HtmlTag::code()->initID()->addClass("language-html","default");
@@ -83,9 +86,11 @@ class PrettyPrint extends HtmlComponent{
         }        
         return $this;
     }    
-    public function toHtmlAsString(){   
+    public function toHtmlAsString($doc = null){   
         if(in_array($this->type,array("js"))){
             $this->tag->addClass("language-js","default");
+        }else if(in_array($this->type,array("php"))){
+            $this->tag->addClass("language-php","default");
         }     
         $s = '<pre>'.$this->tag->setInnerHtml(htmlentities($this->code,ENT_QUOTES,'UTF-8'))->toHtml().'</pre>';
         return $s;

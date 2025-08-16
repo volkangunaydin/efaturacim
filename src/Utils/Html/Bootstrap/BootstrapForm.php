@@ -55,7 +55,7 @@ class BootstrapForm extends HtmlComponent{
         }
         return parent::toHtml($doc);
   }
-  public function toHtmlAsString(){
+  public function toHtmlAsString($doc = null){
         $s = '';        
         $s .= $this->tagForm->render();
         return $s;
