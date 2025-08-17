@@ -29,6 +29,7 @@ class LarvavelUsage{
             '<?php'
             ,'   Route::any("/example-page1", function (){'
             ,'       // instead of return view("page1");'
+            ,'       // you can also use controllers and return view from there'
             ,'       return MyLaravelDocument::getDoc()->handlePage(function(&$doc){ return view("page1")->render(); });'
             ,'   });'
             ,'   Route::any("/example-using-LaravelDocTrait", function (){'
