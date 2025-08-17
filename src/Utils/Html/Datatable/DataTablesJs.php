@@ -87,6 +87,7 @@ class DataTablesJs extends HtmlComponent{
         return $arr;
     }   
     public function getJsFiles(){
+        
         if($this->hasAssetPath()){
             return ['jquery'=>null,'datatable'=>$this->assetPath."datatables.min.js"];   
         }else{
@@ -191,16 +192,20 @@ class DataTablesJs extends HtmlComponent{
         }
         return $table;
     }
+    public function setUrl($url=null){
+        if(is_null($url)){
+            $url = UrlUtil::getUrl(null,array("__dtaction"=>"data"))->toUrlString();
+        }
+        $this->jsOption->setOption("serverSide",true);
+        $this->jsOption->setOption("ajax",array("url"=>$url,"type"=>"POST"));
+        return $this;
+    }
     public static function newServerSideTable($url=null,$capsAsArray=null,$options=null){
         $table = new static($options);        
         if($capsAsArray && is_array($capsAsArray) && count($capsAsArray)){
             $table->setCaptions($capsAsArray);            
         }        
-        if(is_null($url)){
-            $url = UrlUtil::getUrl(null,array("__dtaction"=>"data"))->toUrlString();
-        }
-        $table->jsOption->setOption("serverSide",true);
-        $table->jsOption->setOption("ajax",array("url"=>$url,"type"=>"POST"));
+        $table->setUrl($url);
         return $table;
     }
     
