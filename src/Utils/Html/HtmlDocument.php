@@ -192,7 +192,11 @@ class HtmlDocument
         }
         return $this;
     }
+    public function onBeforeRender(){
+
+    }
     public function toHtml(){
+        $this->onBeforeRender();
         $s  = $this->getHeadAsString();
         $s .= $this->nl.$this->bodyTag->printStartingTag();
         $s .= $this->bodyContent;
