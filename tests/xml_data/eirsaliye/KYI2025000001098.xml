@@ -13,7 +13,7 @@
     <cbc:IssueDate>2025-07-30</cbc:IssueDate>
     <cbc:IssueTime>15:55:00</cbc:IssueTime>
     <cbc:DespatchAdviceTypeCode>SEVK</cbc:DespatchAdviceTypeCode>
-    <cbc:LineCountNumeric>1</cbc:LineCountNumeric>
+    <cbc:LineCountNumeric>4</cbc:LineCountNumeric>
     <cac:AdditionalDocumentReference>
         <cbc:ID>b494f490-0185-41e8-8f9d-f876538ea322</cbc:ID>
         <cbc:IssueDate>2025-07-30</cbc:IssueDate>
@@ -173,6 +173,57 @@
             </cac:Despatch>
         </cac:Delivery>
     </cac:Shipment>
+    <cac:DespatchLine>
+        <cbc:ID>1</cbc:ID>
+        <cbc:DeliveredQuantity unitCode="KGM">11160</cbc:DeliveredQuantity>
+        <cac:OrderLineReference>
+            <cbc:LineID/>
+        </cac:OrderLineReference>
+        <cac:Item>
+            <cbc:Name>Razmol (Yem Üretimi İçin) "Dökme"</cbc:Name>
+            <cac:SellersItemIdentification>
+                <cbc:ID>152.01.10.000140</cbc:ID>
+            </cac:SellersItemIdentification>
+        </cac:Item>
+        <cac:Shipment>
+            <cbc:ID/>
+            <cac:GoodsItem/>
+        </cac:Shipment>
+    </cac:DespatchLine>
+    <cac:DespatchLine>
+        <cbc:ID>1</cbc:ID>
+        <cbc:DeliveredQuantity unitCode="KGM">11160</cbc:DeliveredQuantity>
+        <cac:OrderLineReference>
+            <cbc:LineID/>
+        </cac:OrderLineReference>
+        <cac:Item>
+            <cbc:Name>Razmol (Yem Üretimi İçin) "Dökme"</cbc:Name>
+            <cac:SellersItemIdentification>
+                <cbc:ID>152.01.10.000140</cbc:ID>
+            </cac:SellersItemIdentification>
+        </cac:Item>
+        <cac:Shipment>
+            <cbc:ID/>
+            <cac:GoodsItem/>
+        </cac:Shipment>
+    </cac:DespatchLine>
+    <cac:DespatchLine>
+        <cbc:ID>1</cbc:ID>
+        <cbc:DeliveredQuantity unitCode="KGM">11160</cbc:DeliveredQuantity>
+        <cac:OrderLineReference>
+            <cbc:LineID/>
+        </cac:OrderLineReference>
+        <cac:Item>
+            <cbc:Name>Razmol (Yem Üretimi İçin) "Dökme"</cbc:Name>
+            <cac:SellersItemIdentification>
+                <cbc:ID>152.01.10.000140</cbc:ID>
+            </cac:SellersItemIdentification>
+        </cac:Item>
+        <cac:Shipment>
+            <cbc:ID/>
+            <cac:GoodsItem/>
+        </cac:Shipment>
+    </cac:DespatchLine>
     <cac:DespatchLine>
         <cbc:ID>1</cbc:ID>
         <cbc:DeliveredQuantity unitCode="KGM">11160</cbc:DeliveredQuantity>

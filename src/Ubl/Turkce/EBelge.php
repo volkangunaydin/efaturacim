@@ -130,7 +130,7 @@ class EBelge{
         EBelgeDebugger::debug($this);
     }
     public function getSatirSayisi(){
-        if($this->ubl && $this->ubl instanceof InvoiceDocument){
+        if($this->ubl && property_exists($this->ubl, 'invoiceLine')){
             return $this->ubl->invoiceLine->getCount();        
         }        
         return 0;

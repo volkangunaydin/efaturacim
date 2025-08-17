@@ -1,37 +1,33 @@
 <?php
-
 namespace Efaturacim\Util\Ubl;
 
-use DOMDocument;
-use DOMElement;
+use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
+use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
+use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
+use Efaturacim\Util\Ubl\Objects\AllowanceCharge;
+use Efaturacim\Util\Ubl\Objects\BillingReference;
+use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
+use Efaturacim\Util\Ubl\Objects\Delivery;
+use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
+use Efaturacim\Util\Ubl\Objects\InvoiceLine;
+use Efaturacim\Util\Ubl\Objects\InvoicePeriod;
+use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
+use Efaturacim\Util\Ubl\Objects\Note;
+use Efaturacim\Util\Ubl\Objects\OrderReference;
+use Efaturacim\Util\Ubl\Objects\Party;
+use Efaturacim\Util\Ubl\Objects\PaymentMeans;
+use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
+use Efaturacim\Util\Ubl\Objects\TaxTotal;
+use Efaturacim\Util\Ubl\Objects\UblDataType;
+use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
+use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
+use Efaturacim\Util\Ubl\Objects\UBLExtensions;
+use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Utils\Array\ArrayUtil;
 use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
-use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
-use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
-use Efaturacim\Util\Ubl\Objects\TaxTotal;
-use Efaturacim\Util\Ubl\Objects\UBLExtensions;
-use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
-use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
-use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
-use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
-use Efaturacim\Util\Ubl\Objects\InvoiceLine;
-use Efaturacim\Util\Ubl\Objects\PaymentMeans;
-use Efaturacim\Util\Ubl\Objects\AllowanceCharge;
-use Efaturacim\Util\Ubl\Objects\Delivery;
-use Efaturacim\Util\Ubl\Objects\BillingReference;
-use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
-use Efaturacim\Util\Ubl\Objects\OrderReference;
-use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
-use Efaturacim\Util\Ubl\Objects\Note;
-use Efaturacim\Util\Ubl\Objects\InvoicePeriod;
-use Efaturacim\Util\Ubl\Objects\Party;
-use Efaturacim\Util\Ubl\Objects\UblDataType;
-use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
-use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
 use Efaturacim\Util\Utils\xml\XmlToArray;
-
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.
@@ -46,6 +42,7 @@ class InvoiceDocument extends UblDocument
      * Invoice type code. e.g., "SATIS", "IADE"
      * @var string|null
      */
+
     public ?string $invoiceTypeCode = null;
 
     public ?string $accountingCost = null;
@@ -74,23 +71,20 @@ class InvoiceDocument extends UblDocument
      */
     public $taxTotal = null;
 
-
     /**
      * @var WithholdingTaxTotal
      */
     public $withholdingTaxTotal = null;
 
-    
     /**
      * @var AllowanceCharge
      */
     public $allowanceCharge = null;
 
-        /**
+    /**
      * @var InvoicePeriod
      */
     public $invoicePeriod = null;
-
 
     /**
      * @var PricingExchangeRate
@@ -99,7 +93,7 @@ class InvoiceDocument extends UblDocument
 
     public $paymentMeans = null;
 
-    /**     
+    /**
      * @var UblDataType
      */
     public $UBLExtensions = null;
@@ -111,11 +105,11 @@ class InvoiceDocument extends UblDocument
     public $billingReference = null;
 
     public $orderReference = null;
-    /**     
+    /**
      * @var UblDataTypeList
      */
     public $despatchDocumentReference = null;
-    /**     
+    /**
      * @var UblDataTypeList
      */
     public $note = null;
@@ -144,38 +138,40 @@ class InvoiceDocument extends UblDocument
         // Default profile for a commercial invoice. Can be overridden for "TEMELFATURA".
 
     }
-    public function getIssueDate(){
+    public function getIssueDate()
+    {
         return $this->issueDate;
     }
-    public function getIssueTime(){
+    public function getIssueTime()
+    {
         return $this->issueTime;
     }
     public function initMe()
     {
         $this->rootElementName = 'Invoice';
-        $this->setProfileId('TICARIFATURA');
+        $this->setProfileId();
         $this->setIssueDate(date('Y-m-d'));
         $this->setIssueTime(date('H:i:s'));
         $this->invoicePeriod = new InvoicePeriod();
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
-        $this->billingReference = new UblDataTypeList(BillingReference::class);
-        $this->accountingSupplierParty = new AccountingSupplierParty();
-        $this->accountingCustomerParty = new AccountingCustomerParty();
-        $this->buyerCustomerParty = new BuyerCustomerParty();
-        $this->delivery = new Delivery();
-        $this->orderReference = new UblDataTypeList(OrderReference::class);
-        $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
-        $this->note = new UblDataTypeList(Note::class);
-        $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
-        $this->allowanceCharge = new AllowanceCharge();
-        $this->taxTotal = new TaxTotal();
-        $this->withholdingTaxTotal = new WithholdingTaxTotal();
-        $this->pricingExchangeRate = new PricingExchangeRate();
-        $this->paymentMeans = new UblDataTypeList(PaymentMeans::class);
-        $this->legalMonetaryTotal = new LegalMonetaryTotal();
+        $this->billingReference            = new UblDataTypeList(BillingReference::class);
+        $this->accountingSupplierParty     = new AccountingSupplierParty();
+        $this->accountingCustomerParty     = new AccountingCustomerParty();
+        $this->buyerCustomerParty          = new BuyerCustomerParty();
+        $this->delivery                    = new Delivery();
+        $this->orderReference              = new UblDataTypeList(OrderReference::class);
+        $this->despatchDocumentReference   = new UblDataTypeList(DespatchDocumentReference::class);
+        $this->note                        = new UblDataTypeList(Note::class);
+        $this->invoiceLine                 = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
+        $this->allowanceCharge             = new AllowanceCharge();
+        $this->taxTotal                    = new TaxTotal();
+        $this->withholdingTaxTotal         = new WithholdingTaxTotal();
+        $this->pricingExchangeRate         = new PricingExchangeRate();
+        $this->paymentMeans                = new UblDataTypeList(PaymentMeans::class);
+        $this->legalMonetaryTotal          = new LegalMonetaryTotal();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
-        $this->UBLExtensions = new UBLExtensions();
+        $this->UBLExtensions               = new UBLExtensions();
     }
     public function setLineCount()
     {
@@ -189,7 +185,7 @@ class InvoiceDocument extends UblDocument
      */
     public function toXml(): string
     {
-        $this->getGUID();        
+        $this->getGUID();
         $this->root = $this->document->createElement($this->rootElementName);
         $this->document->appendChild($this->root);
         $this->setNamespaces();
@@ -213,7 +209,7 @@ class InvoiceDocument extends UblDocument
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
-        
+
         $this->appendLegalMonetaryTotal();
         $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();
@@ -275,11 +271,11 @@ class InvoiceDocument extends UblDocument
      */
     public function getPropertyAlias($k, $v)
     {
-        if (in_array($k, array("satici"))) {
+        if (in_array($k, ["satici"])) {
             return "accountingSupplierParty";
-        } else if (in_array($k, array("alici", "musteri"))) {
+        } else if (in_array($k, ["alici", "musteri"])) {
             return "accountingCustomerParty";
-        } else if (in_array($k, array("notlar", "notes"))) {
+        } else if (in_array($k, ["notlar", "notes"])) {
             return "note";
         }
         return null;
@@ -287,23 +283,26 @@ class InvoiceDocument extends UblDocument
     /**
      * Skalar degerlerin nasil atnacagi belirtilir
      */
-    public function setPropertyFromOptions($k, $v, $options)
+    public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, array("fatura_no", "faturano", "belgeno")) && StrUtil::notEmpty($v)) {
+        if (in_array($k, ["fatura_no", "faturano", "belgeno"]) && StrUtil::notEmpty($v)) {
             $this->id = $v;
             return true;
-        } else if (in_array($k, array("guid", "uid", "uuid")) && StrUtil::notEmpty($v)) {
+        }else if (in_array($k, ["profileid", "profile_id", "ProfileID"]) && StrUtil::notEmpty($v)) {
+            $this->profileId = $v;
+            return true;
+        } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
             return true;
-        } else if (in_array($k, array("note", "notes", "Note")) && ArrayUtil::notEmpty($v)) {
+        } else if (in_array($k, ["note", "notes", "Note"]) && ArrayUtil::notEmpty($v)) {
             foreach ($v as $vv) {
                 $this->note->add(Note::newNote($vv));
             }
             return true;
-        } else if (in_array($k, array("note", "notes", "Note")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, ["note", "notes", "Note"]) && StrUtil::notEmpty($v)) {
             $this->note->add(Note::newNote($v));
             return true;
-        } else if (in_array($k, array("invoiceLine", "satirlar", "lines", "InvoiceLine")) && ArrayUtil::notEmpty($v)) {
+        } else if (in_array($k, ["invoiceLine", "satirlar", "lines", "InvoiceLine"]) && ArrayUtil::notEmpty($v)) {
             if (ArrayUtil::isAssoc($v)) {
                 $this->invoiceLine->add(InvoiceLine::newLine($v), null, null, $this->getContextArray());
             } else {
@@ -312,14 +311,13 @@ class InvoiceDocument extends UblDocument
                 }
             }
             return true;
-        } else if (in_array($k, array("note", "notes")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, ["note", "notes"]) && StrUtil::notEmpty($v)) {
             $this->note->add(Note::newNote($v));
             return true;
         }
         //\Vulcan\V::dump(array($k,$v,$options));
         return false;
     }
-
 
     public function loadFromXml($xmlString, $debug = false): static
     {
@@ -343,13 +341,13 @@ class InvoiceDocument extends UblDocument
     public function addToOrderList($code = null, $date = null)
     {
         if (StrUtil::notEmpty($code)) {
-            $this->orderReference->add(new OrderReference(array("id" => $code, "date" => $date)));
+            $this->orderReference->add(new OrderReference(["id" => $code, "date" => $date]));
         }
     }
     public function addToDespatchList($code = null, $date = null)
     {
         if (StrUtil::notEmpty($code)) {
-            $this->despatchDocumentReference->add(new DespatchDocumentReference(array("id" => $code, "date" => $date)));
+            $this->despatchDocumentReference->add(new DespatchDocumentReference(["id" => $code, "date" => $date]));
         }
     }
     public function addNote($noteStr)
@@ -362,21 +360,21 @@ class InvoiceDocument extends UblDocument
     }
     public function getContextArray()
     {
-        return new Options(array(
-            "nextLineId" => $this->invoiceLine->getCount() + 1,
+        return new Options([
+            "nextLineId"           => $this->invoiceLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "invoiceTypeCode" => $this->invoiceTypeCode,
-            "accountingCost" => $this->accountingCost
-        ));
+            "invoiceTypeCode"      => $this->invoiceTypeCode,
+            "accountingCost"       => $this->accountingCost,
+        ]);
     }
     public function rebuildValues()
-    {        
-        $totalLineExtensionAmount = 0;
-        $totalTaxExclusiveAmount = 0;
-        $totalTaxInclusiveAmount = 0;
+    {
+        $totalLineExtensionAmount  = 0;
+        $totalTaxExclusiveAmount   = 0;
+        $totalTaxInclusiveAmount   = 0;
         $totalAllowanceTotalAmount = 0;
-        $totalChargeTotalAmount = 0;
-        $totalPayableAmount = 0;
+        $totalChargeTotalAmount    = 0;
+        $totalPayableAmount        = 0;
 
         // Rebuild invoice line values and collect totals
         foreach ($this->invoiceLine->list as &$invLine) {
@@ -403,92 +401,105 @@ class InvoiceDocument extends UblDocument
         $this->legalMonetaryTotal->taxInclusiveAmount->setValue($totalTaxInclusiveAmount);
         $this->legalMonetaryTotal->allowanceTotalAmount->setValue($totalAllowanceTotalAmount);
         $this->legalMonetaryTotal->chargeTotalAmount->setValue($totalChargeTotalAmount);
-        $this->legalMonetaryTotal->payableAmount->setValue($totalPayableAmount);        
+        $this->legalMonetaryTotal->payableAmount->setValue($totalPayableAmount);
     }
-    public function getVatsAsArray(){
-        $arr = array();
-        foreach($this->invoiceLine->list as $line){
-            if($line instanceof InvoiceLine){
+    public function getVatsAsArray()
+    {
+        $arr = [];
+        foreach ($this->invoiceLine->list as $line) {
+            if ($line instanceof InvoiceLine) {
                 $vat = $line->getVatAsArray();
-                if($vat && is_array($vat) && count($vat)>0 && key_exists("percent",$vat)){
+                if ($vat && is_array($vat) && count($vat) > 0 && key_exists("percent", $vat)) {
                     $percent = @$vat["percent"];
-                    if(!key_exists($percent,$arr)){
-                        $arr[$percent] = array();
+                    if (! key_exists($percent, $arr)) {
+                        $arr[$percent] = [];
                     }
-                    foreach($vat as $kk=>$vv){
-                        if($kk=="percent"){ 
+                    foreach ($vat as $kk => $vv) {
+                        if ($kk == "percent") {
                             $arr[$percent][$kk] = $vv;
                             continue;
                         }
-                        if(key_exists($kk,$arr[$percent]) && is_numeric($arr[$percent][$kk])){
+                        if (key_exists($kk, $arr[$percent]) && is_numeric($arr[$percent][$kk])) {
                             $arr[$percent][$kk] += $vv;
-                        }else{
+                        } else {
                             $arr[$percent][$kk] = $vv;
-                        }                        
+                        }
                     }
                 }
             }
         }
         return $arr;
     }
-    public function getPayableAmount(){
+    public function getPayableAmount()
+    {
         return $this->legalMonetaryTotal->payableAmount->toNumber();
     }
-    public function getLineExtensionAmount(){
+    public function getLineExtensionAmount()
+    {
         return $this->legalMonetaryTotal->lineExtensionAmount->toNumber();
     }
-    public function getTaxExclusiveAmount(){
+    public function getTaxExclusiveAmount()
+    {
         return $this->legalMonetaryTotal->taxExclusiveAmount->toNumber();
     }
-    public function getTaxInclusiveAmount(){
+    public function getTaxInclusiveAmount()
+    {
         return $this->legalMonetaryTotal->taxInclusiveAmount->toNumber();
     }
-    public function getAllowanceTotalAmount(){
+    public function getAllowanceTotalAmount()
+    {
         return $this->legalMonetaryTotal->allowanceTotalAmount->toNumber();
     }
-    public function getChargeTotalAmount(){
+    public function getChargeTotalAmount()
+    {
         return $this->legalMonetaryTotal->chargeTotalAmount->toNumber();
-    }    
-    public function getLineExtensionAmountFromLines(){        
-        return $this->invoiceLine->sum(function($line){
-            if($line instanceof InvoiceLine){
+    }
+    public function getLineExtensionAmountFromLines()
+    {
+        return $this->invoiceLine->sum(function ($line) {
+            if ($line instanceof InvoiceLine) {
                 return $line->getLineExtensionAmount();
-            }                
+            }
         });
     }
-    public function getTaxExclusiveAmountFromLines(){        
-        return $this->invoiceLine->sum(function($line){
-            if($line instanceof InvoiceLine){
+    public function getTaxExclusiveAmountFromLines()
+    {
+        return $this->invoiceLine->sum(function ($line) {
+            if ($line instanceof InvoiceLine) {
                 return $line->getTaxExclusiveAmount();
-            }                
+            }
         });
     }
-    public function getTaxInclusiveAmountFromLines(){        
-        return $this->invoiceLine->sum(function($line){
-            if($line instanceof InvoiceLine){
+    public function getTaxInclusiveAmountFromLines()
+    {
+        return $this->invoiceLine->sum(function ($line) {
+            if ($line instanceof InvoiceLine) {
                 return $line->getTaxInclusiveAmount();
-            }                
+            }
         });
     }
-    public function getAllowanceTotalAmountFromLines(){        
-        return $this->invoiceLine->sum(function($line){
-            if($line instanceof InvoiceLine){
+    public function getAllowanceTotalAmountFromLines()
+    {
+        return $this->invoiceLine->sum(function ($line) {
+            if ($line instanceof InvoiceLine) {
                 return $line->getAllowanceTotalAmount();
-            }                
+            }
         });
-    }   
-    public function getChargeTotalAmountFromLines(){        
-        return $this->invoiceLine->sum(function($line){
-            if($line instanceof InvoiceLine){
+    }
+    public function getChargeTotalAmountFromLines()
+    {
+        return $this->invoiceLine->sum(function ($line) {
+            if ($line instanceof InvoiceLine) {
                 return $line->getChargeTotalAmount();
-            }                
+            }
         });
-    }       
-    public function getPayableAmountFromLines(){        
-        return $this->invoiceLine->sum(function($line){
-            if($line instanceof InvoiceLine){
+    }
+    public function getPayableAmountFromLines()
+    {
+        return $this->invoiceLine->sum(function ($line) {
+            if ($line instanceof InvoiceLine) {
                 return $line->getPayableAmount();
-            }                
+            }
         });
-    }      
+    }
 }

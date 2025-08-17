@@ -110,12 +110,17 @@ abstract class UblDocument{
     /**
      * Sets the Profile ID for the UBL document.
      *
-     * @param string $profileId
+     * @param string|null $profileId The profile ID to set. If null, uses a default value.
      * @return static
      */
-    public function setProfileId(string $profileId): static
+    public function setProfileId(?string $profileId = null): static
     {
-        $this->profileId = $profileId;
+        if ($profileId === null) {
+            // Default profile ID based on document type
+            $this->profileId = 'TICARIFATURA';
+        } else {
+            $this->profileId = $profileId;
+        }
         return $this;
     }
 
@@ -211,6 +216,17 @@ abstract class UblDocument{
     public function getDocumentCurrencyCode(){
         return $this->documentCurrencyCode;
     }
+
+    /**
+     * Sets properties from options/array data.
+     * This method can be overridden by subclasses to handle specific properties.
+     *
+     * @param string $k The property key
+     * @param mixed $v The property value
+     * @param mixed $options Additional options
+     * @return bool True if the property was handled, false otherwise
+     */
+ 
 
     /**
      * Generates the XML representation of the UBL document.
