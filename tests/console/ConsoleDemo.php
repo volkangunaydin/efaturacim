@@ -149,18 +149,18 @@ class ConsoleDemo
         Console::print('');
         
         Console::window('System Information', function() {
-            Console::print('Operating System: ' . PHP_OS, 'green');
-            Console::print('PHP Version: ' . PHP_VERSION, 'blue');
-            Console::print('Memory Limit: ' . ini_get('memory_limit'), 'yellow');
-            Console::print('Max Execution Time: ' . ini_get('max_execution_time') . ' seconds', 'magenta');
+            $this->printWindowLine('Operating System: ' . PHP_OS, 'green', 58);
+            $this->printWindowLine('PHP Version: ' . PHP_VERSION, 'blue', 58);
+            $this->printWindowLine('Memory Limit: ' . ini_get('memory_limit'), 'yellow', 58);
+            $this->printWindowLine('Max Execution Time: ' . ini_get('max_execution_time') . ' seconds', 'magenta', 58);
         }, 'cyan', 60);
         
         Console::print('');
         
         Console::window('File System Info', function() {
-            Console::print('Current Directory: ' . getcwd(), 'green');
-            Console::print('Available Space: ' . $this->formatBytes(disk_free_space('.'), 2), 'blue');
-            Console::print('Total Space: ' . $this->formatBytes(disk_total_space('.'), 2), 'yellow');
+            $this->printWindowLine('Current Directory: ' . getcwd(), 'green', 58);
+            $this->printWindowLine('Available Space: ' . $this->formatBytes(disk_free_space('.'), 2), 'blue', 58);
+            $this->printWindowLine('Total Space: ' . $this->formatBytes(disk_total_space('.'), 2), 'yellow', 58);
         }, 'green', 60);
         
         Console::waitForInput('Press Enter to continue...');
@@ -276,6 +276,13 @@ class ConsoleDemo
         }
         
         return round($bytes, $precision) . ' ' . $units[$i];
+    }
+    
+    private function printWindowLine(string $text, string $color, int $width): void
+    {
+        $paddedText = str_pad($text, $width, ' ');
+        Console::printInline('│  ' . $paddedText . '  │', $color);
+        Console::print(''); // Add newline
     }
 }
 

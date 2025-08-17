@@ -189,9 +189,12 @@ class Console
         $leftPadding = (int) $padding;
         $rightPadding = max(0, $width - $titleLength - 4 - $leftPadding);
         
-        $topLine = '┌' . str_repeat('─', $width - 2) . '┐';
-        $titleLine = '│' . str_repeat(' ', $leftPadding) . $title . str_repeat(' ', $rightPadding) . '│';
-        $bottomLine = '└' . str_repeat('─', $width - 2) . '┘';
+        // Calculate the actual width needed for the box
+        $boxWidth = $leftPadding + $titleLength + $rightPadding + 4; // +4 for borders and padding
+        
+        $topLine = '┌' . str_repeat('─', $boxWidth - 2) . '┐';
+        $titleLine = '│' . str_repeat(' ', $leftPadding+2) . $title . str_repeat(' ', $rightPadding) . '│';
+        $bottomLine = '└' . str_repeat('─', $boxWidth - 2) . '┘';
         
         self::print($topLine, $color);
         self::print($titleLine, $color);
@@ -221,15 +224,18 @@ class Console
         $leftPadding = (int) $padding;
         $rightPadding = max(0, $width - $titleLength - 4 - $leftPadding);
         
+        // Calculate the total width of the window
+        $windowWidth = $leftPadding + $titleLength + 2 + $rightPadding; // +2 for spaces around title
+        
         // Top border
         $topLine = '┌' . str_repeat('─', $leftPadding) . ' ' . $title . ' ' . str_repeat('─', $rightPadding) . '┐';
         self::print($topLine, $color);
         
-        // Content
+        // Content with side borders
         $content();
         
         // Bottom border - should match the width of the top border
-        $bottomLine = '└' . str_repeat('─', $leftPadding + $titleLength + 2 + $rightPadding) . '┘';
+        $bottomLine = '└' . str_repeat('─', $windowWidth) . '┘';
         self::print($bottomLine, $color);
     }
 
