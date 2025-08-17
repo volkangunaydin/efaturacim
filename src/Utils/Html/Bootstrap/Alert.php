@@ -12,13 +12,19 @@ class Alert extends HtmlComponent{
         }elseif(in_array($type,array("warn"))){
             $type = 'warning';
         }
-        $s = '<div class="alert alert-'.$type.'" role="alert">';
+        
+        $close = @$this->options['close'];
+        $closeClass = $close ? ' alert-dismissible' : '';
+        $closeButton = $close ? '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' : '';
+        
+        $s = '<div class="alert alert-'.$type.$closeClass.'" role="alert">';
+        $s .= $closeButton;
         $s .= @$this->options['message'];
         $s .= '</div>';
         return $s;
     }
     public function getDefaultOptions(){
-        return array('type'=>'danger','message'=>'');
+        return array('type'=>'danger','message'=>'','close'=>false);
     }
 
     public function getJsLines(){

@@ -1,6 +1,7 @@
 <?php
 namespace Efaturacim\Util\Usage\Html;
 
+use Efaturacim\Util\Utils\Html\Bootstrap\Accordion;
 use Efaturacim\Util\Utils\Html\Bootstrap\Alert;
 use Efaturacim\Util\Utils\Html\Bootstrap\Badge;
 use Efaturacim\Util\Utils\Html\Bootstrap\BootstrapDocument;
@@ -20,6 +21,7 @@ use Efaturacim\Util\Utils\Html\Bootstrap\Tooltips;
 use Efaturacim\Util\Utils\Html\PrettyPrint\PrettyPrint;
 
 class BootstrapUsage{
+    public static $text1 = "";
     public static function runDemo(){
         $doc = new BootstrapDocument();
         $doc->setBodyContent(self::getDemoHtml($doc));
@@ -34,6 +36,7 @@ class BootstrapUsage{
         // Add all component demos
         $s .= self::getAlertDemo($doc);
         $s .= self::getBadgeDemo($doc);
+        $s .= self::getAccordionDemo($doc);
         $s .= self::getCarouselDemo($doc);
         $s .= self::getCollapseDemo($doc);
         $s .= self::getDropdownDemo($doc);
@@ -74,6 +77,25 @@ class BootstrapUsage{
         $s .= '</div>';
         
         $s .= '<div class="col-12">';
+        $s .= '<h3>Dismissible Alerts</h3>';
+        $s .= '<div class="mb-3">';
+        $s .= Alert::primary('This is a dismissible primary alert', ['close' => true]);
+        $s .= '</div>';
+        $s .= '<div class="mb-3">';
+        $s .= Alert::success('This is a dismissible success alert', ['close' => true]);
+        $s .= '</div>';
+        $s .= '<div class="mb-3">';
+        $s .= Alert::danger('This is a dismissible danger alert', ['close' => true]);
+        $s .= '</div>';
+        $s .= '<div class="mb-3">';
+        $s .= Alert::warning('This is a dismissible warning alert', ['close' => true]);
+        $s .= '</div>';
+        $s .= '<div class="mb-3">';
+        $s .= Alert::info('This is a dismissible info alert', ['close' => true]);
+        $s .= '</div>';
+        $s .= '</div>';
+        
+        $s .= '<div class="col-12">';
         $s .= '<h4>Usage Example:</h4>';
         $code = '<?php
 use Efaturacim\Util\Utils\Html\Bootstrap\Alert;
@@ -85,10 +107,22 @@ echo Alert::danger("This is a danger alert"); // Note: use danger() not error()
 echo Alert::warning("This is a warning alert");
 echo Alert::info("This is an info alert");
 
+// Dismissible alerts with close button
+echo Alert::primary("This is a dismissible alert", ["close" => true]);
+echo Alert::success("This is a dismissible alert", ["close" => true]);
+echo Alert::danger("This is a dismissible alert", ["close" => true]);
+echo Alert::warning("This is a dismissible alert", ["close" => true]);
+echo Alert::info("This is a dismissible alert", ["close" => true]);
+
 // Alert with custom options
 echo Alert::alert("primary", "Custom alert", [
+    "close" => true,
     "class" => "custom-alert"
-]);';
+]);
+
+// Using constructor with close option
+$alert = new Alert(["type" => "success", "message" => "Success message", "close" => true]);
+echo $alert->toHtmlAsString();';
         $s .= PrettyPrint::php($doc, $code, null, 400);
         $s .= '</div>';
         $s .= '</div>';
@@ -144,15 +178,131 @@ echo Badge::create("Custom badge", "primary", true)->toHtmlAsString();';
         return $s;
     }
 
+    private static function getAccordionDemo(&$doc){
+        $s = '<div class="row mb-5">';
+        $s .= '<div class="col-12">';
+        $s .= '<h2>Accordion</h2>';
+        $s .= '<div class="mb-3">';
+        $s .= Accordion::multiple([
+            [
+                'header' => 'Accordion Item #1',
+                'content' => '<strong>This is the first item\'s accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.',
+                'collapsed' => false
+            ],
+            [
+                'header' => 'Accordion Item #2',
+                'content' => '<strong>This is the second item\'s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.',
+                'collapsed' => true
+            ],
+            [
+                'header' => 'Accordion Item #3',
+                'content' => '<strong>This is the third item\'s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.',
+                'collapsed' => true
+            ]
+        ]);
+        $s .= '</div>';
+        $s .= '</div>';
+        
+        $s .= '<div class="col-12">';
+        $s .= '<h3>Flush Accordion</h3>';
+        $s .= '<div class="mb-3">';
+        $s .= Accordion::flush([
+            [
+                'header' => 'Flush Item #1',
+                'content' => 'This is a flush accordion item with no borders.',
+                'collapsed' => false
+            ],
+            [
+                'header' => 'Flush Item #2',
+                'content' => 'Another flush accordion item.',
+                'collapsed' => true
+            ]
+        ]);
+        $s .= '</div>';
+        $s .= '</div>';
+        
+        $s .= '<div class="col-12">';
+        $s .= '<h3>Multiple Open Accordion</h3>';
+        $s .= '<div class="mb-3">';
+        $s .= Accordion::multipleOpen([
+            [
+                'header' => 'Multiple Open Item #1',
+                'content' => 'This item can stay open when others are opened.',
+                'collapsed' => false
+            ],
+            [
+                'header' => 'Multiple Open Item #2',
+                'content' => 'This item can also stay open.',
+                'collapsed' => false
+            ]
+        ]);
+        $s .= '</div>';
+        $s .= '</div>';
+        
+        $s .= '<div class="col-12">';
+        $s .= '<h4>Usage Example:</h4>';
+        $code = '<?php
+use Efaturacim\Util\Utils\Html\Bootstrap\Accordion;
+
+// Simple accordion with one item (returns string directly)
+echo Accordion::simple("Accordion Title", "This is the accordion content.");
+
+// Multiple accordion items
+echo Accordion::multiple([
+    [
+        "header" => "Item 1",
+        "content" => "Content for item 1",
+        "collapsed" => false
+    ],
+    [
+        "header" => "Item 2", 
+        "content" => "Content for item 2",
+        "collapsed" => true
+    ]
+]);
+
+// Flush accordion (no borders)
+echo Accordion::flush([
+    ["header" => "Flush Item", "content" => "No borders"]
+]);
+
+// Multiple open accordion
+echo Accordion::multipleOpen([
+    ["header" => "Item 1", "content" => "Can stay open"],
+    ["header" => "Item 2", "content" => "Can also stay open"]
+]);
+
+// Accordion with first item open by default
+echo Accordion::firstOpen([
+    ["header" => "First Item", "content" => "This will be open"],
+    ["header" => "Second Item", "content" => "This will be closed"]
+]);
+
+// Accordion with custom options
+echo Accordion::multiple($items, [
+    "id" => "custom-accordion",
+    "flush" => false,
+    "alwaysOpen" => false,
+    "multiple" => false,
+    "class" => "custom-accordion",
+    "style" => "border: 1px solid #ccc;"
+]);';
+        $s .= PrettyPrint::php($doc, $code, null, 400);
+        $s .= '</div>';
+        $s .= '</div>';
+        
+        return $s;
+    }
+
     private static function getCarouselDemo(&$doc){
         $s = '<div class="row mb-5">';
         $s .= '<div class="col-12">';
         $s .= '<h2>Carousel</h2>';
         $s .= '<div class="mb-3">';
         $s .= Carousel::withCaptions([
-            ['image' => 'https://via.placeholder.com/800x400/007bff/ffffff?text=Slide+1', 'title' => 'First Slide', 'text' => 'This is the first slide'],
-            ['image' => 'https://via.placeholder.com/800x400/28a745/ffffff?text=Slide+2', 'title' => 'Second Slide', 'text' => 'This is the second slide'],
-            ['image' => 'https://via.placeholder.com/800x400/dc3545/ffffff?text=Slide+3', 'title' => 'Third Slide', 'text' => 'This is the third slide']
+            ['image' => 'https://picsum.photos/800/400?random=1', 'title' => 'First Slide', 'text' => 'This is the first slide'],
+            ['image' => 'https://picsum.photos/800/400?random=2', 'title' => 'Second Slide', 'text' => 'This is the second slide'],
+            ['image' => 'https://picsum.photos/800/400?random=3', 'title' => 'Third Slide', 'text' => 'This is the third slide']
         ]);
         $s .= '</div>';
         $s .= '</div>';
@@ -164,19 +314,19 @@ use Efaturacim\Util\Utils\Html\Bootstrap\Carousel;
 
 // Simple carousel with just images
 echo Carousel::simple([
-    "https://via.placeholder.com/800x400/007bff/ffffff?text=Slide+1",
-    "https://via.placeholder.com/800x400/28a745/ffffff?text=Slide+2"
+    "https://picsum.photos/800/400?random=1",
+    "https://picsum.photos/800/400?random=2"
 ]);
 
 // Carousel with captions
 echo Carousel::withCaptions([
     [
-        "image" => "https://via.placeholder.com/800x400/007bff/ffffff?text=Slide+1",
+        "image" => "https://picsum.photos/800/400?random=1",
         "title" => "First Slide",
         "text" => "This is the first slide"
     ],
     [
-        "image" => "https://via.placeholder.com/800x400/28a745/ffffff?text=Slide+2",
+        "image" => "https://picsum.photos/800/400?random=2",
         "title" => "Second Slide",
         "text" => "This is the second slide"
     ]
