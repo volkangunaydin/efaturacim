@@ -65,6 +65,9 @@ class PrettyPrint extends HtmlComponent{
         
     }    
     public function setCode($code,$type=null){
+        if(is_array($code)){
+            $code = implode("\r\n",$code);
+        }
         $this->code = $code;        
         if(!is_null($type)){
             $this->setType($type);

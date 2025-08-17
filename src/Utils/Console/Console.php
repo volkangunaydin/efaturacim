@@ -670,4 +670,5 @@ class Console
     {
         self::print('ℹ ' . $message, self::COLOR_CYAN);
     }
-} 
+}
+?>

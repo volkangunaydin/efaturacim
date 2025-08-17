@@ -295,3 +295,4 @@ if (php_sapi_name() === 'cli') {
     echo "Usage: php ConsoleDemo.php [options]\n";
     echo "Example: php ConsoleDemo.php --help color=red\n";
 }
+?>

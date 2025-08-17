@@ -35,4 +35,9 @@ class Title extends HtmlComponent{
         
         return $html;
     }
+    public static function title($text,$options=null){
+        $title = new Title($options);
+        $title->options['text'] = $text;        
+        return $title;
+    }
 }

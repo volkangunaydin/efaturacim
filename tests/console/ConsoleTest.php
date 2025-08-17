@@ -106,3 +106,4 @@ if (php_sapi_name() === 'cli') {
     echo "This test should be run from the command line.\n";
     echo "Usage: php ConsoleTest.php [options]\n";
 }
+?>
