@@ -228,8 +228,8 @@ class Console
         // Content
         $content();
         
-        // Bottom border
-        $bottomLine = '└' . str_repeat('─', $width - 2) . '┘';
+        // Bottom border - should match the width of the top border
+        $bottomLine = '└' . str_repeat('─', $leftPadding + $titleLength + 2 + $rightPadding) . '┘';
         self::print($bottomLine, $color);
     }
 
