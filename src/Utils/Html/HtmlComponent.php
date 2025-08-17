@@ -25,7 +25,7 @@ class HtmlComponent{
     /**
      * @var array Global asset paths for components
      */
-    protected static $PATHS = [];    
+    public static $PATHS = [];    
     
     /**
      * @var array Component options (merged from constructor parameters)
@@ -55,6 +55,7 @@ class HtmlComponent{
         if(!is_null($this->assetPathKey)){
             $this->assetPath = AssocArray::getVal(HtmlComponent::$PATHS,$this->assetPathKey,null);
         }
+        
     }
     
     /**
