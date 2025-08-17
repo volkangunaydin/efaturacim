@@ -192,7 +192,7 @@ class HtmlDocument
         }
         return $this;
     }
-    public function onBeforeRender(){
+    protected function onBeforeRender(){
 
     }
     public function toHtml(){
