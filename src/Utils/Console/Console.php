@@ -564,7 +564,7 @@ class Console
         
         // Message lines
         foreach ($wrappedMessage as $line) {
-            $paddedLine = str_pad($line, $availableWidth, ' ');
+            $paddedLine = str_pad($line, $availableWidth+2, ' ');
             $messageLine = '│ ' . $paddedLine . ' │';
             self::print($messageLine, $color);
         }
