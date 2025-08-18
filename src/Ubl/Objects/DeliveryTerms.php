@@ -20,14 +20,13 @@ class DeliveryTerms extends UblDataType
         }        
         return $this;
     }
-    public function setPropertyFromOptions($k, $v, $options){        
+    public function setPropertyFromOptions($k,$v,$options){        
         if (in_array($k, ['id', 'ID']) && StrUtil::notEmpty($v)) {
-            $schemeID = $options['schemeID'] ?? null;
-            $this->id = new ID();
             $this->id->textContent = $v;
-            if (StrUtil::notEmpty($schemeID)) {
-                $this->id->attributes['schemeID'] = $schemeID;
-            }
+            return true;
+        }
+        if (in_array($k, ['schemeID', 'scheme_id']) && StrUtil::notEmpty($v)) {
+            $this->id->attributes['schemeID'] = $v;
             return true;
         }
         return false;
