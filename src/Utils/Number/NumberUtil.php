@@ -21,14 +21,14 @@ class NumberUtil{
         $num = 0 + self::getAsCleanNumber($str,$decimal);
         return  $convertToNumber ? $num : "".$num;
     }
-    public static function getAsCleanNumber($s,$prec=8){
-            if(is_null($prec)){ $prec = 8; }
-            $s1 = number_format(self::smartRead($s,0,$prec),$prec,".","");
+    public static function getAsCleanNumber($s,$maxPrec=8,$returnAsNumber=false){
+            if(is_null($maxPrec)){ $maxPrec = 8; }
+            $s1 = number_format(self::smartRead($s,0,$maxPrec),$maxPrec,".","");
             if(strpos("".$s1, ".")!==false){
                 $s1 = rtrim($s1,'0');
             }                       
             if(substr($s1, -1)=="."){ $s1 = substr($s1, 0,-1); }
-            return $s1;
+            return $returnAsNumber ? (float)$s1 : $s1;
     }    
     public static function smartRead($strIn,$defVal,$prec=null){
         if(is_null($strIn) || $strIn===""){ return $defVal; }

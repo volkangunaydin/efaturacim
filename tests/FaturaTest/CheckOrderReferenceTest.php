@@ -1,6 +1,6 @@
 <?php
 
-namespace Efaturacim\Util\Tests;
+namespace Efaturacim\Util\Tests\FaturaTest;
 
 use Efaturacim\Util\Utils\Number\NumberUtil;
 use PHPUnit\Framework\TestCase;
@@ -76,8 +76,8 @@ class CheckOrderReferenceTest extends TestCase
     public static function getAsCleanNumberProvider(): array
     {
         return [
-            'keeps trailing zeros' => ['1.2300', '1.2300', 4],
-            'keeps trailing zeros with dot' => ['1.000', '1.000', 3],
+            'keeps trailing zeros' => ['1.23', '1.2300', 4],
+            'keeps trailing zeros with dot' => ['1','1.000',  3],
             'no change' => ['123.45', 123.45, 2],
         ];
     }

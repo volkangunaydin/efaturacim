@@ -1,12 +1,12 @@
 <?php
 namespace Efaturacim\Util\Ubl\Samples;
 
-use Efaturacim\Util\ArrayUtil;
 use Efaturacim\Util\IO\IO_Util;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\PartyIdentification;
 use Efaturacim\Util\Ubl\Objects\PartyName;
 use Efaturacim\Util\Ubl\Turkce\EFaturaBelgesi;
+use Efaturacim\Util\Utils\Array\ArrayUtil;
 use PDO;
 use Vulcan\Base\Debug\DebugUtil;
 use Vulcan\Base\Util\StringUtil\StrSerialize;

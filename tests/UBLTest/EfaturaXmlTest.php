@@ -1,6 +1,6 @@
 <?php
 
-namespace Efaturacim\Util\Tests;
+namespace Efaturacim\Util\Tests\UBLTest;
 
 use Efaturacim\Util\Ubl\Turkce\EFaturaBelgesi;
 use Efaturacim\Util\Utils\Common\EFaturacimLibUtil;

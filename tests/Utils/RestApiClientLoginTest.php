@@ -1,6 +1,6 @@
 <?php
 
-namespace Efaturacim\Util\Tests;
+namespace Efaturacim\Util\Tests\Utils;
 
 use Efaturacim\Util\Utils\RestApiClient;
 use Efaturacim\Util\Utils\RestApiResult;

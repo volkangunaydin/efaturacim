@@ -1,6 +1,6 @@
 <?php
 
-namespace Efaturacim\Util\Tests;
+namespace Efaturacim\Util\Tests\FaturaTest;
 
 use Efaturacim\Util\Ubl\Samples\EFaturaSamples;
 use PHPUnit\Framework\TestCase;
