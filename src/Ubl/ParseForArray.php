@@ -201,7 +201,7 @@ class ParseForArray
         $invoicedQuantity = [];
         if (isset($invoiceLine['cbc:InvoicedQuantity'])) {
             $invoicedQuantity = [
-                'value' => $invoiceLine['cbc:InvoicedQuantity']['@value'] ?? '',
+                'value' => $invoiceLine['cbc:InvoicedQuantity'] ?? '',
                 'unitCode' => $invoiceLine['cbc:InvoicedQuantity']['@unitCode'] ?? ''
             ];
         }
@@ -210,7 +210,7 @@ class ParseForArray
         $lineExtensionAmount = [];
         if (isset($invoiceLine['cbc:LineExtensionAmount'])) {
             $lineExtensionAmount = [
-                'value' => $invoiceLine['cbc:LineExtensionAmount']['@value'] ?? '',
+                'value' => $invoiceLine['cbc:LineExtensionAmount'] ?? '',
                 'currencyID' => $invoiceLine['cbc:LineExtensionAmount']['@currencyID'] ?? ''
             ];
         }
@@ -223,6 +223,8 @@ class ParseForArray
                 'name' => $itemData['cbc:Name'] ?? '',
                 'description' => $itemData['cbc:Description'] ?? '',
                 'sellersItemIdentification' => $itemData['cac:SellersItemIdentification']['cbc:ID'] ?? '',
+                'buyersItemIdentification' => $itemData['cac:BuyersItemIdentification']['cbc:ID'] ?? '',
+                'manufacturersItemIdentification' => $itemData['cac:ManufacturersItemIdentification']['cbc:ID'] ?? '',
                 'standardItemIdentification' => $itemData['cac:StandardItemIdentification']['cbc:ID'] ?? ''
             ];
         }
@@ -233,14 +235,122 @@ class ParseForArray
             $priceData = $invoiceLine['cac:Price'];
             $price = [
                 'priceAmount' => [
-                    'value' => $priceData['cbc:PriceAmount']['@value'] ?? '',
+                    'value' => $priceData['cbc:PriceAmount'] ?? '',
                     'currencyID' => $priceData['cbc:PriceAmount']['@currencyID'] ?? ''
                 ],
                 'baseQuantity' => [
-                    'value' => $priceData['cbc:BaseQuantity']['@value'] ?? '',
+                    'value' => $priceData['cbc:BaseQuantity'] ?? '',
                     'unitCode' => $priceData['cbc:BaseQuantity']['@unitCode'] ?? ''
                 ]
             ];
+        }
+
+        // Parse TaxTotal
+        $taxTotal = [];
+        if (isset($invoiceLine['cac:TaxTotal'])) {
+            $taxTotalData = $invoiceLine['cac:TaxTotal'];
+            $taxTotal = [
+                'taxAmount' => [
+                    'value' => $taxTotalData['cbc:TaxAmount'] ?? '',
+                    'currencyID' => $taxTotalData['cbc:TaxAmount']['@currencyID'] ?? ''
+                ]
+            ];
+
+            // Parse TaxSubtotal (can be multiple)
+            if (isset($taxTotalData['cac:TaxSubtotal'])) {
+                $taxSubtotals = $taxTotalData['cac:TaxSubtotal'];
+                $taxTotal['taxSubtotal'] = [];
+                
+                // Handle multiple tax subtotals or single tax subtotal
+                if (isset($taxSubtotals[0])) {
+                    // Multiple tax subtotals
+                    foreach ($taxSubtotals as $taxSubtotalData) {
+                        $taxTotal['taxSubtotal'][] = [
+                            'taxableAmount' => [
+                                'value' => $taxSubtotalData['cbc:TaxableAmount'] ?? '',
+                                'currencyID' => $taxSubtotalData['cbc:TaxableAmount']['@currencyID'] ?? ''
+                            ],
+                            'taxAmount' => [
+                                'value' => $taxSubtotalData['cbc:TaxAmount'] ?? '',
+                                'currencyID' => $taxSubtotalData['cbc:TaxAmount']['@currencyID'] ?? ''
+                            ],
+                            'percent' => $taxSubtotalData['cbc:Percent'] ?? '',
+                            'taxCategory' => [
+                                'taxExemptionReasonCode' => $taxSubtotalData['cac:TaxCategory']['cbc:TaxExemptionReasonCode'] ?? '',
+                                'taxExemptionReason' => $taxSubtotalData['cac:TaxCategory']['cbc:TaxExemptionReason'] ?? '',
+                                'taxScheme' => [
+                                    'name' => $taxSubtotalData['cac:TaxCategory']['cac:TaxScheme']['cbc:Name'] ?? '',
+                                    'taxTypeCode' => $taxSubtotalData['cac:TaxCategory']['cac:TaxScheme']['cbc:TaxTypeCode'] ?? ''
+                                ]
+                            ]
+                        ];
+                    }
+                } else {
+                    // Single tax subtotal
+                    $taxTotal['taxSubtotal'][] = [
+                        'taxableAmount' => [
+                            'value' => $taxSubtotals['cbc:TaxableAmount'] ?? '',
+                            'currencyID' => $taxSubtotals['cbc:TaxableAmount']['@currencyID'] ?? ''
+                        ],
+                        'taxAmount' => [
+                            'value' => $taxSubtotals['cbc:TaxAmount'] ?? '',
+                            'currencyID' => $taxSubtotals['cbc:TaxAmount']['@currencyID'] ?? ''
+                        ],
+                        'percent' => $taxSubtotals['cbc:Percent'] ?? '',
+                        'taxCategory' => [
+                            'taxExemptionReasonCode' => $taxSubtotals['cac:TaxCategory']['cbc:TaxExemptionReasonCode'] ?? '',
+                            'taxExemptionReason' => $taxSubtotals['cac:TaxCategory']['cbc:TaxExemptionReason'] ?? '',
+                            'taxScheme' => [
+                                'name' => $taxSubtotals['cac:TaxCategory']['cac:TaxScheme']['cbc:Name'] ?? '',
+                                'taxTypeCode' => $taxSubtotals['cac:TaxCategory']['cac:TaxScheme']['cbc:TaxTypeCode'] ?? ''
+                            ]
+                        ]
+                    ];
+                }
+            }
+        }
+
+        // Parse AllowanceCharge (can be multiple)
+        $allowanceCharge = [];
+        if (isset($invoiceLine['cac:AllowanceCharge'])) {
+            $allowanceChargeData = $invoiceLine['cac:AllowanceCharge'];
+            
+            // Handle multiple allowance charges or single allowance charge
+            if (isset($allowanceChargeData[0])) {
+                // Multiple allowance charges
+                foreach ($allowanceChargeData as $charge) {
+                    $allowanceCharge[] = [
+                        'chargeIndicator' => $charge['cbc:ChargeIndicator'] ?? '',
+                        'allowanceChargeReasonCode' => $charge['cbc:AllowanceChargeReasonCode'] ?? '',
+                        'allowanceChargeReason' => $charge['cbc:AllowanceChargeReason'] ?? '',
+                        'multiplierFactorNumeric' => $charge['cbc:MultiplierFactorNumeric'] ?? '',
+                        'amount' => [
+                            'value' => $charge['cbc:Amount'] ?? '',
+                            'currencyID' => $charge['cbc:Amount']['@currencyID'] ?? ''
+                        ],
+                        'baseAmount' => [
+                            'value' => $charge['cbc:BaseAmount'] ?? '',
+                            'currencyID' => $charge['cbc:BaseAmount']['@currencyID'] ?? ''
+                        ]
+                    ];
+                }
+            } else {
+                // Single allowance charge
+                $allowanceCharge[] = [
+                    'chargeIndicator' => $allowanceChargeData['cbc:ChargeIndicator'] ?? '',
+                    'allowanceChargeReasonCode' => $allowanceChargeData['cbc:AllowanceChargeReasonCode'] ?? '',
+                    'allowanceChargeReason' => $allowanceChargeData['cbc:AllowanceChargeReason'] ?? '',
+                    'multiplierFactorNumeric' => $allowanceChargeData['cbc:MultiplierFactorNumeric'] ?? '',
+                    'amount' => [
+                        'value' => $allowanceChargeData['cbc:Amount'] ?? '',
+                        'currencyID' => $allowanceChargeData['cbc:Amount']['@currencyID'] ?? ''
+                    ],
+                    'baseAmount' => [
+                        'value' => $allowanceChargeData['cbc:BaseAmount'] ?? '',
+                        'currencyID' => $allowanceChargeData['cbc:BaseAmount']['@currencyID'] ?? ''
+                    ]
+                ];
+            }
         }
 
         return [
@@ -248,7 +358,9 @@ class ParseForArray
             'invoicedQuantity' => $invoicedQuantity,
             'lineExtensionAmount' => $lineExtensionAmount,
             'item' => $item,
-            'price' => $price
+            'price' => $price,
+            'taxTotal' => $taxTotal,
+            'allowanceCharge' => $allowanceCharge
         ];
     }
 
@@ -274,6 +386,8 @@ class ParseForArray
 
         return $parsedLines;
     }
+
+
 
     public static function PaymentMeans($array)
     {
