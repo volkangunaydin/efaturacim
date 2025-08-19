@@ -63,7 +63,6 @@ class ServisTest extends TestCase
             Console::print('Pass: '.str_repeat("*",strlen($pass)), 'cyan');
             Console::print('=====================================================', 'cyan');
             $r = RestApiClient::getLogin($baseUrl,"EFaturacim/Login",array("customer"=>$customer,"user"=>$user,"pass"=>$pass,"clientInfo"=>@$_SERVER["HTTP_USER_AGENT"],"clientSecret"=>SecurityUtil::getClientKey(),"ip"=>"127.0.0.1"));                    
-            print_r($r);
             $firmaRef = 0;
             foreach($r->lines as $k=>$v){
                 $firmaRef = 0 + @$v["ref"];
