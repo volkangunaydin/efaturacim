@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Efaturacim\Util\Utils\Console;
 
+use Efaturacim\Util\Utils\SimpleResult;
+use Efaturacim\Util\Utils\String\StrUtil;
+
 /**
  * Console utilities 
  */
@@ -45,6 +48,30 @@ class Console
         $output = self::colorize($message, $color);
         echo $output . PHP_EOL;
     }
+    public static function getIconStr($icon){
+        if($icon=='ok' || $icon=='success'){
+            return '✓ ';
+        }else if($icon=='error' || $icon=='failed' || $icon=='danger' || $icon=='err'){
+            return '✗ ';
+        }else if($icon=='warning' || $icon=='warn'){
+            return '⚠ ';
+        }else if($icon=='info' || $icon=='info'){
+            return 'ℹ ';
+        }else if($icon=='question' || $icon=='q'){
+            return '? ';
+        }
+        return ''.$icon;
+    }
+    public static function printSuccess(string $message, ?string $icon = null): void    
+    {
+        $iconStr = self::getIconStr($icon);
+        self::print($iconStr.$message, self::COLOR_GREEN);
+    }
+    public static function printError(string $message, ?string $icon = null): void
+    {
+        $iconStr = self::getIconStr($icon);
+        self::print($iconStr.$message, self::COLOR_RED);
+    }
 
     /**
      * Print a message without newline with optional color.
@@ -59,11 +86,14 @@ class Console
      * Print a title with optional styling and borders.
      */
     public static function title(
-        string $title,
+        $title,
         ?string $color = null,
         string $style = 'simple',
         int $width = 80
     ): void {
+        if(is_array($title)){
+            $title = implode("\n", $title);
+        }
         $title = trim($title);
         $titleLength = mb_strlen($title);
         
@@ -505,44 +535,55 @@ class Console
     /**
      * Print a success alert box.
      */
-    public static function success(string $message, int $width = 80): void
+    public static function success($message, string $title = null, string $icon = null, int $width = 80): void
     {
-        self::alert($message, 'success', $width);
+        self::alert($message, 'success', $width, $title, $icon);
     }
 
     /**
      * Print an error alert box.
      */
-    public static function error(string $message, int $width = 80): void
+    public static function error($message, string $title = null, string $icon = null, int $width = 80): void
     {
-        self::alert($message, 'error', $width);
+        self::alert($message, 'error', $width, $title, $icon);
     }
 
     /**
      * Print a warning alert box.
      */
-    public static function warning(string $message, int $width = 80): void
+    public static function warning($message, string $title = null, string $icon = null, int $width = 80): void
     {
-        self::alert($message, 'warning', $width);
+        self::alert($message, 'warning', $width, $title, $icon);
     }
 
     /**
      * Print an info alert box.
      */
-    public static function info(string $message, int $width = 80): void
+    public static function info($message, string $title = null, string $icon = null, int $width = 80): void
     {
-        self::alert($message, 'info', $width);
+        self::alert($message, 'info', $width, $title, $icon);
     }
 
     /**
      * Print an alert box with specified type.
      */
-    private static function alert(string $message, string $type, int $width): void
+    private static function alert($message, string $type, int $width, string $title = null, string $icon = null): void
     {
         $config = self::getAlertConfig($type);
-        $icon = $config['icon'];
+        $defaultIcon = $config['icon'];
         $color = $config['color'];
-        $title = $config['title'];
+        $defaultTitle = $config['title'];
+
+        // Use custom parameters if provided, otherwise use defaults
+        $icon = $icon ?? $defaultIcon;
+        $title = $title ?? $defaultTitle;
+        if(!is_null($icon)){
+            $icon = self::getIconStr($icon);
+        }
+        // Handle message as string or array
+        if (is_array($message)) {
+            $message = implode("\n", $message);
+        }
 
         // Calculate available width for message (accounting for borders and padding)
         $availableWidth = $width - 6; // 2 borders + 2 spaces + 2 padding
@@ -669,6 +710,28 @@ class Console
     public static function infoMessage(string $message): void
     {
         self::print('ℹ ' . $message, self::COLOR_CYAN);
+    }
+    public static function printResult($result,$title=null,$icon=null){
+        if($result instanceof SimpleResult){
+            if($result->isOK()){
+                self::printSuccess($title,$icon??"ok");
+            }else{
+                self::printError($title,$icon??"error");
+            }
+            foreach($result->messages  as $k=>$v){                
+                $v["text"]  = StrUtil::toEng(@$v["text"]);
+                if(in_array(@$v["type"],array("error","danger"))){
+                    self::error(@$v["text"],$icon);
+                }else if(in_array(@$v["type"],array("succ","success"))){
+                    self::success(@$v["text"],$icon);
+                }else if(in_array(@$v["type"],array("warn","warning"))){
+                    self::warning(@$v["text"],$icon);
+                }else{
+                    self::info(@$v["text"],$icon);
+                }
+            }
+        }
+
     }
 }
 ?>

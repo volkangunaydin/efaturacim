@@ -15,17 +15,17 @@ class SecurityUtil{
     }
     public static function getIp(){
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+            $ip_address = @$_SERVER['HTTP_CLIENT_IP'];
         }elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            $ip_address = explode(',', $ip_address)[0];
+            $ip_address = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+            $ip_address = explode(',', "".@$ip_address)[0];
         }elseif (!empty($_SERVER['HTTP_X_REAL_IP'])) {
-            $ip_address = $_SERVER['HTTP_X_REAL_IP'];
+            $ip_address = @$_SERVER['HTTP_X_REAL_IP'];
         }else {
-            $ip_address = $_SERVER['REMOTE_ADDR'];
+            $ip_address = @$_SERVER['REMOTE_ADDR'];
         }
 
-        $ip_address = filter_var($ip_address, FILTER_VALIDATE_IP);
+        $ip_address = filter_var("".@$ip_address, FILTER_VALIDATE_IP);
         
         if ($ip_address === false) {
             return "";
@@ -33,7 +33,7 @@ class SecurityUtil{
         return $ip_address;
     }    
     public static function getUserAgent(){
-        return $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+        return @$_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
     }
 }
 ?>

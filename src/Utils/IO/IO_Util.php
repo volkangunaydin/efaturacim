@@ -13,7 +13,7 @@ class IO_Util{
     public static function readFile($path,$options){
         $r = new SimpleResult();
         Options::ensureParam($options);
-        if($path && file_exists($path) && is_readable($path)){
+        if($path && file_exists($path) && is_dir($path)){
             $r->setIsOk(true);
             $r->value = file_get_contents($path);
         }
@@ -27,5 +27,18 @@ class IO_Util{
     public static function readFileAsBase64EncodedString($path,$options=null){
         return StrBase64::encode(self::readFileAsString($path,$options));
     }
+    public static function getSafePath($path,$isFile=true){
+        if($path && file_exists($path) && is_dir($path)){
+            $path = "".$path;
+        }else if($isFile){
+            $path = dirname($path);
+        }
+        $path = str_replace("\\","/",$path);
+        $path = str_replace("//","/",$path);
+        if(substr("".$path,-1) !== "/"){
+            $path .= "/";
+        }
+        return $path;
+    }   
 }
 ?>

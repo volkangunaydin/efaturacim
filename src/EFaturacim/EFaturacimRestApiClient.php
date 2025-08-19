@@ -59,7 +59,7 @@ class EFaturacimRestApiClient{
                 return self::$BEARERS[$bearerKey];
             }else{
                 if(strlen($customer)>0){
-                    $r = RestApiClient::getLogin(self::$BASE_API_URL,"EFaturacim/Login",array("customer"=>$customer,"user"=>$user,"pass"=>$pass,"clientInfo"=>@$_SERVER["HTTP_USER_AGENT"],"clientSecret"=>SecurityUtil::getClientKey()));                    
+                    $r = RestApiClient::getLogin(self::$BASE_API_URL,"EFaturacim/Login",array("customer"=>$customer,"user"=>$user,"pass"=>$pass,"clientInfo"=>"PHP UNIT TEST","clientSecret"=>"SecretForTestSys"));                    
                     if($r->isOK() && strlen("".$r->getAttribute("bearer"))>0){
                         self::$BEARERS[$bearerKey] = $r->getAttribute("bearer");
                         if($isDefault){
