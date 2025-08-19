@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class ServisTest extends TestCase
 {
-    public $options = array();
+    public $options = array();  
     
 
     
