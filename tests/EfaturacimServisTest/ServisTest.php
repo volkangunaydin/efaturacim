@@ -117,10 +117,10 @@ class ServisTest extends TestCase
                     }
                 }
 
-                $r = RestApiClient::getJsonResult($baseUrl,"EFaturacim/FirmaBilgilerim/AyarDegistir",array("bearer"=>$bearer,"firma"=>$firmaRef,"tip"=>"kullanici","il" => "ANKARA - 06","ilce" => "ÇANKAYA - 06010"));                
+                $r = RestApiClient::getJsonResult($baseUrl,"EFaturacim/FirmaBilgilerim/AyarDegistir",array("bearer"=>$bearer,"firma"=>$firmaRef,"tip"=>"kullanici","il" => "ANKARA - 07","ilce" => "ÇANKAYA - 06010"));                
                 Console::printResult($r,"Ayar Degistir");
                 $this->assertTrue($r->isOK(), 'Ayar Degistir');
-               
+                
 
             }else{
                 Console::error('Login failed', 'Login failed', '✗', 80);
