@@ -25,7 +25,7 @@ class IO_Util{
         return $r;
     }        
     public static function readFileAsBase64EncodedString($path,$options=null){
-        return StrBase64::encode(self::readFileAsString($path,$options));
+        return ++::encode(self::readFileAsString($path,$options));
     }
     public static function getSafePath($path,$isFile=true){
         if($path && file_exists($path) && is_dir($path)){
