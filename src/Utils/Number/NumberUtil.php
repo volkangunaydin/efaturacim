@@ -17,6 +17,9 @@ class NumberUtil{
         if(is_null($ref) || $ref===0 || $ref===""){ return false; }
         return self::isInt($ref) && $ref>0;
     }
+    public static function asMoneyFormat($str,$decimal=2){
+        return number_format(self::asCleanNumber($str,$decimal,true),$decimal,".","");
+    }
     public static function cleanNumber($str,$decimal=2,$convertToNumber=true){
         $num = 0 + self::getAsCleanNumber($str,$decimal);
         return  $convertToNumber ? $num : "".$num;
