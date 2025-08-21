@@ -145,16 +145,18 @@ class ServisTest extends TestCase
 
                 //XSLT OKUMA
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltOku", array("bearer" => $bearer, "firma" => $firmaRef, "xslt_ref" => $xsltRef));
+                Console::printResult($r, "XSLT Okunuyor : " . $xsltRef);
+                $this->assertTrue($r->isOK(), 'XSLT Okunuyor : ' . $xsltRef);
                 if($r->isOK()){
                     Console::printResult($r, "XSLT Okundu Hashlenmiş Hali: ". $r->attributes['hash']);
-                    $this->assertTrue($r->isOK(), 'XSLT Okundu');
+                    $this->assertTrue($r->isOK(), "XSLT Okundu Hashlenmiş Hali: ". $r->attributes['hash']);
                 }
 
                 //XSLT YAZMA
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltYazma", array("bearer" => $bearer, "firma" => $firmaRef, "xslt_content" => "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPG9ya2VzdHJhPgoKPC9vcmtlc3RyYT4=", "xslt_desc" => "test_upload"));
                 if($r->isOK()){
                     Console::printResult($r, "XSLT Yazıldı XSLT Ref: ". $r->attributes['ref']);
-                    $this->assertTrue($r->isOK(), 'XSLT Yazıldı');
+                    $this->assertTrue($r->isOK(), "XSLT Yazıldı XSLT Ref: ". $r->attributes['ref']);
                 }
 
                 //XSLT YAZMA - JSON BODY
@@ -168,7 +170,30 @@ class ServisTest extends TestCase
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltYazma", $jsonBody);
                 if($r->isOK()){
                     Console::printResult($r, "XSLT Yazıldı (JSON Body) XSLT Ref: ". $r->attributes['ref']);
-                    $this->assertTrue($r->isOK(), 'XSLT Yazıldı (JSON Body)');
+                    $this->assertTrue($r->isOK(), "XSLT Yazıldı (JSON Body) XSLT Ref: ". $r->attributes['ref']);
+                }
+
+                //ETİKETLERİ OKUMA
+                $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Etiketler", array("bearer" => $bearer));
+                if($r->isOK()){
+                    $etiketRef = @$r->lines[0]["ref"];
+                    Console::printResult($r, "Etiketler Okundu Toplam Etiket Sayısı: ". count($r->lines));
+                    $this->assertTrue($r->isOK(), "Etiketler Okundu Toplam Etiket Sayısı: ". count($r->lines));
+                }
+
+                //ETİKET DETAY
+                $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Etiketler", array("bearer" => $bearer, "etiket_ref" => $etiketRef));
+                if($r->isOK()){
+                    Console::printResult($r, "Etiket Detayı Okundu Etiket ID: ". @$r->lines[0]['wl__reference']);
+                    $this->assertTrue($r->isOK(), "Etiket Detayı Okundu Etiket ID: ". @$r->lines[0]['wl__reference']);
+                }
+
+                //E-DEFTER YEDEK - FİRMA LİSTESİ
+                $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/EDefterYedek/FirmaListesi", array("bearer" => $bearer, "firma" => $firmaRef));
+                if($r->isOK()){
+                    $firmaRef = @$r->lines[0]['ref'];
+                    Console::printResult($r, "E-Defter Yedek Firma Listesi Okundu Toplam Firma Sayısı: ". count($r->lines));
+                    $this->assertTrue($r->isOK(), "E-Defter Yedek Firma Listesi Okundu Toplam Firma Sayısı: ". count($r->lines));
                 }
 
             } else {
