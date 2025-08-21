@@ -8,7 +8,7 @@ namespace Efaturacim\Util\Utils\Html;
 class HtmlDocument
 {
     protected $lang        = 'en';
-    protected $title       = '';
+    public $title       = '';
     protected $charset     = 'utf-8';
     protected $viewport    = 'width=device-width, initial-scale=1.0';
     protected $bodyTag     = null;
