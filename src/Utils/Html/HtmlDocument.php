@@ -2,13 +2,16 @@
 
 namespace Efaturacim\Util\Utils\Html;
 
+use Efaturacim\Util\Utils\Url\UrlUtil;
+
 /**
  * HTML Document
  */
 class HtmlDocument
 {
     protected $lang        = 'en';
-    public $title       = '';
+    public    $title       = '';
+    public    $baseUrl     = null;
     protected $charset     = 'utf-8';
     protected $viewport    = 'width=device-width, initial-scale=1.0';
     protected $bodyTag     = null;
@@ -23,7 +26,7 @@ class HtmlDocument
     public    $csrf     = null;
     public static function hasDefaultDoc(){
         return !is_null(HtmlDocument::$instance);
-    }
+    }    
     public static function getDoc($optionsArray=null){
         if(is_null(HtmlDocument::$instance)){
             self::$instance = new static($optionsArray);
@@ -89,6 +92,9 @@ class HtmlDocument
         $s  = '<!doctype html>';   
         $s .= $this->nl.'<html lang="'.$this->lang.'">';
         $s .= $this->nl.'<head>';
+        if(!is_null($this->baseUrl) && !empty($this->baseUrl)){
+            $s .= $this->nl.'<base href="'.$this->baseUrl.'" />';
+        }
         $s .= $this->nl.'<meta charset="'.$this->charset.'">';
         if(!is_null($this->csrf)){
             $s .= $this->nl.'<meta name="csrf-token" content="'.$this->csrf.'" />';
@@ -237,6 +243,14 @@ class HtmlDocument
         }
         $this->setBodyContent($s);
         $this->toHtml();    
+    }
+    public function setAutoBaseUrl(){        
+        $this->setBaseUrl(UrlUtil::getBaseUrl());
+        return $this;
+    }
+    public function setBaseUrl($baseUrl){
+        $this->baseUrl = $baseUrl;
+        return $this;
     }
 }
 ?>
