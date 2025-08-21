@@ -105,7 +105,7 @@ class ServisTest extends TestCase
                 $this->assertTrue($user_reference > 0, 'User reference kontrolu başarılı');
 
 
-                // XSLT LISTESI
+                // XSLT LISTESI VE XSLT OKUMA
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltListesi", array("bearer" => $bearer, "firma" => $firmaRef));
                 Console::printResult($r, "XSLT Listesi : " . count($r->lines) . " dosya bulundu");
                 $this->assertTrue($r->isOK(), 'XSLT Listesi - ' . count($r->lines) . " dosya bulundu");
@@ -113,9 +113,16 @@ class ServisTest extends TestCase
                     $xsltRef = @$r->lines[0]["ref"];
                     if ($xsltRef && $xsltRef > 0) {
                         Console::printSuccess('XSLT okunuyor : ' . $xsltRef, "ok");
-                        $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltListesi", array("bearer" => $bearer, "firma" => $firmaRef, "xslt_ref" => $xsltRef));
-                        Console::printResult($r, "XSLT Okuma => Ref:" . $xsltRef);
-                        $this->assertTrue($r->isOK(), 'XSLT Okuma => Ref:' . $xsltRef);
+                        $r = RestApiClient::getJsonResult($baseUrl,"EFaturacim/FirmaBilgilerim/XsltOku",array("bearer"=>$bearer,"firma"=>$firmaRef,"xslt_ref"=>$xsltRef));
+                        Console::printResult($r,"XSLT Okuma => Ref:".$xsltRef);
+                        $this->assertTrue($r->isOK(), 'XSLT Okuma => Ref:'.$xsltRef);
+                        $xsltString = AssocArray::getVal($r->value,"value",null);
+                        if(strlen("".$xsltString)>100){
+                            Console::printSuccess('XSLT okundu : '.$xsltRef." [ ".strlen("".$xsltString)." ]","ok");
+                            $this->assertTrue(true, 'XSLT okundu : '.$xsltRef." [ ".strlen("".$xsltString)." ]");
+                        }else{
+                            $this->assertTrue(false, 'XSLT okunamadı : '.$xsltRef);
+                        }
                     }
                 }
 
