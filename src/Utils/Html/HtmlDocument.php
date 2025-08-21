@@ -5,7 +5,7 @@ namespace Efaturacim\Util\Utils\Html;
 use Efaturacim\Util\Utils\Url\UrlUtil;
 
 /**
- * HTML Document
+ * HTML Document 
  */
 class HtmlDocument
 {

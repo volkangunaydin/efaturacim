@@ -20,8 +20,10 @@ class BootstrapDocument extends HtmlDocument{
     public function initMe(){        
         if(HtmlComponent::isPathDefined("bootstrap")){            
             $assetPath = HtmlComponent::getPathDefined("bootstrap");
-            $this->addCss($assetPath.'css/bootstrap.min.css','bootstrap');
-            $this->addJsFileOnEnd($assetPath.'js/bootstrap.bundle.min.js','bootstrap');    
+            if($assetPath!="none"){
+                $this->addCss($assetPath.'css/bootstrap.min.css','bootstrap');
+                $this->addJsFileOnEnd($assetPath.'js/bootstrap.bundle.min.js','bootstrap');        
+            }            
         }else{
             $this->addCss('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css','bootstrap');
             $this->addJsFileOnEnd('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js','bootstrap');    
