@@ -35,6 +35,9 @@ class LaravelPath{
         }
         return "";
     }
+    public static function prettyPrintCode(&$doc,$code,$type="auto"){        
+        return PrettyPrint::smart($doc,$code,$type);
+    }    
     public static function prettyPrint(&$doc,$path,$type="auto"){
         $code = self::readFile($path);          
         if(StrUtil::notEmpty($code)){

@@ -14,7 +14,14 @@ class PrettyPrint extends HtmlComponent{
     protected $style = "purebasic";
     /** @var HtmlTag */
     protected $tag = null;
-    public static function smart($doc,$code,$type="auto"){        
+    public static function smart($doc,$code,$type="auto"){
+        if(is_array($code)){
+            if(in_array($type,array("json"))){
+                $code = json_encode($code, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }else{
+                $code = implode("\r\n",$code);            
+            }            
+        }       
         if(StrUtil::notEmpty($code)){
             if(in_array($type,array("html"))){
                 return self::html($doc,$code,$type);
@@ -24,6 +31,8 @@ class PrettyPrint extends HtmlComponent{
                 return self::php($doc,$code,$type);
             }else if(in_array($type,array("blade"))){                
                 return self::blade($doc,$code,$type);
+            }else if(in_array($type,array("json"))){                
+                return self::json($doc,$code,$type);
             }else if(StrUtil::startsWith($code,"<?php")){
                 return self::php($doc,$code,$type);
             }else if(StrUtil::startsWith($code,"<script")){
@@ -44,6 +53,21 @@ class PrettyPrint extends HtmlComponent{
     }
     public static function blade($doc,$code,$options=null,$maxHeight=null){
         return (new static($options))->setCode($code,"blade")->setMaxHeight($maxHeight)->toHtml($doc);
+    }
+    
+    public static function json($doc,$code,$options=null,$maxHeight=null){
+        // Handle different input types
+        if(is_array($code) || is_object($code)){
+            $code = json_encode($code, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }else if(is_string($code)){
+            // Try to decode and re-encode to format it properly
+            $decoded = json_decode($code, true);
+            if(json_last_error() === JSON_ERROR_NONE){
+                $code = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+        }
+        
+        return (new static($options))->setCode($code,"json")->setMaxHeight($maxHeight)->toHtml($doc);
     }
 
     public function initMe(){
@@ -102,6 +126,8 @@ class PrettyPrint extends HtmlComponent{
             $this->lang = "html";
         }else if($type=="js"){
             $this->lang = "javascript";
+        }else if($type=="json"){
+            $this->lang = "json";
         }
         return $this;
     }
