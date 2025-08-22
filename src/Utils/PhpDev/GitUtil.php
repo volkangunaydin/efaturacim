@@ -40,7 +40,7 @@ class GitUtil{
             return $r;
         }        
         $r->setIsOk(true);
-        $r->value = $payload;
+        $r->value = $payload;  
         if($isJson && JsonUtil::isJson($payload)){
             $r->value = JsonUtil::getAsArray($payload);
         }
