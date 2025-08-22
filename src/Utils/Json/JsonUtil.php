@@ -3,6 +3,7 @@ namespace Efaturacim\Util\Utils\Json;
 
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
+use Exception;
 
 class JsonUtil{
     public static function toJsonStringWithOptions($arrOrObject,$context=null){
@@ -68,5 +69,77 @@ class JsonUtil{
         echo self::toJsonStringWithOptions($arrOrObject,$context);            
         die("");        
     } 
+    public static function readAsArray($path,$default=array()){
+        if(file_exists($path) && is_readable($path)){
+            return @json_decode(file_get_contents($path),true);
+        }
+        return $default;
+    }
+        /**
+         * 
+         * @param string $jsonString
+         * @param VParams $options
+         * @param array $defArr
+         * @param number $depth
+         * @return mixed|string|array|mixed|string|array
+         */
+        public static function getAsArray($jsonString=null,$options=null,$defArr=null,$depth=0){
+            $arr     = array();
+            Options::ensureParam($options);
+            try {
+                $a = @json_decode("".$jsonString,true);                
+                if($a && is_array($a) && count($a)>0){
+                    return $a;
+                }else if($depth<=0 && $options->getAsBool(array("try"),false) && self::isJson($jsonString,true) ){
+                    $jsonString2 = self::checkJsonStringAndReturn($jsonString);
+                    return self::getAsArray($jsonString2,$options,$defArr,$depth+1);
+                }
+            } catch (Exception $e) {
+                //throw $th;
+                if($depth<=0 && $options instanceof Options && $options->getAsBool(array("try"),false) && self::isJson($jsonString)){
+                    $jsonString2 = self::checkJsonStringAndReturn($jsonString);
+                    return self::getAsArray($jsonString2,$options,$defArr,$depth+1);                    
+                }
+            }
+            if(!is_null($defArr)){ return $defArr; }
+            return $arr;
+        }    
+        public static function checkJsonStringAndReturn($jsonString=null){
+            if(!is_null($jsonString) && strlen("".$jsonString)>0){
+                try {
+                    $a = self::convertLooseJsonToArray($jsonString);
+                    //\Vulcan\V::dump($a);
+                }catch (Exception $e) {
+                    //throw $th;
+                }
+                //\Vulcan\V::dump($jsonString);                
+            }
+            return $jsonString;
+        }
+        public static function  convertLooseJsonToArray($json_string) {
+            // Remove leading/trailing whitespace and potential control characters
+            $json_string = trim("".$json_string);
+            
+            // Check if it's already valid JSON
+            if (json_decode($json_string, true) !== null) {
+                return json_decode($json_string, true);
+            }
+            $result = array();            
+            return $result;
+        }                
+        public static function isJson($string,$softCheck=false) {
+            $string = trim("".$string);
+            if(substr($string,0,1)=="[" && substr($string,-1,1)=="]"){
+                return true;                
+            }else if(substr($string,0,1)=="{" && substr($string,-1,1)=="}"){
+                return true;
+            }
+            $arr = @json_decode($string,true);
+            $err = json_last_error();
+            if($err === JSON_ERROR_NONE){
+                return true;
+            }
+            return false;
+        }        
 }
 ?>

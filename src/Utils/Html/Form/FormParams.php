@@ -13,14 +13,15 @@ class FormParams{
     }
     public static function getRequestParam($nameOrNames,$defVal=null,$type=null){
         $post = self::getPostParam($nameOrNames,null,$type);        
-        if(is_null($post)){
+        if(is_null($post) || $post===""){        
             $get = self::getGetParam($nameOrNames,$defVal,$type);
             if(is_null($get)){
                 return $defVal;
             }
+            return $get;
         }else{
             return $post;
-        }        
+        }             
     }
 }
 ?>

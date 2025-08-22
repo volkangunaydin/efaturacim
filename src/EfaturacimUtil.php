@@ -7,9 +7,8 @@ class EfaturacimUtil{
     protected static $version = null;
     public static function getVersion(){
         if(is_null(self::$version)){
-            $arr = JsonUtil::readfile(dirname(__FILE__)."/info.json");
-            dd($arr);
-            self::$version = $version;
+            $arr = JsonUtil::readAsArray(dirname(__FILE__)."/info.json");            
+            self::$version = @$arr["version"];
         }
         return self::$version;
     }
