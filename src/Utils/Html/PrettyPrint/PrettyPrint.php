@@ -14,6 +14,25 @@ class PrettyPrint extends HtmlComponent{
     protected $style = "purebasic";
     /** @var HtmlTag */
     protected $tag = null;
+    public static function smart($doc,$code,$type="auto"){        
+        if(StrUtil::notEmpty($code)){
+            if(in_array($type,array("html"))){
+                return self::html($doc,$code,$type);
+            }else if(in_array($type,array("js"))){
+                return self::js($doc,$code,$type);
+            }else if(in_array($type,array("php"))){                
+                return self::php($doc,$code,$type);
+            }else if(in_array($type,array("blade"))){                
+                return self::blade($doc,$code,$type);
+            }else if(StrUtil::startsWith($code,"<?php")){
+                return self::php($doc,$code,$type);
+            }else if(StrUtil::startsWith($code,"<script")){
+                return self::js($doc,$code,$type);
+            }else{}            
+        }
+        return self::html($code,$type);
+        return null;
+    }
     public static function html($doc,$html,$options=null,$maxHeight=null,$style=null){
         return (new static($options))->setCode($html,"html")->setStyle($style)->setMaxHeight($maxHeight)->toHtml($doc);
     }
@@ -22,6 +41,9 @@ class PrettyPrint extends HtmlComponent{
     }    
     public static function php($doc,$code,$options=null,$maxHeight=null){
         return (new static($options))->setCode($code,"php")->setMaxHeight($maxHeight)->toHtml($doc);
+    }
+    public static function blade($doc,$code,$options=null,$maxHeight=null){
+        return (new static($options))->setCode($code,"blade")->setMaxHeight($maxHeight)->toHtml($doc);
     }
 
     public function initMe(){
@@ -94,8 +116,10 @@ class PrettyPrint extends HtmlComponent{
             $this->tag->addClass("language-js","default");
         }else if(in_array($this->type,array("php"))){
             $this->tag->addClass("language-php","default");
+        }else{
+            $this->tag->addClass("language-".$this->type,"default");
         }     
-        $s = '<pre>'.$this->tag->setInnerHtml(htmlentities($this->code,ENT_QUOTES,'UTF-8'))->toHtml().'</pre>';
+        $s = '<pre>'.$this->tag->setContent(htmlentities($this->code,ENT_QUOTES,'UTF-8'))->toHtml().'</pre>';
         return $s;
     }
 }   

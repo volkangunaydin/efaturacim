@@ -96,7 +96,7 @@ class HtmlComponent{
      * @return array|null Array of default options or null if no defaults
      */
     public function getDefaultOptions(){
-        return null;
+        return [];
     }
     
     /**

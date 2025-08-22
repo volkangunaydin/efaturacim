@@ -56,5 +56,19 @@ class AssocArray{
         }
         return $r;
     }
+    public static function merge($arr1,$arr2){
+        $r = [];
+        if(is_array($arr1)){
+            foreach($arr1 as $key=>$val){
+                $r[$key] = $val;
+            }
+        }
+        if(is_array($arr2)){
+            foreach($arr2 as $key=>$val){
+                $r[$key] = $val;
+            }
+        }
+        return $r;
+    }
 }
 ?>  

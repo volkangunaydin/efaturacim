@@ -45,11 +45,11 @@ class BootstrapUsage{
         $s .= self::getNavbarDemo($doc);
         $s .= self::getOffcanvasDemo($doc);
         $s .= self::getPlaceholdersDemo($doc);
-        $s .= self::getPopoversDemo($doc);
+        //$s .= self::getPopoversDemo($doc);
         $s .= self::getScrollspyDemo($doc);
         $s .= self::getSpinnersDemo($doc);
         $s .= self::getToastsDemo($doc);
-        $s .= self::getTooltipsDemo($doc);
+        //$s .= self::getTooltipsDemo($doc);
         
         $s .= '</div>';
         return $s;
