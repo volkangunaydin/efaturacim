@@ -94,7 +94,7 @@ class CurrentUrl{
     * Detect host with proxy support (similar to UrlUtil::getBaseHost)
     */
    protected static function detectHost() {
-        if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+        if (isset($_SERVER['HTTP_X_FORWARDED_HOST']) && strlen("".$_SERVER['HTTP_X_FORWARDED_HOST'])>0) {
             // The proxy has provided the original host requested by the client.
             return $_SERVER['HTTP_X_FORWARDED_HOST'];
         } elseif (isset($_SERVER['HTTP_HOST'])) {
@@ -120,7 +120,7 @@ class CurrentUrl{
    }
    public static function getBaseUrl($path="/"){
     self::initIfNot();  
-    return self::isSsl() ? "https://" : "http://" . self::detectHost().$path;
+    return (self::isSsl() ? "https://" : "http://") . self::detectHost().$path;
    }
    public static function getFolderIndex($index=1){
         self::initIfNot();  
