@@ -20,6 +20,7 @@ use Efaturacim\Util\Utils\Array\AssocArray;
  * 7. Please implement getJsFiles function
  * 8. Please implement getCssFiles function
  * 9. If not required please do not implement toHtml function since  toHtmlAsString,getJsLines,getJsLinesForInit,getJsFiles and getCssFiles build the toHtmlFunction 
+ * 10. Plase write the source prompt and the extra propts that changes to the target file that işs extended from this class
  */
 class HtmlComponent{  
     /**
