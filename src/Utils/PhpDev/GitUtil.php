@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util\Utils\Php;
+namespace Efaturacim\Util\Utils\PhpDev;
 
 use Efaturacim\Util\Utils\Html\Form\FormParams;
 use Efaturacim\Util\Utils\Json\JsonUtil;
