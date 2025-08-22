@@ -8,7 +8,10 @@ class UrlUtil{
     }
     public static function isSsl(){    
         if(is_null(self::$__isSSL)){
-            self::$__isSSL = ((isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||  isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] == 1));
+            
+            self::$__isSSL = ((isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||  
+                              isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] == 1) ||
+                              isset($_SERVER['HTTPS_PROXY']) && $_SERVER['HTTPS_PROXY'] === 'on');
         }
         return self::$__isSSL;
     }
