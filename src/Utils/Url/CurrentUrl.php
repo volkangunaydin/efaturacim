@@ -8,7 +8,7 @@ class CurrentUrl{
    protected static $urlGetParams = [];   
    protected static $urlFullPath = '';
    protected static $folders = [];
-   
+   protected static $isSsl = null;
    protected static function initIfNot(){
         if(count(self::$urlParts) === 0){
             if (!isset($_SERVER)) {
@@ -53,7 +53,7 @@ class CurrentUrl{
                 'fullUrl' => $fullUrl
             ];
             
-                         $path = $parsedUrl['path'] ?? '/';
+             $path = $parsedUrl['path'] ?? '/';
              $folders = explode('/', trim($path, '/'));
              $folderIndex = 1;
              self::$folders = []; // Reset folders array
@@ -72,7 +72,12 @@ class CurrentUrl{
             self::$urlFullPath = $parsedUrl['path'] ?? '/';
         } 
    }
-   
+   protected static function isSsl() {
+    if(self::$isSsl===null){
+        self::$isSsl = self::detectProtocol() === 'https';
+    }
+    return self::$isSsl;
+   }
    /**
     * Detect protocol with proxy support (similar to UrlUtil::isSsl)
     */
@@ -113,7 +118,10 @@ class CurrentUrl{
         self::initIfNot();  
         return self::$urlParts["basePath"];
    }
-   
+   public static function getBaseUrl($path="/"){
+    self::initIfNot();  
+    return self::isSsl() ? "https://" : "http://" . self::detectHost().$path;
+   }
    public static function getFolderIndex($index=1){
         self::initIfNot();  
         return @self::$urlParts["folder".$index];
