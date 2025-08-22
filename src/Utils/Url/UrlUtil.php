@@ -41,7 +41,7 @@ class UrlUtil{
     public static function getBaseUrl(){        
         $isSsl = self::isSsl();
         $host  = self::getBaseHost();        
-        return $isSsl ? 'https://' : 'http://' . $host."/";
+        return ($isSsl ? 'https://' : 'http://') . $host."/";
     }
 }
 ?>
