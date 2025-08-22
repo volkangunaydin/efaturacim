@@ -1,5 +1,5 @@
 <?php
-namespace Efaturacim\Util\Utils\Php;
+namespace Efaturacim\Util\Utils\PhpDev;
 
 class PhpInfo{
     protected static $infoHtml = null;  
@@ -25,7 +25,7 @@ class PhpInfo{
         
     }
     public static function getPhpVersionAsString(){                      
-        return "".phpversion();
+        return "".phpversion();  
     }
     
 }
