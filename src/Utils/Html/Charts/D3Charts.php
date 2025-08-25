@@ -125,7 +125,35 @@ class D3Charts extends ChartsBase
             ],
             'responsive' => true,
             'animate' => true,
-            'duration' => 750
+            'duration' => 750,
+            // Yeni özellikler
+            'showTooltip' => true,
+            'showLegend' => true,
+            'legendPosition' => 'top-right', // top-right, top-left, bottom-right, bottom-left
+            'tooltipFormat' => 'value', // value, percentage, custom
+            'customTooltip' => null, // Custom tooltip function
+            'axisLabels' => [
+                'x' => '',
+                'y' => ''
+            ],
+            'tickFormat' => [
+                'x' => null, // Custom x-axis tick format function
+                'y' => null  // Custom y-axis tick format function
+            ],
+            'interactive' => true,
+            'hoverEffects' => true,
+            'transitionDuration' => 300,
+            'legendStyle' => [
+                'fontSize' => '12px',
+                'fontFamily' => 'Arial, sans-serif'
+            ],
+            'tooltipStyle' => [
+                'backgroundColor' => 'rgba(0,0,0,0.8)',
+                'color' => 'white',
+                'borderRadius' => '4px',
+                'padding' => '8px',
+                'fontSize' => '12px'
+            ]
         ]);
     }
     
@@ -935,7 +963,35 @@ class D3Charts extends ChartsBase
             ],
             'responsive' => $this->options['responsive'] ?? true,
             'animate' => $this->options['animate'] ?? true,
-            'duration' => $this->options['duration'] ?? 750
+            'duration' => $this->options['duration'] ?? 750,
+            // Yeni özellikler
+            'showTooltip' => $this->options['showTooltip'] ?? true,
+            'showLegend' => $this->options['showLegend'] ?? true,
+            'legendPosition' => $this->options['legendPosition'] ?? 'top-right', // top-right, top-left, bottom-right, bottom-left
+            'tooltipFormat' => $this->options['tooltipFormat'] ?? 'value', // value, percentage, custom
+            'customTooltip' => $this->options['customTooltip'] ?? null, // Custom tooltip function
+            'axisLabels' => $this->options['axisLabels'] ?? [
+                'x' => '',
+                'y' => ''
+            ],
+            'tickFormat' => $this->options['tickFormat'] ?? [
+                'x' => null, // Custom x-axis tick format function
+                'y' => null  // Custom y-axis tick format function
+            ],
+            'interactive' => $this->options['interactive'] ?? true,
+            'hoverEffects' => $this->options['hoverEffects'] ?? true,
+            'transitionDuration' => $this->options['transitionDuration'] ?? 300,
+            'legendStyle' => $this->options['legendStyle'] ?? [
+                'fontSize' => '12px',
+                'fontFamily' => 'Arial, sans-serif'
+            ],
+            'tooltipStyle' => $this->options['tooltipStyle'] ?? [
+                'backgroundColor' => 'rgba(0,0,0,0.8)',
+                'color' => 'white',
+                'borderRadius' => '4px',
+                'padding' => '8px',
+                'fontSize' => '12px'
+            ]
         ]);
     }
     
