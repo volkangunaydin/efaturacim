@@ -256,7 +256,7 @@ class DespatchAdviceDocument extends UblDocument
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
             return true;
-        }else if (in_array($k, ["profileid", "profile_id", "ProfileID"]) && StrUtil::notEmpty($v)) {
+        }else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
             $this->profileId = $v;
             return true;
         } else if (in_array($k, ["note", "notes", "Note"]) && ArrayUtil::notEmpty($v)) {

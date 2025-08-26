@@ -193,6 +193,8 @@ class InvoiceDocument extends UblDocument
         $this->appendCommonElements();
         $this->appendInvoicePeriod();
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
+        // Ensure currency code element is present in XML
+        $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);
         $this->appendElement('cbc:AccountingCost', $this->accountingCost);
         $this->appendElementList($this->billingReference);
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
@@ -288,7 +290,7 @@ class InvoiceDocument extends UblDocument
         if (in_array($k, ["fatura_no", "faturano", "belgeno"]) && StrUtil::notEmpty($v)) {
             $this->id = $v;
             return true;
-        }else if (in_array($k, ["profileid", "profile_id", "ProfileID"]) && StrUtil::notEmpty($v)) {
+        }else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
             $this->profileId = $v;
             return true;
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {

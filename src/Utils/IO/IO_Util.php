@@ -13,7 +13,7 @@ class IO_Util{
     public static function readFile($path,$options){
         $r = new SimpleResult();
         Options::ensureParam($options);
-        if($path && file_exists($path) && is_dir($path)){
+        if($path && file_exists($path) && is_file($path)){
             $r->setIsOk(true);
             $r->value = file_get_contents($path);
         }

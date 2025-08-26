@@ -174,6 +174,8 @@ class CreditNoteDocument extends UblDocument
         $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
         $this->appendCommonElements();
         $this->appendElement('cbc:CreditNoteTypeCode', $this->invoiceTypeCode);
+        // Ensure currency code element is present in XML
+        $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);
 
         // TODO: Implement and call methods to append other required sections:
         //$this->appendSignature();
@@ -255,6 +257,9 @@ class CreditNoteDocument extends UblDocument
     {
         if (in_array($k, ["fatura_no", "faturano", "belgeno"]) && StrUtil::notEmpty($v)) {
             $this->id = $v;
+            return true;
+        } else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
+            $this->profileId = $v;
             return true;
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
