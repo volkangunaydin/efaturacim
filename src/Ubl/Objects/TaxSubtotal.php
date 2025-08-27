@@ -23,6 +23,7 @@ class TaxSubtotal extends UblDataType
     public ?TaxAmount $taxAmount = null;    
 
     public ?TaxCategory $taxCategory = null;
+    public ?float $calculationSequenceNumeric = null;
 
     public function __construct($options = null)
     {
@@ -48,6 +49,10 @@ class TaxSubtotal extends UblDataType
         }
         if (in_array($k, ['percent',  'kdv_oran','kdv_orani']) && NumberUtil::isNumberString($v)) {
             $this->percent = $v;
+            return true;
+        }
+        if (in_array($k, ['calculationSequenceNumeric','calculation_sequence','sequence','sira']) && NumberUtil::isNumberString($v)) {
+            $this->calculationSequenceNumeric = (float)$v;
             return true;
         }
         if (in_array($k, ['currency', 'currencyID', 'para_birimi']) && StrUtil::notEmpty($v)) {
@@ -88,6 +93,9 @@ class TaxSubtotal extends UblDataType
         $element = $this->createElement($document,$this->defaultTagName);
         $this->appendChild($element,$this->taxableAmount->toDOMElement($document));
         $this->appendChild($element,$this->taxAmount->toDOMElement($document));
+        if(!is_null($this->calculationSequenceNumeric)){
+            $this->appendElement($document, $element, 'cbc:CalculationSequenceNumeric', NumberUtil::asCleanNumber($this->calculationSequenceNumeric));
+        }
         if(!is_null($this->percent)){
             $this->appendElement($document, $element, 'cbc:Percent',NumberUtil::asCleanNumber($this->percent));
         }

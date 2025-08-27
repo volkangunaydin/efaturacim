@@ -26,7 +26,9 @@ class DataTablesJs extends HtmlComponent{
     public function getDefaultOptions(){
         return [            
             'css1' => 'https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css',            
-            'js1' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js',                        
+            'js1' => 'https://cdn.datatables.net/2.3.2/js/dataTables.js',
+            'responsive' => false, // Disable responsive by default
+            'cssCustom' => null, // Custom CSS will be loaded from asset path
         ];
     }
     protected function getColumnsAsArray(){
@@ -78,6 +80,13 @@ class DataTablesJs extends HtmlComponent{
             }
             $this->jsOption->setOption("ajax",$ajax);
         }
+        
+        // Add responsive and scroll options
+        $this->jsOption->setOption("responsive", false); // Disable DataTables responsive
+        $this->jsOption->setOption("scrollX", true); // Enable horizontal scrolling
+        $this->jsOption->setOption("scrollCollapse", true);
+        $this->jsOption->setOption("autoWidth", false);
+        
         $this->jsOption->setOption("columns",$this->getColumnsAsArray());            
         if(count($this->columnDefs)>0){
             $this->jsOption->setOption("columnDefs",$this->getColumnDefsAsArray());            
@@ -96,9 +105,20 @@ class DataTablesJs extends HtmlComponent{
     }
     public function getCssFiles(){
         if($this->hasAssetPath()){
-            return ['bootstrap'=>null,'datatable'=>$this->assetPath."datatables.min.css"];
+            return [
+                'bootstrap'=>null,
+                'datatable'=>$this->assetPath."datatables.min.css",
+                'datatableCustom'=>$this->assetPath."datatableCustom.css",
+                'datatableJquery'=>$this->assetPath."datatableJquery.min.css"
+
+            ];
         }else{
-            return ['bootstrap'=>null,'datatable'=>@$this->options['css']];
+            return [
+                'bootstrap'=>null,
+                'datatable'=>@$this->options['css'],
+                'datatableCustom'=>@$this->options['cssCustom'],
+                'datatableJquery'=>@$this->options['cssJquery']
+            ];
         }
         
     }
@@ -124,7 +144,8 @@ class DataTablesJs extends HtmlComponent{
     }
     public function toHtmlAsString($doc = null){
         $body = '';
-        $nl = "\r\n";        
+        $nl = "\r\n";
+        
         if(count($this->caps) > 0){            
             $body .= $nl.'<thead><tr>';
             foreach($this->caps as $cap){
@@ -150,6 +171,10 @@ class DataTablesJs extends HtmlComponent{
         }
         $this->tableTag->setInnerHtml($body);
         $s = $this->tableTag->render();
+        
+        // Wrap table with responsive container
+        $s = '<div class="datatable-responsive-container">' . $s . '</div>';
+        
         return $s;
     }
     public function addStaticData($dataAsArray,$mapFunction=null){
