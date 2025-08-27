@@ -4,14 +4,24 @@ declare(strict_types=1);
 
 namespace Efaturacim\Util\Utils\Console;
 
+use Efaturacim\Util\Utils\Array\AssocArray;
+use Efaturacim\Util\Utils\Number\NumberUtil;
+use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\SimpleResult;
+use Efaturacim\Util\Utils\String\StringSplitter;
 use Efaturacim\Util\Utils\String\StrUtil;
+use Vulcan\Base\Util\StringUtil\StrPercent;
+use Vulcan\VResult;
 
 /**
  * Console utilities 
  */
 class Console
 {
+    /**
+     * @var Options|null
+     */
+    protected $calculatedVars = null; 
     /**
      * Console colors constants.
      */
@@ -39,7 +49,7 @@ class Console
         'white' => '0;37',
         'default' => '0',
     ];
-
+    public static $defaultBarLength = 50;
     /**
      * Print a message to the console with optional color.
      */
@@ -49,7 +59,7 @@ class Console
         echo $output . PHP_EOL;
     }
     public static function getIconStr($icon){
-        if($icon=='ok' || $icon=='success'){
+        if($icon=='ok' || $icon=='success' || $icon=="OK"){
             return '✓ ';
         }else if($icon=='error' || $icon=='failed' || $icon=='danger' || $icon=='err'){
             return '✗ ';
@@ -301,11 +311,12 @@ class Console
     /**
      * Print progress percentage with optional color.
      */
-    public static function printProgress(int $percent, ?string $color = null): void
+    public static function printProgress($percent, ?string $color = null,$strExtra=""): void
     {
+        $percent = (int)round($percent);
         $bar = self::createProgressBar($percent);
         $message = sprintf('Progress: %s %d%%', $bar, $percent);
-        self::printInline($message, $color);
+        self::printInline($message.$strExtra, $color);
         echo "\r";
     }
 
@@ -484,10 +495,12 @@ class Console
     /**
      * Create a progress bar string.
      */
-    private static function createProgressBar(int $percent): string
+    private static function createProgressBar(int $percent,$barLength=null): string
     {
+        if(is_null($barLength)){
+            $barLength = self::$defaultBarLength;
+        }
         $percent = max(0, min(100, $percent));
-        $barLength = 20;
         $filledLength = (int) round(($percent / 100) * $barLength);
         $emptyLength = $barLength - $filledLength;
 
@@ -581,15 +594,17 @@ class Console
             $icon = self::getIconStr($icon);
         }
         // Handle message as string or array
+        $messageArray = [];
         if (is_array($message)) {
-            $message = implode("\n", $message);
+            $messageArray = $message;
+        }else if (is_string($message)){
+            $messageArray = StringSplitter::splitWithNewLine($message);
         }
 
         // Calculate available width for message (accounting for borders and padding)
         $availableWidth = $width - 6; // 2 borders + 2 spaces + 2 padding
         
-        // Wrap message to fit width
-        $wrappedMessage = self::wrapText($message, $availableWidth);
+
         
         // Top border
         $topLine = '┌' . str_repeat('─', $width - 2) . '┐';
@@ -603,12 +618,16 @@ class Console
         $separatorLine = '│' . str_repeat('─', $width - 2) . '│';
         self::print($separatorLine, $color);
         
-        // Message lines
-        foreach ($wrappedMessage as $line) {
-            $paddedLine = str_pad($line, $availableWidth+2, ' ');
-            $messageLine = '│ ' . $paddedLine . ' │';
-            self::print($messageLine, $color);
+        foreach($messageArray as $message){
+            $wrappedMessage = self::wrapText($message, $availableWidth);
+            // Message lines
+            foreach ($wrappedMessage as $line) {
+                $paddedLine = str_pad($line, $availableWidth+2, ' ');
+                $messageLine = '│ ' . $paddedLine . ' │';
+                self::print($messageLine, $color);
+            }    
         }
+            // Wrap message to fit width
         
         // Bottom border
         $bottomLine = '└' . str_repeat('─', $width - 2) . '┘';
@@ -711,8 +730,12 @@ class Console
     {
         self::print('ℹ ' . $message, self::COLOR_CYAN);
     }
-    public static function printResult($result,$title=null,$icon=null){
-        if($result instanceof SimpleResult){
+    public static function printResult($result,$title=null,$icon=null,$printAttributes=false,$width=80){
+        if($result instanceof SimpleResult || $result instanceof VResult){
+            
+            if($printAttributes && count($result->attributes)>0){
+                self::alert(AssocArray::printKeyValue($result->attributes),"warning",$width,$title);
+            }
             if($result->isOK()){
                 self::printSuccess($title,$icon??"ok");
             }else{
@@ -731,7 +754,23 @@ class Console
                 }
             }
         }
-
+    }
+    public static function getHostName(){
+        return gethostname();
+    }
+    public static function clearScreen($rowSize=60){
+        for($i=1;$i<=$rowSize;$i++){
+            self::print('');
+        }
+    }    
+    public static function printProgressFor($index,$totalCount,$mod=0,$decimal=2){
+        if($mod<=1 || ($index%$mod)==0){
+            if($totalCount>0){
+                $percent = NumberUtil::asCleanNumber((100*$index)/$totalCount,$decimal,true);
+                self::printProgress($percent,"white"," => ".$percent." => [ ".$index." / ".number_format($totalCount,0," "," ")." ]");
+            }
+            
+        }    
     }
 }
 ?>

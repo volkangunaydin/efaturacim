@@ -2,7 +2,7 @@
 namespace Efaturacim\Util\Utils\String;
 
 use Efaturacim\Util\CastUtil;
-use Efaturacim\Util\Options;
+use Efaturacim\Util\Utils\Options;
 
     class StringSplitter{
         public static function splitWithWidth($string,$charLimit=0,$splitFromWords=false,$trim=false){
@@ -67,6 +67,10 @@ use Efaturacim\Util\Options;
         public static function withNewLines($string){
             return self::newLines($string,false,false,null,null,0);
         }
+        public static function splitWithNewLine($string){
+            return self::withNewLines($string);
+        }
+        
         public static function newLines($string,$trim=true,$removeEmpty=false,$options=null,$regEx=null,$charLimit=0){
             $res   = array();            
             if(is_null($string) || $string==""){ return $res; }

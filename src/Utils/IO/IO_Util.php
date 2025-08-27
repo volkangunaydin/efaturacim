@@ -40,5 +40,8 @@ class IO_Util{
         }
         return $path;
     }   
+    public static function getExtensionFromName($name,$toLower=false,$canBeExtension=true){
+        return FileExtensions::getExtensionFromName($name,$toLower,$canBeExtension);
+    }   
 }
 ?>

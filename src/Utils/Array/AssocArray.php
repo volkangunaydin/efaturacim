@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils\Array;
 
 use Efaturacim\Util\Utils\CastUtil;
+use Efaturacim\Util\Utils\String\StrTo;
 
 class AssocArray{
     public static function newArray($options=null,$defVals=null,$initVals=null){
@@ -69,6 +70,16 @@ class AssocArray{
             }
         }
         return $r;
+    }
+    public static function printKeyValue($assocArray)
+    {
+        $s = '';
+        if (is_array($assocArray)) {
+            foreach ($assocArray as $key => $value) {
+                $s .= $key . ': ' . StrTo::str($value) . "\n";
+            }
+        }
+        return $s;
     }
 }
 ?>  
