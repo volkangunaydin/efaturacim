@@ -952,6 +952,8 @@ class D3Charts extends ChartsBase
         return array_merge($config, [
             'type' => $this->chartType ?: 'stacked-bar',
             'd3Version' => $this->d3Version,
+            'width' => $this->options['width'] ?? 600,
+            'height' => $this->options['height'] ?? 400,
             'useCdn' => $this->useCdn,
             'd3CdnUrl' => $this->d3CdnUrl,
             'd3Options' => $this->d3Options,
