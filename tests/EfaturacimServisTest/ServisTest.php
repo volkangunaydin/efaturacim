@@ -18,7 +18,7 @@ class ServisTest extends TestCase
 
     /**
      * Test to check if curl functions are available
-     * testler için yapılmıştır
+     * .testler için yapılmıştır
      */
     public function testCurlFunctionsAvailable()
     {
