@@ -75,15 +75,15 @@ class ServisTest extends TestCase
             if ($r->isOK() && strlen("" . $bearer) > 0 && $firmaRef > 0) {
                 Console::success('Bearer:' . $bearer, 'Login successful');
                 Console::success('Firma Ref:' . $firmaRef, 'Firma Secimi');
-
+                Console::print('=========================Status=========================', 'orange');
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Status", array("bearer" => $bearer));
                 Console::printResult($r, "Status");
                 $this->assertTrue($r->isOK(), 'Status');
-
+                Console::print('=========================Şifre Kontrolü=========================', 'orange');
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/SifreKontrol", array("bearer" => $bearer, "firma" => $firmaRef, "sifre" => $pass));
                 Console::printResult($r, "Sifre kontrol");
 
-
+                Console::print('=========================Firma Bilgileri=========================', 'orange');
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim", array("bearer" => $bearer, "firma" => $firmaRef));
                 $this->assertTrue($r->isOK(), 'Firma Bilgileri');
                 Console::printResult($r, "Firma Bilgileri");
@@ -95,10 +95,12 @@ class ServisTest extends TestCase
                     }
                 }
 
+                Console::print('=========================Şifre Değişikliği=========================', 'orange');
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/SifreDegistir", array("bearer" => $bearer, "firma" => $firmaRef, "yeni_sifre" => $pass, "eski_sifre" => $pass));
                 $this->assertTrue($r->isOK(), 'Şifre Değişikliği');
                 Console::printResult($r, "Şifre Değişikliği");
 
+                Console::print('=========================Hesap Kurtarma Bilgileri=========================', 'orange');
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Kullanici/HesapKurtarmaBilgileri", array("bearer" => $bearer));
                 Console::printResult($r, "HesapKurtarmaBilgileri");
                 $this->assertTrue($r->isOK(), 'HesapKurtarmaBilgileri');
@@ -106,6 +108,7 @@ class ServisTest extends TestCase
                 $this->assertTrue($user_reference > 0, 'User reference kontrolu başarılı');
 
 
+                Console::print('=========================XSLT LISTESI VE XSLT OKUMA=========================', 'orange');
                 // XSLT LISTESI VE XSLT OKUMA
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltListesi", array("bearer" => $bearer, "firma" => $firmaRef));
                 Console::printResult($r, "XSLT Listesi : " . count($r->lines) . " dosya bulundu");
@@ -114,19 +117,20 @@ class ServisTest extends TestCase
                     $xsltRef = @$r->lines[0]["ref"];
                     if ($xsltRef && $xsltRef > 0) {
                         Console::printSuccess('XSLT okunuyor : ' . $xsltRef, "ok");
-                        $r = RestApiClient::getJsonResult($baseUrl,"EFaturacim/FirmaBilgilerim/XsltOku",array("bearer"=>$bearer,"firma"=>$firmaRef,"xslt_ref"=>$xsltRef));
-                        Console::printResult($r,"XSLT Okuma => Ref:".$xsltRef);
-                        $this->assertTrue($r->isOK(), 'XSLT Okuma => Ref:'.$xsltRef);
-                        $xsltString = AssocArray::getVal($r->value,"value",null);
-                        if(strlen("".$xsltString)>100){
-                            Console::printSuccess('XSLT okundu : '.$xsltRef." [ ".strlen("".$xsltString)." ]","ok");
-                            $this->assertTrue(true, 'XSLT okundu : '.$xsltRef." [ ".strlen("".$xsltString)." ]");
-                        }else{
-                            $this->assertTrue(false, 'XSLT okunamadı : '.$xsltRef);
+                        $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltOku", array("bearer" => $bearer, "firma" => $firmaRef, "xslt_ref" => $xsltRef));
+                        Console::printResult($r, "XSLT Okuma => Ref:" . $xsltRef);
+                        $this->assertTrue($r->isOK(), 'XSLT Okuma => Ref:' . $xsltRef);
+                        $xsltString = AssocArray::getVal($r->value, "value", null);
+                        if (strlen("" . $xsltString) > 100) {
+                            Console::printSuccess('XSLT okundu : ' . $xsltRef . " [ " . strlen("" . $xsltString) . " ]", "ok");
+                            $this->assertTrue(true, 'XSLT okundu : ' . $xsltRef . " [ " . strlen("" . $xsltString) . " ]");
+                        } else {
+                            $this->assertTrue(false, 'XSLT okunamadı : ' . $xsltRef);
                         }
                     }
                 }
 
+                Console::print('=========================FİRMA BİLGİSİ GÜNCELLEME VE KONTROLÜ=========================', 'orange');
                 //FİRMA BİLGİSİ GÜNCELLEME VE KONTROLÜ
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/AyarDegistir", array("bearer" => $bearer, "firma" => $firmaRef, "tip" => "kullanici", "il" => "ANKARA - 07", "ilce" => "ÇANKAYA - 06010"));
                 Console::printResult($r, "Ayar Degistir");
@@ -144,20 +148,22 @@ class ServisTest extends TestCase
                     $this->assertTrue($r3->isOK(), 'Ayarlar Eski Haline Getirildi');
                 }
 
+                Console::print('=========================XSLT OKUMA=========================', 'orange');
                 //XSLT OKUMA
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltOku", array("bearer" => $bearer, "firma" => $firmaRef, "xslt_ref" => $xsltRef));
                 Console::printResult($r, "XSLT Okunuyor : " . $xsltRef);
                 $this->assertTrue($r->isOK(), 'XSLT Okunuyor : ' . $xsltRef);
-                if($r->isOK()){
-                    Console::printResult($r, "XSLT Okundu Hashlenmiş Hali: ". $r->attributes['hash']);
-                    $this->assertTrue($r->isOK(), "XSLT Okundu Hashlenmiş Hali: ". $r->attributes['hash']);
+                if ($r->isOK()) {
+                    Console::printResult($r, "XSLT Okundu Hashlenmiş Hali: " . $r->attributes['hash']);
+                    $this->assertTrue($r->isOK(), "XSLT Okundu Hashlenmiş Hali: " . $r->attributes['hash']);
                 }
 
+                Console::print('=========================XSLT YAZMA=========================', 'orange');
                 //XSLT YAZMA
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltYazma", array("bearer" => $bearer, "firma" => $firmaRef, "xslt_content" => "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPG9ya2VzdHJhPgoKPC9vcmtlc3RyYT4=", "xslt_desc" => "test_upload"));
-                if($r->isOK()){
-                    Console::printResult($r, "XSLT Yazıldı XSLT Ref: ". $r->attributes['ref']);
-                    $this->assertTrue($r->isOK(), "XSLT Yazıldı XSLT Ref: ". $r->attributes['ref']);
+                if ($r->isOK()) {
+                    Console::printResult($r, "XSLT Yazıldı XSLT Ref: " . $r->attributes['ref']);
+                    $this->assertTrue($r->isOK(), "XSLT Yazıldı XSLT Ref: " . $r->attributes['ref']);
                 }
 
                 //XSLT YAZMA - JSON BODY
@@ -169,33 +175,97 @@ class ServisTest extends TestCase
                     "xslt_desc" => "test_upload"
                 );
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/FirmaBilgilerim/XsltYazma", $jsonBody);
-                if($r->isOK()){
-                    Console::printResult($r, "XSLT Yazıldı (JSON Body) XSLT Ref: ". $r->attributes['ref']);
-                    $this->assertTrue($r->isOK(), "XSLT Yazıldı (JSON Body) XSLT Ref: ". $r->attributes['ref']);
+                if ($r->isOK()) {
+                    Console::printResult($r, "XSLT Yazıldı (JSON Body) XSLT Ref: " . $r->attributes['ref']);
+                    $this->assertTrue($r->isOK(), "XSLT Yazıldı (JSON Body) XSLT Ref: " . $r->attributes['ref']);
                 }
 
+                Console::print('=========================ETİKETLERİ OKUMA=========================', 'orange');
                 //ETİKETLERİ OKUMA
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Etiketler", array("bearer" => $bearer));
-                if($r->isOK()){
+                if ($r->isOK()) {
                     $etiketRef = @$r->lines[0]["ref"];
-                    Console::printResult($r, "Etiketler Okundu Toplam Etiket Sayısı: ". count($r->lines));
-                    $this->assertTrue($r->isOK(), "Etiketler Okundu Toplam Etiket Sayısı: ". count($r->lines));
+                    Console::printResult($r, "Etiketler Okundu Toplam Etiket Sayısı: " . count($r->lines));
+                    $this->assertTrue($r->isOK(), "Etiketler Okundu Toplam Etiket Sayısı: " . count($r->lines));
+                    $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Etiketler", array("bearer" => $bearer, "etiket_ref" => $etiketRef));
+                    if ($r2->isOK()) {
+                        Console::printResult($r, "Etiket Detayı Okundu Etiket ID: " . @$r->lines[0]['wl__reference']);
+                        $this->assertTrue($r->isOK(), "Etiket Detayı Okundu Etiket ID: " . @$r->lines[0]['wl__reference']);
+                    }
                 }
 
-                //ETİKET DETAY
-                $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Etiketler", array("bearer" => $bearer, "etiket_ref" => $etiketRef));
-                if($r->isOK()){
-                    Console::printResult($r, "Etiket Detayı Okundu Etiket ID: ". @$r->lines[0]['wl__reference']);
-                    $this->assertTrue($r->isOK(), "Etiket Detayı Okundu Etiket ID: ". @$r->lines[0]['wl__reference']);
-                }
-
-                //E-DEFTER YEDEK - FİRMA LİSTESİ
+                Console::print('=========================E-DEFTER YEDEK - FİRMA LİSTESİ | YÜKLEME LİSTESİ=========================', 'orange');
+                //E-DEFTER YEDEK - FİRMA LİSTESİ | YÜKLEME LİSTESİ
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/EDefterYedek/FirmaListesi", array("bearer" => $bearer, "firma" => $firmaRef));
-                if($r->isOK()){
+                if ($r->isOK()) {
                     $firmaRef = @$r->lines[0]['ref'];
-                    Console::printResult($r, "E-Defter Yedek Firma Listesi Okundu Toplam Firma Sayısı: ". count($r->lines));
-                    $this->assertTrue($r->isOK(), "E-Defter Yedek Firma Listesi Okundu Toplam Firma Sayısı: ". count($r->lines));
+                    Console::printResult($r, "E-Defter Yedek Firma Listesi Okundu Toplam Firma Sayısı: " . count($r->lines));
+                    $this->assertTrue($r->isOK(), "E-Defter Yedek Firma Listesi Okundu Toplam Firma Sayısı: " . count($r->lines));
+                    $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/EDefterYedek/YuklemeListesi", array("bearer" => $bearer, "firma_ref" => $firmaRef));
+                    if ($r2->isOK()) {
+                        $yuklemeRef = @$r2->lines[0]['klasor__reference'];
+                        Console::printResult($r2, "E-Defter Yedek Yükleme Listesi Okundu Toplam Yükleme Sayısı: " . count($r2->lines));
+                        $this->assertTrue($r2->isOK(), "E-Defter Yedek Yükleme Listesi Okundu Toplam Yükleme Sayısı: " . count($r2->lines));
+                        $r3 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/EDefterYedek/Klasor", array("bearer" => $bearer, "firma_ref" => $firmaRef, "klasor_ref" => $yuklemeRef));
+                        if ($r3->isOK()) {
+                            $dosyaRef = @$r3->lines[0]['dosya__reference'];
+                            Console::printResult($r3, "E-Defter Yedek Klasor Detayı Okundu Klasor ID: " . $dosyaRef);
+                            $this->assertTrue($r3->isOK(), "E-Defter Yedek Klasor Detayı Okundu Klasor ID: " . $dosyaRef);
+                            $r4 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/EDefterYedek/Dosya", array("bearer" => $bearer, "firma_ref" => $firmaRef, "dosya_ref" => $dosyaRef));
+                            if ($r4->isOK()) {
+                                $dosyaAdi = @$r4->attributes['dosya__fileName'];
+                                Console::printResult($r4, "E-Defter Yedek Dosya Detayı Okundu Dosya Adı: " . $dosyaAdi);
+                                $this->assertTrue($r4->isOK(), "E-Defter Yedek Dosya Detayı Okundu Dosya Ado: " . $dosyaAdi);
+                            }
+                        }
+                    }
                 }
+
+                Console::print('=========================Muhasebe Raporları=========================', 'orange');
+                $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Liste/MuhasebeRaporlari", array("bearer" => $bearer, "firma" => $firmaRef));
+                if($r->isOK()){
+                    Console::printResult($r, "Muhasebe Raporları Okundu Toplam Muhasebe Rapor Sayısı: " . count($r->lines));
+                    $this->assertTrue($r->isOK(), "Muhasebe Raporları Okundu Toplam Muhasebe Rapor Sayısı: " . count($r->lines));
+                    $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Indir/MuhasebeRaporu", array("bearer" => $bearer, "firma" => $firmaRef, "rapor_ref" => @$r->lines[0]['dosya__reference']));
+                    if($r2->isOK() && !is_null($r->value) && !empty($r->value)){
+                        Console::printResult($r2, "Muhasebe Rapor Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
+                        $this->assertTrue($r2->isOK(), "Muhasebe Rapor Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
+                        if(@$r->lines[0]['dosya__reference'] == @$r2->attributes['dosya__reference']){
+                            Console::printSuccess("Muhasebe Raporu ile İndirilen Raporun ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
+                            $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
+                        }
+                        else{
+                            Console::error("Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
+                            $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
+                        }
+                    }
+                    $r3 = $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Olustur/MuhasebeRaporu", array("bearer" => $bearer, "firma" => $firmaRef, "yil" => '2025', 'ay' => '07', 'return_data' => true));
+                    if($r3->isOK() && !is_null($r3->value) && !empty($r3->value)){
+                        Console::printResult($r3, "Muhasebe Rapor Detayı Oluşturuldu Dosya Adı:" . $r3->attributes['dosya_adi']);
+                        $this->assertTrue($r3->isOK(), "Muhasebe Rapor Detayı Oluşturuldu Adı:" . $r3->attributes['dosya_adi']);
+                    }
+                }
+
+                Console::print('=========================Arişvlenen Dosyalar=========================', 'orange');
+                $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Liste/ArsivlenenDosyalar", array("bearer" => $bearer, "firma" => $firmaRef));
+                if($r->isOK()){
+                    Console::printResult($r, "Arişvlenen Dosyalar Okundu Toplam Dosya Sayısı: " . count($r->lines));
+                    $this->assertTrue($r->isOK(), "Arişvlenen Dosyalar Okundu Toplam Dosya Sayısı: " . count($r->lines));
+                    $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Indir/ArsivlenenDosyalar", array("bearer" => $bearer, "firma" => $firmaRef, "dosya_ref" => @$r->lines[0]['dosya__reference']));
+                    if($r2->isOK() && !is_null($r2->value) && !empty($r2->value)){
+                        Console::printResult($r2, "Arşivlenen Dosya Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
+                        $this->assertTrue($r2->isOK(), "Arşivlenen Dosya Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
+                        if(@$r->lines[0]['dosya__reference'] == @$r2->attributes['dosya__reference']){
+                            Console::printSuccess("Arşivlenen Dosya ile İndirilen Dosyanın ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
+                            $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
+                        }
+                        else{
+                            Console::error("Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
+                            $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
+                        }
+                    }
+                }
+
 
             } else {
                 Console::error('Login failed', 'Login failed', '✗', 80);

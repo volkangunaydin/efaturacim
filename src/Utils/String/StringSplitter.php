@@ -70,7 +70,11 @@ use Efaturacim\Util\Utils\Options;
         public static function splitWithNewLine($string){
             return self::withNewLines($string);
         }
-        
+
+        public static function notEmptyString($str){
+            return !is_null($str) && is_scalar($str) && strlen(trim("".$str))>0;
+        }
+
         public static function newLines($string,$trim=true,$removeEmpty=false,$options=null,$regEx=null,$charLimit=0){
             $res   = array();            
             if(is_null($string) || $string==""){ return $res; }
@@ -106,8 +110,9 @@ use Efaturacim\Util\Utils\Options;
                             $res[$key] = $v;
                         }
                     }
+                    
                     $delimiter = $options->getAsString("key_delimiter");
-                    if(\Vulcan\V::notEmptyString($delimiter)){
+                    if(self::notEmptyString($delimiter)){
                         $reverseKey = $options->getAsBool("reverse_key");
                         $arr = array();
                         foreach ($res as $val){
@@ -188,7 +193,7 @@ use Efaturacim\Util\Utils\Options;
             return self::newLines($str,true,true,$options,$regEx);
         }
         public static function csvStringToArray($string,$seperator=";",$enclosure = "\"",$escape = "\\"){
-            if(\Vulcan\V::notEmptyString($string)){
+            if(self::notEmptyString($string)){
                 try {
                     $arr = str_getcsv($string,$seperator,$enclosure,$escape);
                     if($arr && is_array($arr) && count($arr)>0){
