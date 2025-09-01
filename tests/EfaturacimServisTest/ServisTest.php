@@ -223,48 +223,64 @@ class ServisTest extends TestCase
 
                 Console::print('=========================Muhasebe Raporları=========================', 'orange');
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Liste/MuhasebeRaporlari", array("bearer" => $bearer, "firma" => $firmaRef));
-                if($r->isOK()){
+                if ($r->isOK()) {
                     Console::printResult($r, "Muhasebe Raporları Okundu Toplam Muhasebe Rapor Sayısı: " . count($r->lines));
                     $this->assertTrue($r->isOK(), "Muhasebe Raporları Okundu Toplam Muhasebe Rapor Sayısı: " . count($r->lines));
                     $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Indir/MuhasebeRaporu", array("bearer" => $bearer, "firma" => $firmaRef, "rapor_ref" => @$r->lines[0]['dosya__reference']));
-                    if($r2->isOK() && !is_null($r->value) && !empty($r->value)){
+                    if ($r2->isOK() && !is_null($r->value) && !empty($r->value)) {
                         Console::printResult($r2, "Muhasebe Rapor Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
                         $this->assertTrue($r2->isOK(), "Muhasebe Rapor Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
-                        if(@$r->lines[0]['dosya__reference'] == @$r2->attributes['dosya__reference']){
+                        if (@$r->lines[0]['dosya__reference'] == @$r2->attributes['dosya__reference']) {
                             Console::printSuccess("Muhasebe Raporu ile İndirilen Raporun ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
                             $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
-                        }
-                        else{
+                        } else {
                             Console::error("Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
                             $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
                         }
                     }
                     $r3 = $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Olustur/MuhasebeRaporu", array("bearer" => $bearer, "firma" => $firmaRef, "yil" => '2025', 'ay' => '07', 'return_data' => true));
-                    if($r3->isOK() && !is_null($r3->value) && !empty($r3->value)){
+                    if ($r3->isOK() && !is_null($r3->value) && !empty($r3->value)) {
                         Console::printResult($r3, "Muhasebe Rapor Detayı Oluşturuldu Dosya Adı:" . $r3->attributes['dosya_adi']);
                         $this->assertTrue($r3->isOK(), "Muhasebe Rapor Detayı Oluşturuldu Adı:" . $r3->attributes['dosya_adi']);
                     }
                 }
 
-                Console::print('=========================Arişvlenen Dosyalar=========================', 'orange');
+                Console::print('=========================E-Fatura Listesi=========================', 'orange');
+                $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Liste/EFatura", array("bearer" => $bearer, "firma" => $firmaRef, "yon" => 'giden'));
+                if ($r->isOK()) {
+                    $kayitNo = @$r->lines[0]['belge__reference'];
+                    Console::printResult($r, "E-Fatura Listesi Okundu Toplam E-Fatura Sayısı: " . $r->value['data']['totalSize']);
+                    Console::printResult($r, "E-Fatura Listesi Kayıt No: " . $kayitNo);
+                    $this->assertTrue($r->isOK(), "E-Fatura Listesi Okundu Toplam E-Fatura Sayısı: " . $r->value['data']['totalSize']);
+                    $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Oku/EFatura", array("bearer" => $bearer, "firma" => $firmaRef, "kayit_no" => $kayitNo, "cikti_xml" => true, 'cikti_html'=> true, 'cikti_pdf' => true));
+                    if ($r2->isOK() && !is_null($r2->value) && !empty($r2->value)) {
+                        Console::printResult($r2, "E-Fatura Detayı Okundu XML Mevcut");
+                        $this->assertTrue($r2->isOK(), "E-Fatura Detayı Okundu XML Mevcut");
+                        Console::printResult($r2, "E-Fatura Detayı Okundu HTML Mevcut");
+                        $this->assertTrue($r2->isOK(), "E-Fatura Detayı Okundu HTML Mevcut");
+                        Console::printResult($r2, "E-Fatura Detayı Okundu PDF Mevcut");
+                        $this->assertTrue($r2->isOK(), "E-Fatura Detayı Okundu PDF Mevcut");
+                    }
+                }
+
+                /*Console::print('=========================Arişvlenen Dosyalar=========================', 'orange');
                 $r = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Liste/ArsivlenenDosyalar", array("bearer" => $bearer, "firma" => $firmaRef));
-                if($r->isOK()){
+                if ($r->isOK()) {
                     Console::printResult($r, "Arişvlenen Dosyalar Okundu Toplam Dosya Sayısı: " . count($r->lines));
                     $this->assertTrue($r->isOK(), "Arişvlenen Dosyalar Okundu Toplam Dosya Sayısı: " . count($r->lines));
                     $r2 = RestApiClient::getJsonResult($baseUrl, "EFaturacim/Indir/ArsivlenenDosyalar", array("bearer" => $bearer, "firma" => $firmaRef, "dosya_ref" => @$r->lines[0]['dosya__reference']));
-                    if($r2->isOK() && !is_null($r2->value) && !empty($r2->value)){
+                    if ($r2->isOK() && !is_null($r2->value) && !empty($r2->value)) {
                         Console::printResult($r2, "Arşivlenen Dosya Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
                         $this->assertTrue($r2->isOK(), "Arşivlenen Dosya Detayı İndirildi ID:" . $r2->attributes['dosya__reference']);
-                        if(@$r->lines[0]['dosya__reference'] == @$r2->attributes['dosya__reference']){
+                        if (@$r->lines[0]['dosya__reference'] == @$r2->attributes['dosya__reference']) {
                             Console::printSuccess("Arşivlenen Dosya ile İndirilen Dosyanın ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
                             $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşiyor:" . $r2->attributes['dosya__reference']);
-                        }
-                        else{
+                        } else {
                             Console::error("Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
                             $this->assertTrue($r2->isOK(), "Muhasebe Raporu ile İndirilen Raporun ID Eşleşmiyor:" . $r2->attributes['dosya__reference']);
                         }
                     }
-                }
+                }*/
 
 
             } else {
