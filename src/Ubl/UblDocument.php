@@ -51,7 +51,7 @@ abstract class UblDocument{
      * Copy Indicator. e.g., "false"
      * @var bool
      */
-    protected bool $copyIndicator = false;
+    protected ?bool $copyIndicator = false;
 
     /**
      * Profile Identifier. e.g., "TEMELFATURA", "TICARIFATURA"
@@ -145,6 +145,9 @@ abstract class UblDocument{
 
     public function getCustomizationId(){
         return $this->customizationId;
+    }
+    public function getCopyIndicator(){
+        return $this->copyIndicator;
     }
     public function setId(string $id): static
     {

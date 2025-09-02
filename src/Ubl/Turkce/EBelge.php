@@ -58,6 +58,9 @@ class EBelge{
     public function getBelgeNo(){
         return $this->ubl->getId();
     }
+    public function getCopyIndicator(){
+        return $this->ubl->getCopyIndicator();
+    }
     public function getBelgeGuid(){
        return  $this->ubl->getGUID();
     }

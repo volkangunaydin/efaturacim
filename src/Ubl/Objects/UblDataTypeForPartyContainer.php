@@ -41,4 +41,37 @@ class UblDataTypeForPartyContainer extends UblDataType{
     public function getVknOrTckn(){
         return $this->party->getVknOrTckn();
     }
+    public function getStreetName(){
+        return $this->party->getPostalAddress()->getStreetName();
+    }
+    public function getBuildingName(){
+        return $this->party->getPostalAddress()->getBuildingName();
+    }
+    public function getBuildingNumber(){
+        return $this->party->getPostalAddress()->getBuildingNumber();
+    }
+    public function getCitySubdivisionName(){
+        return $this->party->getPostalAddress()->getCitySubdivisionName();
+    }
+    public function getCityName(){
+        return $this->party->getPostalAddress()->getCityName();
+    }
+    public function getPostalZone(){
+        return $this->party->getPostalAddress()->getPostalZone();
+    }
+    public function getRegion(){
+        return $this->party->getPostalAddress()->getRegion();
+    }
+    public function getDistrict(){
+        return $this->party->getPostalAddress()->getDistrict();
+    }
+    public function getCountryIdentificationCode(){
+        return $this->party->getPostalAddress()->getCountry()->getIdentificationCode();
+    }
+    public function getCountryName(){
+        return $this->party->getPostalAddress()->getCountry()->getName();
+    }
+    public function getTaxSchemeName(){
+        return $this->party->getTaxSchemeName();
+    }
 }

@@ -66,7 +66,7 @@ class PaymentMeans extends UblDataType
         $this->appendElement($document, $element, 'cbc:PaymentDueDate', $this->paymentDueDate);
         
         // PayeeFinancialAccount varsa ekle
-        if ($this->payeeFinancialAccount && !$this->payeeFinancialAccount->isEmpty()) {
+        if ($this->payeeFinancialAccount && !$this->payeeFinancialAccount->isEmpty() && $this->payeeFinancialAccount->id && !$this->payeeFinancialAccount->id->isEmpty()) {
             $this->appendChild($element, $this->payeeFinancialAccount->toDOMElement($document));
         }
         return $element;

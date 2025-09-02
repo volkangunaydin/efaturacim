@@ -37,4 +37,7 @@ class TaxScheme extends UblDataType
         }
         return $element;
     }
+    public function getName(){
+        return $this->name;
+    }
 }

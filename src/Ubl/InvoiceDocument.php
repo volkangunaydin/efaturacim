@@ -456,6 +456,31 @@ class InvoiceDocument extends UblDocument
     {
         return $this->legalMonetaryTotal->chargeTotalAmount->toNumber();
     }
+    public function getInvoiceTypeCode()
+    {
+        return $this->invoiceTypeCode;
+    }
+
+    public function getPaymentMeansCode()
+    {
+        if ($this->paymentMeans && !$this->paymentMeans->isEmpty() && count($this->paymentMeans->list) > 0) {
+            $firstPaymentMeans = $this->paymentMeans->list[0];
+            if ($firstPaymentMeans instanceof PaymentMeans && $firstPaymentMeans->paymentMeansCode) {
+                return $firstPaymentMeans->paymentMeansCode->textContent;
+            }
+        }
+        return null;
+    }
+    public function getPaymentDueDate()
+    {
+        if ($this->paymentMeans && !$this->paymentMeans->isEmpty() && count($this->paymentMeans->list) > 0) {
+            $firstPaymentMeans = $this->paymentMeans->list[0];
+            if ($firstPaymentMeans instanceof PaymentMeans && $firstPaymentMeans->paymentDueDate) {
+                return $firstPaymentMeans->paymentDueDate;
+            }
+        }
+        return null;
+    }
     public function getLineExtensionAmountFromLines()
     {
         return $this->invoiceLine->sum(function ($line) {

@@ -6,6 +6,9 @@ REM Check if a parameter was passed
 if "%1"=="ServisTest" (
     echo Running ServisTest only...
     vendor\bin\phpunit tests\EfaturacimServisTest\ServisTest.php
+) else if "%1"=="FaturaTest" (
+    echo Running FaturaTest only...
+    vendor\bin\phpunit tests\UBLTest\EfaturaXmlTest.php
 ) else (
     echo Running all tests...
     vendor\bin\phpunit

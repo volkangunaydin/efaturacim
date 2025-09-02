@@ -31,4 +31,11 @@ class PartyTaxScheme extends UblDataType
     public function isEmpty(){
         return is_null($this->taxScheme) || $this->taxScheme->isEmpty();
     }
+
+    public function getTaxScheme(){
+        return $this->taxScheme;
+    }
+    public function getTaxSchemeName(){
+        return $this->taxScheme->getName();
+    }
 }

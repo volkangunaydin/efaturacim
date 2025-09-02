@@ -68,4 +68,38 @@ class Address extends UblDataType
 
         return $element;
     }
+
+    public function getStreetName(){
+        return $this->streetName;
+    }
+    public function getBuildingName(){
+        return $this->buildingName;
+    }
+    public function getBuildingNumber(){
+        return $this->buildingNumber;
+    }
+    public function getCitySubdivisionName(){
+        return $this->citySubdivisionName;
+    }
+    public function getCityName(){
+        return $this->cityName;
+    }
+    public function getPostalZone(){
+        return $this->postalZone;
+    }
+    public function getRegion(){
+        return $this->region;
+    }
+    public function getDistrict(){
+        return $this->district;
+    }
+    public function getCountry(){
+        return $this->country;
+    }
+    public function getCountryIdentificationCode(){
+        return $this->country->getIdentificationCode();
+    }
+    public function getCountryName(){
+        return $this->country->getName();
+    }
 }

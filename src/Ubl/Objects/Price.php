@@ -41,7 +41,6 @@ class Price extends UblDataType
         $element = $this->createElement($document,$this->defaultTagName);
 
         $this->appendChild($element,$this->priceAmount->toDOMElement($document));
-        $this->appendChild($element,null);
         return $element;
     }
 }

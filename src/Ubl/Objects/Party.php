@@ -64,6 +64,27 @@ class Party extends UblDataType
     public function getPartyName(){
         return $this->partyName->getName();
     }
+    public function getPostalAddress(){
+        return $this->postalAddress;
+    }
+    public function getTaxSchemeName(){
+        return $this->partyTaxScheme->getTaxSchemeName();
+    }
+    public function getCountryIdentificationCode(){
+        return $this->postalAddress->getCountry()->getIdentificationCode();
+    }
+    public function getCountryName(){
+        return $this->postalAddress->getCountry()->getName();
+    }
+    public function getStreetName(){
+        return $this->postalAddress->getStreetName();
+    }
+    public function getBuildingName(){
+        return $this->postalAddress->getBuildingName();
+    }
+    public function getBuildingNumber(){
+        return $this->postalAddress->getBuildingNumber();
+    }
     public function getVknOrTckn(){
         $key1 = $this->partyIdentification->getKeyForSchemeID("TCKN");                
         if(!is_null($key1) && strlen("".$this->partyIdentification->list[$key1]->getValue())>0 ){

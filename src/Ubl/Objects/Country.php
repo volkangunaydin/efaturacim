@@ -38,4 +38,10 @@ class Country extends UblDataType{
         }
         return $element;
     }
+    public function getIdentificationCode(){
+        return $this->identificationCode;
+    }
+    public function getName(){
+        return $this->name;
+    }
 }

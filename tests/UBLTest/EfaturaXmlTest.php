@@ -10,6 +10,7 @@ class EfaturaXmlTest extends TestCase{
     public function testXmlBRK2025000000052()    {
         $efatura = EFaturaBelgesi::fromXmlFile(EFaturacimLibUtil::getTestPath("xml_data/efatura/BRK2025000000052.xml"));
         $this->assertSame("BRK2025000000052",$efatura->getBelgeNo());
+        $this->assertSame(false,$efatura->getCopyIndicator());
         $this->assertSame("685c9608-0829-4b30-bef8-3684395c844c",$efatura->getBelgeGuid());
         $this->assertSame("2.1",$efatura->ubl->getUBLVersionId());
         $this->assertSame("TICARIFATURA",$efatura->ubl->getProfileId());
@@ -20,6 +21,38 @@ class EfaturaXmlTest extends TestCase{
         $this->assertEquals("Ankara Hastanesi İnşaat Sanayi Bilişim Danışmanlık Film teknoloji Yazılım Mühendislik",$efatura->ubl->accountingCustomerParty->getName());
         $this->assertEquals("1111111125",$efatura->ubl->accountingCustomerParty->getVknOrTckn());
         $this->assertEquals("2025-08-04 11:13:00",$efatura->getBelgeTarihi());
+        $this->assertSame("ISTISNA",$efatura->ubl->getInvoiceTypeCode());
+
+        $this->assertSame("Ankara Hastanesi İnşaat Sanayi Bilişim Danışmanlık Film teknoloji Yazılım Mühendislik",$efatura->ubl->accountingCustomerParty->getName());
+        $this->assertSame("1111111125",$efatura->ubl->accountingCustomerParty->getVknOrTckn());
+        $this->assertSame("Kerem İnan caddesi",$efatura->ubl->accountingCustomerParty->getStreetName());
+        $this->assertSame("Nurullah Apt.",$efatura->ubl->accountingCustomerParty->getBuildingName());
+        $this->assertSame("12",$efatura->ubl->accountingCustomerParty->getBuildingNumber());
+        $this->assertSame("Çankaya",$efatura->ubl->accountingCustomerParty->getCitySubdivisionName());
+        $this->assertSame("Ankara",$efatura->ubl->accountingCustomerParty->getCityName());
+        $this->assertSame("06670",$efatura->ubl->accountingCustomerParty->getPostalZone());
+        $this->assertSame("Umut Mah.",$efatura->ubl->accountingCustomerParty->getRegion());
+        $this->assertSame("Zafertepe",$efatura->ubl->accountingCustomerParty->getDistrict());
+        $this->assertSame("TR",$efatura->ubl->accountingCustomerParty->getCountryIdentificationCode());
+        $this->assertSame("Türkiye",$efatura->ubl->accountingCustomerParty->getCountryName());
+        $this->assertSame("Feke Malmüdürlüğü",$efatura->ubl->accountingCustomerParty->getTaxSchemeName());
+        
+        $this->assertSame("BERR YAPI MARKET İNŞ.TAAH.DAN.PAZ.SAN.VEDIŞ TİC.A.Ş. Test Kullanıcısı",$efatura->ubl->accountingSupplierParty->getName());
+        $this->assertSame("5555551470",$efatura->ubl->accountingSupplierParty->getVknOrTckn());
+        $this->assertSame("Göksu Cad. İlkadım Sokak",$efatura->ubl->accountingSupplierParty->getStreetName());
+        $this->assertSame("Lemar",$efatura->ubl->accountingSupplierParty->getBuildingName());
+        $this->assertSame("21",$efatura->ubl->accountingSupplierParty->getBuildingNumber());
+        $this->assertSame("Mamak",$efatura->ubl->accountingSupplierParty->getCitySubdivisionName());
+        $this->assertSame("Ankara",$efatura->ubl->accountingSupplierParty->getCityName());
+        $this->assertSame("06630",$efatura->ubl->accountingSupplierParty->getPostalZone());
+        $this->assertSame("Aşıkveysel Mah.",$efatura->ubl->accountingSupplierParty->getRegion());
+        $this->assertSame("Akdere",$efatura->ubl->accountingSupplierParty->getDistrict());
+        $this->assertSame("TR",$efatura->ubl->accountingSupplierParty->getCountryIdentificationCode());
+        $this->assertSame("Türkiye",$efatura->ubl->accountingSupplierParty->getCountryName());
+        $this->assertSame("Çankaya",$efatura->ubl->accountingSupplierParty->getTaxSchemeName());
+
+        $this->assertSame("42",$efatura->ubl->getPaymentMeansCode());
+        $this->assertSame("2026-01-01",$efatura->ubl->getPaymentDueDate());
 
         $this->assertEquals(42300,$efatura->ubl->getLineExtensionAmount());
         $this->assertEquals(39650,$efatura->ubl->getLineExtensionAmountFromLines());
