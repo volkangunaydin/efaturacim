@@ -22,6 +22,7 @@ class InvoiceLine extends UblDataType
     public ?PayableAmount $payableAmount = null;
     public ?Delivery $delivery = null;
 
+    public ?DespatchLineReference $despatchLineReference = null;
 
     /**     
      * @var Note
@@ -59,6 +60,7 @@ class InvoiceLine extends UblDataType
         $this->price = new Price();
         $this->note = new Note();
         $this->delivery = new Delivery();
+        $this->despatchLineReference = new DespatchLineReference();
     }
     public function addAllowanceCharge(array $options): self
     {
@@ -102,7 +104,10 @@ class InvoiceLine extends UblDataType
             $this->lineExtensionAmount->setCurrencyID($v);
             return true;
         }
-
+        if (in_array($k, ['despatchLineReference', 'satir_referansi']) && StrUtil::notEmpty($v)) {
+            $this->despatchLineReference = $v;
+            return true;
+        }
         // Handle allowance charges array
         if (in_array(strtolower($k), ['allowancecharges', 'discounts', 'charges', 'iskontolar']) && is_array($v)) {
             foreach ($v as $acOptions) {
@@ -162,6 +167,7 @@ class InvoiceLine extends UblDataType
         foreach ($this->withholdingTaxTotal->list as $wtt) {
             $this->appendChild($element, $wtt->toDOMElement($document));
         }
+        $this->appendChild($element, $this->despatchLineReference->toDOMElement($document));
 
         $this->appendChild($element, $this->taxTotal->toDOMElement($document));
         $this->appendChild($element, $this->item->toDOMElement($document));

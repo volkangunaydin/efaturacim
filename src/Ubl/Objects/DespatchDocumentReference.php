@@ -11,10 +11,15 @@ class DespatchDocumentReference extends UblDataType
 {
     public ?string $id = null;
     public ?string $issueDate = null;
+    public ?ValidityPeriod $validityPeriod = null;
 
     public function __construct($options = null)
     {
         parent::__construct($options);
+    }
+
+    public function initMe(){
+        $this->validityPeriod = new ValidityPeriod();
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool
@@ -24,6 +29,9 @@ class DespatchDocumentReference extends UblDataType
             return true;
         }else if (in_array($k, ['issueDate', 'tarih','date']) && StrUtil::notEmpty($v)) {
             $this->issueDate = $v;
+            return true;
+        }else if (in_array($k, ['validityPeriod', 'validityperiod', 'validityPeriod']) && StrUtil::notEmpty($v)) {
+            $this->validityPeriod = $v;
             return true;
         }
         return false;
@@ -36,6 +44,7 @@ class DespatchDocumentReference extends UblDataType
         $element = $document->createElement('cac:DespatchDocumentReference');
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
         $this->appendElement($document, $element, 'cbc:IssueDate', DateUtil::getAsDbDate($this->issueDate));
+        $element->appendChild($this->validityPeriod->toDOMElement($document));
         return $element;
     }
 }

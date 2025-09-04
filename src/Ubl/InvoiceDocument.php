@@ -9,6 +9,7 @@ use Efaturacim\Util\Ubl\Objects\BillingReference;
 use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
 use Efaturacim\Util\Ubl\Objects\Delivery;
 use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
+use Efaturacim\Util\Ubl\Objects\ReceiptDocumentReference;
 use Efaturacim\Util\Ubl\Objects\InvoiceLine;
 use Efaturacim\Util\Ubl\Objects\InvoicePeriod;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
@@ -112,6 +113,10 @@ class InvoiceDocument extends UblDocument
     /**
      * @var UblDataTypeList
      */
+    public $receiptDocumentReference = null;
+    /**
+     * @var UblDataTypeList
+     */
     public $note = null;
     /**
      * @var UblDataTypeList
@@ -162,6 +167,7 @@ class InvoiceDocument extends UblDocument
         $this->delivery                    = new Delivery();
         $this->orderReference              = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference   = new UblDataTypeList(DespatchDocumentReference::class);
+        $this->receiptDocumentReference   = new UblDataTypeList(ReceiptDocumentReference::class);
         $this->note                        = new UblDataTypeList(Note::class);
         $this->invoiceLine                 = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
         $this->allowanceCharge             = new AllowanceCharge();
@@ -193,7 +199,6 @@ class InvoiceDocument extends UblDocument
         $this->appendCommonElements();
         $this->appendInvoicePeriod();
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
-        // Ensure currency code element is present in XML
         $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);
         $this->appendElement('cbc:AccountingCost', $this->accountingCost);
         $this->appendElementList($this->billingReference);
@@ -201,6 +206,7 @@ class InvoiceDocument extends UblDocument
         $this->appendElementList($this->additionalDocumentReference);
         $this->appendElementList($this->orderReference);
         $this->appendElementList($this->despatchDocumentReference);
+        $this->appendElementList($this->receiptDocumentReference);
         $this->appendElementList($this->note);
         $this->appendAccountingSupplierParty();
         $this->appendAccountingCustomerParty();
@@ -211,7 +217,6 @@ class InvoiceDocument extends UblDocument
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
-
         $this->appendLegalMonetaryTotal();
         $this->appendElementList($this->invoiceLine);
         return $this->document->saveXML();

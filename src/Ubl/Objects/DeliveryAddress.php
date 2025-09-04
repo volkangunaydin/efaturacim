@@ -8,6 +8,7 @@ use Efaturacim\Util\Utils\String\StrUtil;
 
 class DeliveryAddress extends UblDataType
 {
+    public ?string $room = null;
     public ?string $streetName = null;
     public ?string $buildingName = null;
     public ?string $buildingNumber = null;
@@ -29,7 +30,10 @@ class DeliveryAddress extends UblDataType
 
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if(in_array($k,array("sokak")) && StrUtil::notEmpty($v)){
+        if(in_array($k,array("room")) && StrUtil::notEmpty($v)){
+            $this->room = $v;
+            return true;
+        }else if(in_array($k,array("sokak")) && StrUtil::notEmpty($v)){
             $this->streetName = $v;
             return true;
         }else if(in_array($k,array("bina_adi")) && StrUtil::notEmpty($v)){
@@ -72,6 +76,7 @@ class DeliveryAddress extends UblDataType
     {
         $element = $document->createElement('cac:DeliveryAddress');
         
+        $this->appendElement($document, $element, 'cbc:Room', $this->room);
         $this->appendElement($document, $element, 'cbc:StreetName', $this->streetName);
         $this->appendElement($document, $element, 'cbc:BuildingName', $this->buildingName);
         $this->appendElement($document, $element, 'cbc:BuildingNumber', $this->buildingNumber);

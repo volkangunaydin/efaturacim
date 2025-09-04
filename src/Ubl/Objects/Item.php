@@ -13,7 +13,7 @@ class Item extends UblDataType
     public ?BuyersItemIdentification $buyersItemIdentification = null;
     public ?SellersItemIdentification $sellersItemIdentification = null;
     public ?ManufacturersItemIdentification $manufacturersItemIdentification = null;
-
+    public ?CommodityClassification $commodityClassification = null;
     public function __construct($options = null)
     {
         parent::__construct($options);
@@ -30,6 +30,9 @@ class Item extends UblDataType
             if (isset($options['manufacturersItemID'])) {
                 $this->manufacturersItemIdentification = new ManufacturersItemIdentification(['id' => $options['manufacturersItemID']]);
             }
+            if (isset($options['commodityClassification'])) {
+                $this->commodityClassification = new CommodityClassification(['itemClassificationCode' => $options['commodityClassification']]);
+            }
         }
     }
 
@@ -37,6 +40,7 @@ class Item extends UblDataType
         $this->sellersItemIdentification   = new SellersItemIdentification();
         $this->buyersItemIdentification   = new BuyersItemIdentification();
         $this->manufacturersItemIdentification   = new ManufacturersItemIdentification();
+        $this->commodityClassification   = new CommodityClassification();
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool
@@ -61,6 +65,11 @@ class Item extends UblDataType
         }
         if (in_array($k, ['manufacturersItemID', 'uretici_stok_kodu']) && StrUtil::notEmpty($v)) {
             $this->manufacturersItemIdentification = new ManufacturersItemIdentification(['id' => $v]);
+            return true;
+        }
+
+        if (in_array($k, ['commodityClassification', 'commodity_classification']) && StrUtil::notEmpty($v)) {
+            $this->commodityClassification = new CommodityClassification(['itemClassificationCode' => $v]);
             return true;
         }
 
@@ -93,7 +102,9 @@ class Item extends UblDataType
         if ($this->manufacturersItemIdentification) {
             $this->appendChild($element, $this->manufacturersItemIdentification->toDOMElement($document));
         }
-
+        if ($this->commodityClassification) {
+            $this->appendChild($element, $this->commodityClassification->toDOMElement($document));
+        }
         return $element;
     }
 }
