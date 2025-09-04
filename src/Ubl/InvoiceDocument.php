@@ -160,24 +160,24 @@ class InvoiceDocument extends UblDocument
         $this->invoicePeriod = new InvoicePeriod();
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
-        $this->billingReference            = new UblDataTypeList(BillingReference::class);
-        $this->accountingSupplierParty     = new AccountingSupplierParty();
-        $this->accountingCustomerParty     = new AccountingCustomerParty();
-        $this->buyerCustomerParty          = new BuyerCustomerParty();
-        $this->delivery                    = new Delivery();
-        $this->orderReference              = new UblDataTypeList(OrderReference::class);
-        $this->despatchDocumentReference   = new UblDataTypeList(DespatchDocumentReference::class);
-        $this->receiptDocumentReference   = new UblDataTypeList(ReceiptDocumentReference::class);
-        $this->note                        = new UblDataTypeList(Note::class);
-        $this->invoiceLine                 = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
-        $this->allowanceCharge             = new AllowanceCharge();
-        $this->taxTotal                    = new TaxTotal();
-        $this->withholdingTaxTotal         = new WithholdingTaxTotal();
-        $this->pricingExchangeRate         = new PricingExchangeRate();
-        $this->paymentMeans                = new UblDataTypeList(PaymentMeans::class);
-        $this->legalMonetaryTotal          = new LegalMonetaryTotal();
+        $this->billingReference = new UblDataTypeList(BillingReference::class);
+        $this->accountingSupplierParty = new AccountingSupplierParty();
+        $this->accountingCustomerParty = new AccountingCustomerParty();
+        $this->buyerCustomerParty = new BuyerCustomerParty();
+        $this->delivery = new Delivery();
+        $this->orderReference = new UblDataTypeList(OrderReference::class);
+        $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
+        $this->receiptDocumentReference = new UblDataTypeList(ReceiptDocumentReference::class);
+        $this->note = new UblDataTypeList(Note::class);
+        $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
+        $this->allowanceCharge = new AllowanceCharge();
+        $this->taxTotal = new TaxTotal();
+        $this->withholdingTaxTotal = new WithholdingTaxTotal();
+        $this->pricingExchangeRate = new PricingExchangeRate();
+        $this->paymentMeans = new UblDataTypeList(PaymentMeans::class);
+        $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
-        $this->UBLExtensions               = new UBLExtensions();
+        $this->UBLExtensions = new UBLExtensions();
     }
     public function setLineCount()
     {
@@ -295,7 +295,7 @@ class InvoiceDocument extends UblDocument
         if (in_array($k, ["fatura_no", "faturano", "belgeno"]) && StrUtil::notEmpty($v)) {
             $this->id = $v;
             return true;
-        }else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
             $this->profileId = $v;
             return true;
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {
@@ -368,20 +368,20 @@ class InvoiceDocument extends UblDocument
     public function getContextArray()
     {
         return new Options([
-            "nextLineId"           => $this->invoiceLine->getCount() + 1,
+            "nextLineId" => $this->invoiceLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "invoiceTypeCode"      => $this->invoiceTypeCode,
-            "accountingCost"       => $this->accountingCost,
+            "invoiceTypeCode" => $this->invoiceTypeCode,
+            "accountingCost" => $this->accountingCost,
         ]);
     }
     public function rebuildValues()
     {
-        $totalLineExtensionAmount  = 0;
-        $totalTaxExclusiveAmount   = 0;
-        $totalTaxInclusiveAmount   = 0;
+        $totalLineExtensionAmount = 0;
+        $totalTaxExclusiveAmount = 0;
+        $totalTaxInclusiveAmount = 0;
         $totalAllowanceTotalAmount = 0;
-        $totalChargeTotalAmount    = 0;
-        $totalPayableAmount        = 0;
+        $totalChargeTotalAmount = 0;
+        $totalPayableAmount = 0;
 
         // Rebuild invoice line values and collect totals
         foreach ($this->invoiceLine->list as &$invLine) {
@@ -418,7 +418,7 @@ class InvoiceDocument extends UblDocument
                 $vat = $line->getVatAsArray();
                 if ($vat && is_array($vat) && count($vat) > 0 && key_exists("percent", $vat)) {
                     $percent = @$vat["percent"];
-                    if (! key_exists($percent, $arr)) {
+                    if (!key_exists($percent, $arr)) {
                         $arr[$percent] = [];
                     }
                     foreach ($vat as $kk => $vv) {

@@ -172,9 +172,6 @@ class DespatchAdviceDocument extends UblDocument
         $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
         $this->appendCommonElements();
         $this->appendElement('cbc:DespatchAdviceTypeCode', $this->invoiceTypeCode);
-
-        // TODO: Implement and call methods to append other required sections:
-        //$this->appendSignature();
         $this->appendElementList($this->additionalDocumentReference);
         $this->appendElementList($this->orderReference);
         $this->appendElementList($this->despatchDocumentReference);
