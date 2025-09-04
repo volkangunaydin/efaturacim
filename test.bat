@@ -8,7 +8,7 @@ if "%1"=="ServisTest" (
     vendor\bin\phpunit tests\EfaturacimServisTest\ServisTest.php
 ) else if "%1"=="FaturaTest" (
     echo Running FaturaTest only...
-    vendor\bin\phpunit tests\UBLTest\EfaturaXmlTest.php
+    vendor\bin\phpunit tests\UBLTest\XMLComparisonTest.php
 ) else (
     echo Running all tests...
     vendor\bin\phpunit

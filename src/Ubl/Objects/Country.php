@@ -7,7 +7,7 @@ use DOMElement;
 use Efaturacim\Util\Utils\String\StrUtil;
 
 class Country extends UblDataType{
-    public $identificationCode = "TR"; // e.g., "TR"
+    public $identificationCode = null; // e.g., "TR"
     public $name = "TURKIYE";               // e.g., "Türkiye"
 
     public function __construct( $name = null,$identificationCode = null)
