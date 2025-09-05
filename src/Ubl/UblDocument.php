@@ -55,6 +55,7 @@ abstract class UblDocument{
      */
     protected ?bool $copyIndicator = false;
 
+    
     /**
      * Profile Identifier. e.g., "TEMELFATURA", "TICARIFATURA"
      * This will be specific to the document type.
