@@ -30,7 +30,7 @@ class AssocArray{
             if(is_array($keyOrArray)){
                 foreach($keyOrArray as $key){
                     if(key_exists($key,$arr)){
-                        return self::getValByRef($arr,$key,$defVal,$typeForCast);
+                        return self::getValByRef($arr,$key,$defVal);
                     }
                 }
             }else if(is_scalar($keyOrArray) && key_exists($keyOrArray,$arr)){

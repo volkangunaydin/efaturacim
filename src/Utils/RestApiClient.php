@@ -1,6 +1,7 @@
 <?php
 namespace Efaturacim\Util\Utils;
 
+use Efaturacim\Util\Utils\Events\AppEvents;
 use Efaturacim\Util\Utils\IO\FileCache;
 use Efaturacim\Util\Utils\Results\ResultUtil;
 use Efaturacim\Util\Utils\String\StrUtil;
@@ -10,6 +11,16 @@ class RestApiClient{
     public static $DEFAULT_BEARER_TOKEN = null;
     public static $DEFAULT_API_URL      = null;
     public static $SERVER_SECURE_KEY    = null;
+    protected static $initCalled        = false;
+    public static function init(){
+        if(!self::$initCalled){
+            self::$initCalled = true;
+            $init_events = array("restapiclient.init","init.restapiclient");
+            if(AppEvents::has($init_events)){
+                AppEvents::fire($init_events,array());
+            }
+        }
+    }
     public static function setDefaultUrl($url){
         self::$DEFAULT_API_URL = $url;
     }
@@ -17,6 +28,7 @@ class RestApiClient{
         self::$SERVER_SECURE_KEY = $key;
     }
     public static function getResult($baseApiUrl,$relPath,$postVars=null,$options=null){        
+        self::init();
         $r = new RestApiResult();
         if(is_null($baseApiUrl) && !is_null(self::$DEFAULT_API_URL) && strlen("".self::$DEFAULT_API_URL)>0){
             $baseApiUrl = self::$DEFAULT_API_URL;
@@ -74,7 +86,7 @@ class RestApiClient{
         }
         return $r;
     }    
-    public static function getJsonResultCached($cacheFolder,$cacheTimeout,$baseApiUrl,$relPath,$postParams=null,$options=null){      
+    public static function getJsonResultCached($cacheFolder,$cacheTimeout,$baseApiUrl,$relPath,$postParams=null,$options=null){              
         if(is_null($cacheFolder)){
             $cacheFolder = "../content_cache/servis_cache/";            
         }          
@@ -96,6 +108,7 @@ class RestApiClient{
         return $r;
     }
     public static function getJsonResult($baseApiUrl,$relPath,$postParams=null,$options=null){        
+        self::init();
         $postVars  = array();
         if($postParams && is_array($postParams)){
             foreach($postParams as $k=>$v){ $postVars[$k] = $v;  }
@@ -173,6 +186,14 @@ class RestApiClient{
             return $bearer;
         }
         return null;
+    }
+    public static function getDebugInfo(){
+        self::init();
+        return array(
+            "default_bearer_token"=>self::$DEFAULT_BEARER_TOKEN,
+            "default_api_url"=>self::$DEFAULT_API_URL,
+            "server_secure_key"=>self::$SERVER_SECURE_KEY,
+        );
     }
 }
 ?>
