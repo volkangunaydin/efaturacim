@@ -806,7 +806,6 @@ class D3Charts extends ChartsBase
             return [];
         }
         
-        // For stacked bar chart, ensure data is in correct format
         $processedData = [];
         foreach ($data as $item) {
             $processedItem = [];
