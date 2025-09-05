@@ -47,6 +47,7 @@ abstract class UblDocument{
      * @var string
      */
     protected string $customizationId = 'TR1.2';
+    
     /**
      * Copy Indicator. e.g., "false"
      * @var bool
