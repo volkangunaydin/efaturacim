@@ -9,8 +9,8 @@
  * the website of d3 charts is : @https://d3js.org/ 
  * please provide me simple static funciton for a Stacked Bar Chart"
  * 
- * D3.js integration for chart components.
- * Provides D3.js specific functionality for creating custom data visualizations
+ * D3.js integration for stacked bar chart components.
+ * Provides D3.js specific functionality for creating stacked bar charts
  * with unparalleled flexibility as described at https://d3js.org/
  */
 
@@ -20,19 +20,18 @@ use Efaturacim\Util\Utils\Html\Charts\ChartsBase;
 use Efaturacim\Util\Utils\Json\JsonUtil;
 
 /**
- * D3.js chart component
+ * D3.js stacked bar chart component
  * 
- * This class provides D3.js integration for creating custom data visualizations.
+ * This class provides D3.js integration for creating stacked bar charts.
  * D3.js is the JavaScript library for bespoke data visualization that provides
  * unparalleled flexibility for creating custom dynamic visualizations.
  * 
  * Features include:
- * - Selections and transitions
- * - Scales and axes
- * - Shapes (arcs, areas, curves, lines, links, pies, stacks, symbols)
- * - Interactions (panning, zooming, brushing, dragging)
- * - Layouts (treemaps, trees, force-directed graphs, Voronoi, contours, chords, circle-packing)
- * - Geographic maps
+ * - Interactive stacked bar charts
+ * - Responsive design
+ * - Tooltips and legends
+ * - Customizable colors and styling
+ * - Smooth animations and transitions
  * 
  * @see https://d3js.org/
  */
@@ -118,10 +117,10 @@ class D3Charts extends ChartsBase
                 'type' => 'stacked-bar'
             ],
             'margin' => [
-                'top' => 20,
-                'right' => 20,
-                'bottom' => 30,
-                'left' => 40
+                'top' => 10,
+                'right' => 10,
+                'bottom' => 40,
+                'left' => 50
             ],
             'responsive' => true,
             'animate' => true,
@@ -241,6 +240,18 @@ class D3Charts extends ChartsBase
             }
         }
         
+        // Add minimal CSS
+        $html .= '<style>' . "\n";
+        $html .= '.d3-chart { width: 100%; }' . "\n";
+        $html .= '.d3-chart svg { width: 100%; }' . "\n";
+        $html .= '.d3-chart .chart-legend { text-align: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 6px; }' . "\n";
+        $html .= '.d3-chart .legend-item { display: inline-block; margin: 5px 10px; cursor: pointer; transition: all 0.3s ease; }' . "\n";
+        $html .= '.d3-chart .legend-item:hover { transform: scale(1.05); }' . "\n";
+        $html .= '.d3-chart .legend-color { display: inline-block; width: 12px; height: 12px; margin-right: 5px; border-radius: 2px; }' . "\n";
+        $html .= '.d3-chart .legend-text { font-size: 12px; color: #666; }' . "\n";
+        $html .= '.d3-tooltip { position: absolute; background: white; color: #333; padding: 10px 15px; border-radius: 6px; font-size: 12px; pointer-events: none; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.15); border: 1px solid #e0e0e0; }' . "\n";
+        $html .= '</style>' . "\n";
+        
         // Add JavaScript files
         $jsFiles = $this->getJsFiles();
         if ($jsFiles) {
@@ -256,18 +267,17 @@ class D3Charts extends ChartsBase
         // Handle percentage width for responsive design
         $widthStyle = is_numeric($width) ? $width . 'px' : $width;
         
-        $html .= '<div id="' . $this->chartId . '" class="' . $this->containerClass . ' d3-chart" ';
-        $html .= 'style="width: ' . $widthStyle . '; height: ' . $height . 'px; max-width: 100%;">';
+        $html .= '<div id="' . $this->chartId . '" class="' . $this->containerClass . ' d3-chart">';
         
         if ($this->showTitle && !empty($this->title)) {
             $html .= '<h3 class="chart-title">' . htmlspecialchars($this->title) . '</h3>';
         }
         
-        $html .= '<svg id="' . $this->chartId . '_svg" class="d3-svg" width="100%" height="' . $height . '" viewBox="0 0 ' . (is_numeric($width) ? $width : 800) . ' ' . $height . '" preserveAspectRatio="xMidYMid meet"></svg>';
-        
         if ($this->showLegend) {
             $html .= '<div class="chart-legend" id="' . $this->chartId . '_legend"></div>';
         }
+        
+        $html .= '<svg id="' . $this->chartId . '_svg" class="d3-svg" width="100%" height="' . $height . '"></svg>';
         
         $html .= '</div>';
         
@@ -315,10 +325,6 @@ class D3Charts extends ChartsBase
             'var chartData_' . $this->chartId . ' = ' . $data . ';',
             'var d3Options_' . $this->chartId . ' = ' . $options . ';',
             '',
-            '// Debug: Log data for troubleshooting',
-            'console.log("Chart Data:", chartData_' . $this->chartId . ');',
-            'console.log("Chart Config:", chartConfig_' . $this->chartId . ');',
-            '',
             '// Initialize D3 Chart for ' . $this->chartId,
             'try {',
             '    if (typeof d3 !== "undefined") {',
@@ -352,59 +358,38 @@ class D3Charts extends ChartsBase
             '        svg.attr("width", actualWidth)',
             '           .attr("height", config.height);',
             '        ',
-            '        // Create chart based on type',
-            '        switch(config.type) {',
-            '            case "stacked-bar":',
-            '                createStackedBarChart_' . $this->chartId . '(svg, data, config, options);',
-            '                break;',
-            '            case "line":',
-            '                createLineChart_' . $this->chartId . '(svg, data, config, options);',
-            '                break;',
-            '            case "bar":',
-            '                createBarChart_' . $this->chartId . '(svg, data, config, options);',
-            '                break;',
-            '            case "pie":',
-            '                createPieChart_' . $this->chartId . '(svg, data, config, options);',
-            '                break;',
-            '            case "area":',
-            '                createAreaChart_' . $this->chartId . '(svg, data, config, options);',
-            '                break;',
-            '            default:',
-            '                console.log("Chart type not implemented:", config.type);',
-            '        }',
+            '        // Create stacked bar chart',
+            '        createStackedBarChart_' . $this->chartId . '(svg, data, config, options, container);',
             '    } catch (error) {',
             '        console.error("Error in createD3Chart:", error);',
             '    }',
             '}',
             '',
             '// Stacked Bar Chart function for ' . $this->chartId,
-            'function createStackedBarChart_' . $this->chartId . '(svg, data, config, options) {',
+            'function createStackedBarChart_' . $this->chartId . '(svg, data, config, options, container) {',
             '    try {',
-            '        console.log("Creating stacked bar chart with data:", data);',
             '        if (!data || data.length === 0) {',
             '            console.error("No data provided for chart");',
             '            return;',
             '        }',
             '        ',
-            '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
             '        var containerWidth = svg.node().getBoundingClientRect().width;',
             '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
-            '        var width = actualWidth - margin.left - margin.right;',
-            '        var height = config.height - margin.top - margin.bottom;',
+            '        var width = actualWidth;',
+            '        var height = config.height;',
             '        ',
-            '        var g = svg.append("g")',
-            '            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");',
+            '        var g = svg.append("g");',
             '        ',
             '        // Create scales',
             '        var x = d3.scaleBand()',
-            '            .range([0, width])',
-            '            .padding(0.1);',
+            '            .range([0, width - 30])',
+            '            .padding(0.2);',
             '        ',
             '        var y = d3.scaleLinear()',
-            '            .range([height, 0]);',
+            '            .range([height - 20, 0]);',
             '        ',
             '        var z = d3.scaleOrdinal()',
-            '            .range(config.colors || d3.schemeCategory10);',
+            '            .range(config.colors || ["#dc3545", "#fd7e14", "#20c997", "#0d6efd", "#6f42c1"]);',
             '        ',
             '        // Process data for stacked bar chart',
             '        var keys = Object.keys(data[0]).filter(function(key) { return key !== "category"; });',
@@ -416,7 +401,52 @@ class D3Charts extends ChartsBase
             '        y.domain([0, d3.max(series, function(d) { return d3.max(d, function(d) { return d[1]; }); })]).nice();',
             '        z.domain(keys);',
             '        ',
-            '        // Add bars',
+            '        // Create legend',
+            '        var legend = container.select(".chart-legend");',
+            '        var legendItems = legend.selectAll(".legend-item")',
+            '            .data(keys);',
+            '        ',
+            '        var legendEnter = legendItems.enter()',
+            '            .append("div")',
+            '            .attr("class", "legend-item")',
+            '            .style("opacity", 1);',
+            '        ',
+            '        legendEnter.append("span")',
+            '            .attr("class", "legend-color")',
+            '            .style("background-color", function(d) { return z(d); });',
+            '        ',
+            '        legendEnter.append("span")',
+            '            .attr("class", "legend-text")',
+            '            .text(function(d) { return d; });',
+            '        ',
+            '        // Legend click handler for filtering',
+            '        legendItems.merge(legendEnter)',
+            '            .on("click", function(event, d) {',
+            '                var legendItem = d3.select(this);',
+            '                var isActive = legendItem.style("opacity") == "1";',
+            '                ',
+            '                console.log("Toggling series:", d, "isActive:", isActive);',
+            '                ',
+            '                // Toggle legend item visual state',
+            '                legendItem.style("opacity", isActive ? 0.3 : 1);',
+            '                legendItem.style("text-decoration", isActive ? "line-through" : "none");',
+            '                ',
+            '                // Toggle corresponding bars - completely hide/show',
+            '                var seriesGroup = g.selectAll("g")',
+            '                    .filter(function(seriesData) { return seriesData.key === d; });',
+            '                ',
+            '                console.log("Found series groups:", seriesGroup.size());',
+            '                ',
+            '                if (isActive) {',
+            '                    // Hide the series completely',
+            '                    seriesGroup.style("display", "none");',
+            '                } else {',
+            '                    // Show the series',
+            '                    seriesGroup.style("display", null);',
+            '                }',
+            '            });',
+            '        ',
+            '        // Add bars with professional styling',
             '        g.append("g")',
             '            .selectAll("g")',
             '            .data(series)',
@@ -425,293 +455,135 @@ class D3Charts extends ChartsBase
             '            .selectAll("rect")',
             '            .data(function(d) { return d; })',
             '            .enter().append("rect")',
-            '            .attr("x", function(d) { return x(d.data.category); })',
+            '            .attr("x", function(d) { return x(d.data.category) + 30; })',
             '            .attr("y", function(d) { return y(d[1]); })',
             '            .attr("height", function(d) { return y(d[0]) - y(d[1]); })',
-            '            .attr("width", x.bandwidth());',
+            '            .attr("width", x.bandwidth())',
+            '            .style("stroke", "white")',
+            '            .style("stroke-width", "1px")',
+            '            .style("opacity", 0.9)',
+            '            .on("mouseover", function(event, d) {',
+            '                console.log("Mouseover event triggered for:", d);',
+            '                console.log("this element:", this);',
+            '                console.log("d3.select(this).datum():", d3.select(this).datum());',
+            '                d3.select(this)',
+            '                    .style("opacity", 1)',
+            '                    .style("stroke-width", "2px");',
+            '                ',
+            '                // Show tooltip - completely new approach',
+            '                d3.selectAll(".d3-tooltip").remove(); // Remove existing tooltips',
+            '                ',
+            '                // Create tooltip with inline styles',
+            '                var tooltip = d3.select("body").append("div")',
+            '                    .attr("class", "d3-tooltip")',
+            '                    .style("position", "absolute")',
+            '                    .style("background", "white")',
+            '                    .style("color", "#333")',
+            '                    .style("padding", "10px 15px")',
+            '                    .style("border-radius", "6px")',
+            '                    .style("font-size", "12px")',
+            '                    .style("pointer-events", "none")',
+            '                    .style("z-index", "9999")',
+            '                    .style("box-shadow", "0 2px 10px rgba(0,0,0,0.15)")',
+            '                    .style("border", "1px solid #e0e0e0")',
+            '                    .style("opacity", 0);',
+            '                ',
+            '                // Get the actual data from the element',
+            '                var actualData = d3.select(this).datum();',
+            '                console.log("Actual data from datum():", actualData);',
+            '                ',
+            '                // Get series name from parent element',
+            '                var parentData = d3.select(this.parentNode).datum();',
+            '                console.log("Parent data:", parentData);',
+            '                ',
+            '                var value = actualData ? (actualData[1] - actualData[0]).toFixed(0) : "0";',
+            '                var seriesName = parentData ? parentData.key : "Unknown";',
+            '                ',
+            '                // Get category name from the data array index',
+            '                var dataIndex = parentData ? parentData.index : 0;',
+            '                var categoryName = data[dataIndex] ? data[dataIndex].category : "Unknown";',
+            '                ',
+            '                console.log("Creating tooltip for:", categoryName, seriesName, value);',
+            '                ',
+            '                // Get mouse coordinates using D3.js v5 method',
+            '                var mouseCoords = d3.mouse(d3.select("body").node());',
+            '                console.log("D3 mouse coordinates:", mouseCoords);',
+            '                ',
+            '                tooltip.html("<div style=\'text-align: center; font-weight: bold; margin-bottom: 5px;\'>" + categoryName + "</div><div style=\'display: flex; align-items: center; justify-content: center; gap: 5px;\'><span style=\'display: inline-block; width: 10px; height: 10px; background-color: " + z(seriesName) + "; border-radius: 2px;\'></span><span>" + seriesName + "</span><span style=\'font-weight: bold; margin-left: 5px;\'>" + value + "</span></div>")',
+            '                    .style("left", (mouseCoords[0] + 10) + "px")',
+            '                    .style("top", (mouseCoords[1] - 10) + "px")',
+            '                    .style("opacity", 1);',
+            '                ',
+            '                console.log("Tooltip final state:", tooltip.node().outerHTML);',
+            '            })',
+            '            .on("mouseout", function(event, d) {',
+            '                d3.select(this)',
+            '                    .style("opacity", 0.9)',
+            '                    .style("stroke-width", "1px");',
+            '                ',
+            '                // Hide tooltip',
+            '                d3.selectAll(".d3-tooltip").remove();',
+            '            })',
+            '            .transition()',
+            '            .duration(750)',
+            '            .attr("y", function(d) { return y(d[1]); })',
+            '            .attr("height", function(d) { return y(d[0]) - y(d[1]); });',
             '        ',
-            '        // Add axes',
+            '        // Add axes with custom tick format for multi-line labels',
             '        g.append("g")',
-            '            .attr("transform", "translate(0," + height + ")")',
-            '            .call(d3.axisBottom(x));',
+            '            .attr("transform", "translate(30," + (height - 20) + ")")',
+            '            .call(d3.axisBottom(x).tickFormat(function(d) {',
+            '                var parts = d.split(" ");',
+            '                if (parts.length >= 2) {',
+            '                    return parts[0] + "\\n" + parts[1];',
+            '                }',
+            '                return d;',
+            '            }))',
+            '            .style("font-size", "12px")',
+            '            .style("color", "#666");',
+            '        ',
+            '        // Format tick labels to display on multiple lines',
+            '        g.selectAll(".tick text")',
+            '            .each(function(d) {',
+            '                var text = d3.select(this);',
+            '                var words = text.text().split("\\n");',
+            '                text.text(null);',
+            '                words.forEach(function(word, i) {',
+            '                    text.append("tspan")',
+            '                        .attr("x", 0)',
+            '                        .attr("dy", i === 0 ? "-0.3em" : "1em")',
+            '                        .text(word);',
+            '                });',
+            '            });',
             '        ',
             '        g.append("g")',
-            '            .call(d3.axisLeft(y));',
+            '            .attr("transform", "translate(30, 0)")',
+            '            .call(d3.axisLeft(y))',
+            '            .style("font-size", "12px")',
+            '            .style("color", "#666");',
+            '        ',
+            '        // Add grid lines',
+            '        g.append("g")',
+            '            .attr("class", "grid")',
+            '            .attr("transform", "translate(30," + (height - 20) + ")")',
+            '            .call(d3.axisBottom(x)',
+            '                .tickSize(-(height - 20))',
+            '                .tickFormat("")',
+            '            )',
+            '            .style("stroke-dasharray", "3,3")',
+            '            .style("opacity", 0.3);',
+            '        ',
+            '        g.append("g")',
+            '            .attr("class", "grid")',
+            '            .attr("transform", "translate(30, 0)")',
+            '            .call(d3.axisLeft(y)',
+            '                .tickSize(-(width - 30))',
+            '                .tickFormat("")',
+            '            )',
+            '            .style("stroke-dasharray", "3,3")',
+            '            .style("opacity", 0.3);',
             '    } catch (error) {',
             '        console.error("Error creating stacked bar chart:", error);',
-            '    }',
-            '}',
-            '',
-            '// Line Chart function for ' . $this->chartId,
-            'function createLineChart_' . $this->chartId . '(svg, data, config, options) {',
-            '    try {',
-            '        console.log("Creating line chart with data:", data);',
-            '        if (!data || data.length === 0) {',
-            '            console.error("No data provided for chart");',
-            '            return;',
-            '        }',
-            '        ',
-            '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var containerWidth = svg.node().getBoundingClientRect().width;',
-            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
-            '        var width = actualWidth - margin.left - margin.right;',
-            '        var height = config.height - margin.top - margin.bottom;',
-            '        ',
-            '        var g = svg.append("g")',
-            '            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");',
-            '        ',
-            '        // Create scales',
-            '        var x = d3.scalePoint()',
-            '            .range([0, width])',
-            '            .padding(0.5);',
-            '        ',
-            '        var y = d3.scaleLinear()',
-            '            .range([height, 0]);',
-            '        ',
-            '        var z = d3.scaleOrdinal()',
-            '            .range(config.colors || d3.schemeCategory10);',
-            '        ',
-            '        // Process data for line chart',
-            '        var keys = Object.keys(data[0]).filter(function(key) { return key !== "category"; });',
-            '        ',
-            '        // Set domains',
-            '        x.domain(data.map(function(d) { return d.category; }));',
-            '        y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice();',
-            '        z.domain(keys);',
-            '        ',
-            '        // Create line generator',
-            '        var line = d3.line()',
-            '            .x(function(d) { return x(d.category); })',
-            '            .y(function(d) { return y(d.value); })',
-            '            .curve(d3.curveMonotoneX);',
-            '        ',
-            '        // Add lines',
-            '        keys.forEach(function(key) {',
-            '            var lineData = data.map(function(d) { return {category: d.category, value: d[key]}; });',
-            '            ',
-            '            g.append("path")',
-            '                .datum(lineData)',
-            '                .attr("fill", "none")',
-            '                .attr("stroke", z(key))',
-            '                .attr("stroke-width", 2)',
-            '                .attr("d", line);',
-            '            ',
-            '            // Add dots',
-            '            g.selectAll(".dot-" + key)',
-            '                .data(lineData)',
-            '                .enter().append("circle")',
-            '                .attr("class", "dot-" + key)',
-            '                .attr("cx", function(d) { return x(d.category); })',
-            '                .attr("cy", function(d) { return y(d.value); })',
-            '                .attr("r", 4)',
-            '                .attr("fill", z(key));',
-            '        });',
-            '        ',
-            '        // Add axes',
-            '        g.append("g")',
-            '            .attr("transform", "translate(0," + height + ")")',
-            '            .call(d3.axisBottom(x));',
-            '        ',
-            '        g.append("g")',
-            '            .call(d3.axisLeft(y));',
-            '    } catch (error) {',
-            '        console.error("Error creating line chart:", error);',
-            '    }',
-            '}',
-            '',
-            '// Bar Chart function for ' . $this->chartId,
-            'function createBarChart_' . $this->chartId . '(svg, data, config, options) {',
-            '    try {',
-            '        console.log("Creating bar chart with data:", data);',
-            '        if (!data || data.length === 0) {',
-            '            console.error("No data provided for chart");',
-            '            return;',
-            '        }',
-            '        ',
-            '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var containerWidth = svg.node().getBoundingClientRect().width;',
-            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
-            '        var width = actualWidth - margin.left - margin.right;',
-            '        var height = config.height - margin.top - margin.bottom;',
-            '        ',
-            '        var g = svg.append("g")',
-            '            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");',
-            '        ',
-            '        // Create scales',
-            '        var x = d3.scaleBand()',
-            '            .range([0, width])',
-            '            .padding(0.1);',
-            '        ',
-            '        var y = d3.scaleLinear()',
-            '            .range([height, 0]);',
-            '        ',
-            '        var z = d3.scaleOrdinal()',
-            '            .range(config.colors || d3.schemeCategory10);',
-            '        ',
-            '        // Process data for bar chart',
-            '        var keys = Object.keys(data[0]).filter(function(key) { return key !== "category"; });',
-            '        ',
-            '        // Set domains',
-            '        x.domain(data.map(function(d) { return d.category; }));',
-            '        y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice();',
-            '        z.domain(keys);',
-            '        ',
-            '        // Add bars',
-            '        keys.forEach(function(key, index) {',
-            '            g.selectAll(".bar-" + key)',
-            '                .data(data)',
-            '                .enter().append("rect")',
-            '                .attr("class", "bar-" + key)',
-            '                .attr("x", function(d) { return x(d.category) + (x.bandwidth() / keys.length) * index; })',
-            '                .attr("y", function(d) { return y(d[key]); })',
-            '                .attr("width", x.bandwidth() / keys.length)',
-            '                .attr("height", function(d) { return height - y(d[key]); })',
-            '                .attr("fill", z(key));',
-            '        });',
-            '        ',
-            '        // Add axes',
-            '        g.append("g")',
-            '            .attr("transform", "translate(0," + height + ")")',
-            '            .call(d3.axisBottom(x));',
-            '        ',
-            '        g.append("g")',
-            '            .call(d3.axisLeft(y));',
-            '    } catch (error) {',
-            '        console.error("Error creating bar chart:", error);',
-            '    }',
-            '}',
-            '',
-            '// Pie Chart function for ' . $this->chartId,
-            'function createPieChart_' . $this->chartId . '(svg, data, config, options) {',
-            '    try {',
-            '        console.log("Creating pie chart with data:", data);',
-            '        if (!data || data.length === 0) {',
-            '            console.error("No data provided for chart");',
-            '            return;',
-            '        }',
-            '        ',
-            '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var containerWidth = svg.node().getBoundingClientRect().width;',
-            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
-            '        var width = actualWidth - margin.left - margin.right;',
-            '        var height = config.height - margin.top - margin.bottom;',
-            '        var radius = Math.min(width, height) / 2;',
-            '        ',
-            '        var g = svg.append("g")',
-            '            .attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 2 + margin.top) + ")");',
-            '        ',
-            '        // Create color scale',
-            '        var color = d3.scaleOrdinal()',
-            '            .range(config.colors || d3.schemeCategory10);',
-            '        ',
-            '        // Create pie generator',
-            '        var pie = d3.pie()',
-            '            .value(function(d) { return d.value; })',
-            '            .sort(null);',
-            '        ',
-            '        // Create arc generator',
-            '        var arc = d3.arc()',
-            '            .innerRadius(0)',
-            '            .outerRadius(radius);',
-            '        ',
-            '        // Process data for pie chart',
-            '        var pieData = data.map(function(d) {',
-            '            return {',
-            '                label: d.category,',
-            '                value: d.value || d.Sales || d.Marketing || d.Development || 0',
-            '            };',
-            '        });',
-            '        ',
-            '        // Set color domain',
-            '        color.domain(pieData.map(function(d) { return d.label; }));',
-            '        ',
-            '        // Add pie slices',
-            '        var path = g.selectAll("path")',
-            '            .data(pie(pieData))',
-            '            .enter().append("path")',
-            '            .attr("d", arc)',
-            '            .attr("fill", function(d) { return color(d.data.label); })',
-            '            .attr("stroke", "white")',
-            '            .style("stroke-width", "2px");',
-            '        ',
-            '        // Add labels',
-            '        g.selectAll("text")',
-            '            .data(pie(pieData))',
-            '            .enter().append("text")',
-            '            .text(function(d) { return d.data.label; })',
-            '            .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })',
-            '            .style("text-anchor", "middle")',
-            '            .style("font-size", "12px")',
-            '            .style("fill", "white");',
-            '    } catch (error) {',
-            '        console.error("Error creating pie chart:", error);',
-            '    }',
-            '}',
-            '',
-            '// Area Chart function for ' . $this->chartId,
-            'function createAreaChart_' . $this->chartId . '(svg, data, config, options) {',
-            '    try {',
-            '        console.log("Creating area chart with data:", data);',
-            '        if (!data || data.length === 0) {',
-            '            console.error("No data provided for chart");',
-            '            return;',
-            '        }',
-            '        ',
-            '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var containerWidth = svg.node().getBoundingClientRect().width;',
-            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
-            '        var width = actualWidth - margin.left - margin.right;',
-            '        var height = config.height - margin.top - margin.bottom;',
-            '        ',
-            '        var g = svg.append("g")',
-            '            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");',
-            '        ',
-            '        // Create scales',
-            '        var x = d3.scalePoint()',
-            '            .range([0, width])',
-            '            .padding(0.5);',
-            '        ',
-            '        var y = d3.scaleLinear()',
-            '            .range([height, 0]);',
-            '        ',
-            '        var z = d3.scaleOrdinal()',
-            '            .range(config.colors || d3.schemeCategory10);',
-            '        ',
-            '        // Process data for area chart',
-            '        var keys = Object.keys(data[0]).filter(function(key) { return key !== "category"; });',
-            '        ',
-            '        // Set domains',
-            '        x.domain(data.map(function(d) { return d.category; }));',
-            '        y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice();',
-            '        z.domain(keys);',
-            '        ',
-            '        // Create area generator',
-            '        var area = d3.area()',
-            '            .x(function(d) { return x(d.category); })',
-            '            .y0(height)',
-            '            .y1(function(d) { return y(d.value); })',
-            '            .curve(d3.curveMonotoneX);',
-            '        ',
-            '        // Add areas',
-            '        keys.forEach(function(key) {',
-            '            var areaData = data.map(function(d) { return {category: d.category, value: d[key]}; });',
-            '            ',
-            '            g.append("path")',
-            '                .datum(areaData)',
-            '                .attr("fill", z(key))',
-            '                .attr("opacity", 0.7)',
-            '                .attr("d", area);',
-            '        });',
-            '        ',
-            '        // Add axes',
-            '        g.append("g")',
-            '            .attr("transform", "translate(0," + height + ")")',
-            '            .call(d3.axisBottom(x));',
-            '        ',
-            '        g.append("g")',
-            '            .call(d3.axisLeft(y));',
-            '    } catch (error) {',
-            '        console.error("Error creating area chart:", error);',
             '    }',
             '}'
         ];
@@ -769,10 +641,10 @@ class D3Charts extends ChartsBase
                 '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
             ],
             'margin' => [
-                'top' => 20,
-                'right' => 20,
-                'bottom' => 30,
-                'left' => 40
+                'top' => 10,
+                'right' => 10,
+                'bottom' => 40,
+                'left' => 50
             ],
             'showLegend' => true,
             'showTitle' => true
@@ -800,174 +672,9 @@ class D3Charts extends ChartsBase
         return $chart;
     }
     
-    /**
-     * Create a line chart
-     * 
-     * @param array $data Chart data
-     * @param array $options Chart options
-     * @return D3Charts Chart instance
-     */
-    public static function createLineChart($data, $options = [])
-    {
-        $defaultOptions = [
-            'chartType' => 'line',
-            'title' => 'Line Chart',
-            'width' => '100%',
-            'height' => 500,
-            'colors' => [
-                '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
-            ],
-            'margin' => [
-                'top' => 20,
-                'right' => 20,
-                'bottom' => 30,
-                'left' => 40
-            ],
-            'showLegend' => true,
-            'showTitle' => true
-        ];
-        
-        $mergedOptions = array_merge($defaultOptions, $options);
-        
-        $chart = new self([
-            'data' => $data
-        ], $mergedOptions);
-        
-        $chart->chartType = 'line';
-        $chart->data = $data;
-        $chart->initMe();
-        
-        return $chart;
-    }
     
-    /**
-     * Create a bar chart
-     * 
-     * @param array $data Chart data
-     * @param array $options Chart options
-     * @return D3Charts Chart instance
-     */
-    public static function createBarChart($data, $options = [])
-    {
-        $defaultOptions = [
-            'chartType' => 'bar',
-            'title' => 'Bar Chart',
-            'width' => '100%',
-            'height' => 500,
-            'colors' => [
-                '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
-            ],
-            'margin' => [
-                'top' => 20,
-                'right' => 20,
-                'bottom' => 30,
-                'left' => 40
-            ],
-            'showLegend' => true,
-            'showTitle' => true
-        ];
-        
-        $mergedOptions = array_merge($defaultOptions, $options);
-        
-        $chart = new self([
-            'data' => $data
-        ], $mergedOptions);
-        
-        $chart->chartType = 'bar';
-        $chart->data = $data;
-        $chart->initMe();
-        
-        return $chart;
-    }
     
-    /**
-     * Create a pie chart
-     * 
-     * @param array $data Chart data in format: [
-     *     ['category' => 'A', 'value' => 30],
-     *     ['category' => 'B', 'value' => 50],
-     *     ['category' => 'C', 'value' => 20],
-     *     ...
-     * ]
-     * @param array $options Chart options
-     * @return D3Charts Chart instance
-     */
-    public static function createPieChart($data, $options = [])
-    {
-        $defaultOptions = [
-            'chartType' => 'pie',
-            'title' => 'Pie Chart',
-            'width' => '100%',
-            'height' => 500,
-            'colors' => [
-                '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
-            ],
-            'margin' => [
-                'top' => 20,
-                'right' => 20,
-                'bottom' => 30,
-                'left' => 40
-            ],
-            'showLegend' => true,
-            'showTitle' => true
-        ];
-        
-        $mergedOptions = array_merge($defaultOptions, $options);
-        
-        $chart = new self([
-            'data' => $data
-        ], $mergedOptions);
-        
-        $chart->chartType = 'pie';
-        $chart->data = $data;
-        $chart->initMe();
-        
-        return $chart;
-    }
     
-    /**
-     * Create an area chart
-     * 
-     * @param array $data Chart data
-     * @param array $options Chart options
-     * @return D3Charts Chart instance
-     */
-    public static function createAreaChart($data, $options = [])
-    {
-        $defaultOptions = [
-            'chartType' => 'area',
-            'title' => 'Area Chart',
-            'width' => '100%',
-            'height' => 500,
-            'colors' => [
-                '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
-            ],
-            'margin' => [
-                'top' => 20,
-                'right' => 20,
-                'bottom' => 30,
-                'left' => 40
-            ],
-            'showLegend' => true,
-            'showTitle' => true
-        ];
-        
-        $mergedOptions = array_merge($defaultOptions, $options);
-        
-        $chart = new self([
-            'data' => $data
-        ], $mergedOptions);
-        
-        $chart->chartType = 'area';
-        $chart->data = $data;
-        $chart->initMe();
-        
-        return $chart;
-    }
     
     /**
      * Generate D3-specific configuration
@@ -1040,29 +747,25 @@ class D3Charts extends ChartsBase
         
         // For stacked bar chart, data should be an array of objects
         // with at least one category and one series
-        if ($this->chartType === 'stacked-bar') {
-            if (!isset($data[0]) || !is_array($data[0])) {
-                return false;
-            }
-            
-            $firstItem = $data[0];
-            if (!isset($firstItem['category'])) {
-                return false;
-            }
-            
-            // Check if there's at least one series column
-            $hasSeries = false;
-            foreach ($firstItem as $key => $value) {
-                if ($key !== 'category' && is_numeric($value)) {
-                    $hasSeries = true;
-                    break;
-                }
-            }
-            
-            return $hasSeries;
+        if (!isset($data[0]) || !is_array($data[0])) {
+            return false;
         }
         
-        return true;
+        $firstItem = $data[0];
+        if (!isset($firstItem['category'])) {
+            return false;
+        }
+        
+        // Check if there's at least one series column
+        $hasSeries = false;
+        foreach ($firstItem as $key => $value) {
+            if ($key !== 'category' && is_numeric($value)) {
+                $hasSeries = true;
+                break;
+            }
+        }
+        
+        return $hasSeries;
     }
     
     /**
@@ -1078,23 +781,19 @@ class D3Charts extends ChartsBase
         }
         
         // For stacked bar chart, ensure data is in correct format
-        if ($this->chartType === 'stacked-bar') {
-            $processedData = [];
-            foreach ($data as $item) {
-                $processedItem = [];
-                foreach ($item as $key => $value) {
-                    if ($key === 'category') {
-                        $processedItem[$key] = $value;
-                    } else {
-                        $processedItem[$key] = (float) $value;
-                    }
+        $processedData = [];
+        foreach ($data as $item) {
+            $processedItem = [];
+            foreach ($item as $key => $value) {
+                if ($key === 'category') {
+                    $processedItem[$key] = $value;
+                } else {
+                    $processedItem[$key] = (float) $value;
                 }
-                $processedData[] = $processedItem;
             }
-            return $processedData;
+            $processedData[] = $processedItem;
         }
-        
-        return $data;
+        return $processedData;
     }
 }
 ?>
