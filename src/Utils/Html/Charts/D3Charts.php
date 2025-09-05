@@ -806,6 +806,7 @@ class D3Charts extends ChartsBase
             return [];
         }
         
+        
         $processedData = [];
         foreach ($data as $item) {
             $processedItem = [];
