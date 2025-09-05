@@ -600,4 +600,52 @@ class JqueryToast extends HtmlComponent {
         $options = AssocArray::newArray(['text' => $text], $options);
         return new self($options);
     }
+    
+    /**
+     * Create multiple toasts from messages array
+     * 
+     * @param mixed $doc Document context
+     * @param array $messages Array of message objects with 'text', 'type', 't' keys
+     * @param array|null $defaultOptions Default options for all toasts
+     * @return string HTML output
+     */
+    public static function fromMessages($doc, $messages, $defaultOptions = null) {
+        if (!is_array($messages) || empty($messages)) {
+            return '';
+        }
+        
+        $delay = 500; // Başlangıç delay'i
+        $output = '';
+        
+        foreach ($messages as $msg) {
+            $message = $msg['text'] ?? '';
+            $type = $msg['type'] ?? 'info';
+            $timestamp = $msg['t'] ?? '';
+            
+            // Default options'ı delay ile birleştir
+            $options = $defaultOptions ?? [];
+            $options['delay'] = $delay;
+            
+            // Mesaj tipine göre toast oluştur
+            switch ($type) {
+                case 'success':
+                    $output .= self::newSuccess($message, "Başarı", $options)->setPositionTopRight()->toHtml($doc);
+                    break;
+                case 'error':
+                    $output .= self::newError($message, "Hata", $options)->setPositionTopRight()->toHtml($doc);
+                    break;
+                case 'warning':
+                    $output .= self::newWarning($message, "Uyarı", $options)->setPositionTopRight()->toHtml($doc);
+                    break;
+                case 'info':
+                default:
+                    $output .= self::newInfo($message, "Bilgi", $options)->setPositionTopRight()->toHtml($doc);
+                    break;
+            }
+            
+            $delay += 500; // Her toast için 500ms artır
+        }
+        
+        return $output;
+    }
 }
