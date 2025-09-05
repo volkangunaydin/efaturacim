@@ -800,14 +800,12 @@ class D3Charts extends ChartsBase
      * @param array $data Raw chart data
      * @return array Processed chart data
      */
-    
+
     protected function prepareData($data)
     {
         if (!$this->validateData($data)) {
             return [];
         }
-        
-
         $processedData = [];
         foreach ($data as $item) {
             $processedItem = [];
