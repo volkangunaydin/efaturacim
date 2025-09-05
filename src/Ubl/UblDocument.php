@@ -18,7 +18,8 @@ use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
  * for subclasses to implement their specific XML generation and parsing logic.
  */
 abstract class UblDocument{
-    use UblDataTrait;    
+    use UblDataTrait;   
+     
     /**
      * Summary of options
      * @var Options
@@ -55,7 +56,7 @@ abstract class UblDocument{
      */
     protected ?bool $copyIndicator = false;
 
-    
+
     /**
      * Profile Identifier. e.g., "TEMELFATURA", "TICARIFATURA"
      * This will be specific to the document type.
