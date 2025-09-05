@@ -249,15 +249,21 @@ class D3Charts extends ChartsBase
             }
         }
         
-        // Add chart container
+        // Add chart container with responsive styling
+        $width = $this->dimensions['width'];
+        $height = $this->dimensions['height'];
+        
+        // Handle percentage width for responsive design
+        $widthStyle = is_numeric($width) ? $width . 'px' : $width;
+        
         $html .= '<div id="' . $this->chartId . '" class="' . $this->containerClass . ' d3-chart" ';
-        $html .= 'style="width: ' . $this->dimensions['width'] . 'px; height: ' . $this->dimensions['height'] . 'px;">';
+        $html .= 'style="width: ' . $widthStyle . '; height: ' . $height . 'px; max-width: 100%;">';
         
         if ($this->showTitle && !empty($this->title)) {
             $html .= '<h3 class="chart-title">' . htmlspecialchars($this->title) . '</h3>';
         }
         
-        $html .= '<svg id="' . $this->chartId . '_svg" class="d3-svg" width="' . $this->dimensions['width'] . '" height="' . $this->dimensions['height'] . '"></svg>';
+        $html .= '<svg id="' . $this->chartId . '_svg" class="d3-svg" width="100%" height="' . $height . '" viewBox="0 0 ' . (is_numeric($width) ? $width : 800) . ' ' . $height . '" preserveAspectRatio="xMidYMid meet"></svg>';
         
         if ($this->showLegend) {
             $html .= '<div class="chart-legend" id="' . $this->chartId . '_legend"></div>';
@@ -324,6 +330,13 @@ class D3Charts extends ChartsBase
             '    console.error("Error initializing chart:", error);',
             '}',
             '',
+            '// Add resize event listener for responsive behavior',
+            'window.addEventListener("resize", function() {',
+            '    if (typeof d3 !== "undefined") {',
+            '        createD3Chart_' . $this->chartId . '("' . $this->chartId . '", chartData_' . $this->chartId . ', chartConfig_' . $this->chartId . ', d3Options_' . $this->chartId . ');',
+            '    }',
+            '});',
+            '',
             '// D3 Chart Functions for ' . $this->chartId,
             'function createD3Chart_' . $this->chartId . '(containerId, data, config, options) {',
             '    try {',
@@ -333,8 +346,10 @@ class D3Charts extends ChartsBase
             '        // Clear previous content',
             '        svg.selectAll("*").remove();',
             '        ',
-            '        // Set SVG dimensions',
-            '        svg.attr("width", config.width)',
+            '        // Set SVG dimensions dynamically',
+            '        var containerWidth = container.node().getBoundingClientRect().width;',
+            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
+            '        svg.attr("width", actualWidth)',
             '           .attr("height", config.height);',
             '        ',
             '        // Create chart based on type',
@@ -372,7 +387,9 @@ class D3Charts extends ChartsBase
             '        }',
             '        ',
             '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var width = config.width - margin.left - margin.right;',
+            '        var containerWidth = svg.node().getBoundingClientRect().width;',
+            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
+            '        var width = actualWidth - margin.left - margin.right;',
             '        var height = config.height - margin.top - margin.bottom;',
             '        ',
             '        var g = svg.append("g")',
@@ -435,7 +452,9 @@ class D3Charts extends ChartsBase
             '        }',
             '        ',
             '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var width = config.width - margin.left - margin.right;',
+            '        var containerWidth = svg.node().getBoundingClientRect().width;',
+            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
+            '        var width = actualWidth - margin.left - margin.right;',
             '        var height = config.height - margin.top - margin.bottom;',
             '        ',
             '        var g = svg.append("g")',
@@ -510,7 +529,9 @@ class D3Charts extends ChartsBase
             '        }',
             '        ',
             '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var width = config.width - margin.left - margin.right;',
+            '        var containerWidth = svg.node().getBoundingClientRect().width;',
+            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
+            '        var width = actualWidth - margin.left - margin.right;',
             '        var height = config.height - margin.top - margin.bottom;',
             '        ',
             '        var g = svg.append("g")',
@@ -570,7 +591,9 @@ class D3Charts extends ChartsBase
             '        }',
             '        ',
             '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var width = config.width - margin.left - margin.right;',
+            '        var containerWidth = svg.node().getBoundingClientRect().width;',
+            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
+            '        var width = actualWidth - margin.left - margin.right;',
             '        var height = config.height - margin.top - margin.bottom;',
             '        var radius = Math.min(width, height) / 2;',
             '        ',
@@ -635,7 +658,9 @@ class D3Charts extends ChartsBase
             '        }',
             '        ',
             '        var margin = config.margin || {top: 20, right: 20, bottom: 30, left: 40};',
-            '        var width = config.width - margin.left - margin.right;',
+            '        var containerWidth = svg.node().getBoundingClientRect().width;',
+            '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
+            '        var width = actualWidth - margin.left - margin.right;',
             '        var height = config.height - margin.top - margin.bottom;',
             '        ',
             '        var g = svg.append("g")',
@@ -730,11 +755,15 @@ class D3Charts extends ChartsBase
      */
     public static function createStackedBarChart($data, $options = [])
     {
+        echo "<pre>";
+        /*print_r($data);
+        echo "</pre>";
+        exit;*/
         $defaultOptions = [
             'chartType' => 'stacked-bar',
             'title' => 'Stacked Bar Chart',
-            'width' => 600,
-            'height' => 400,
+            'width' => '100%',
+            'height' => 500,
             'colors' => [
                 '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
                 '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
@@ -783,8 +812,8 @@ class D3Charts extends ChartsBase
         $defaultOptions = [
             'chartType' => 'line',
             'title' => 'Line Chart',
-            'width' => 600,
-            'height' => 400,
+            'width' => '100%',
+            'height' => 500,
             'colors' => [
                 '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
                 '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
@@ -824,8 +853,8 @@ class D3Charts extends ChartsBase
         $defaultOptions = [
             'chartType' => 'bar',
             'title' => 'Bar Chart',
-            'width' => 600,
-            'height' => 400,
+            'width' => '100%',
+            'height' => 500,
             'colors' => [
                 '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
                 '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
@@ -870,8 +899,8 @@ class D3Charts extends ChartsBase
         $defaultOptions = [
             'chartType' => 'pie',
             'title' => 'Pie Chart',
-            'width' => 600,
-            'height' => 400,
+            'width' => '100%',
+            'height' => 500,
             'colors' => [
                 '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
                 '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
@@ -911,8 +940,8 @@ class D3Charts extends ChartsBase
         $defaultOptions = [
             'chartType' => 'area',
             'title' => 'Area Chart',
-            'width' => 600,
-            'height' => 400,
+            'width' => '100%',
+            'height' => 500,
             'colors' => [
                 '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
                 '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
@@ -952,8 +981,8 @@ class D3Charts extends ChartsBase
         return array_merge($config, [
             'type' => $this->chartType ?: 'stacked-bar',
             'd3Version' => $this->d3Version,
-            'width' => $this->options['width'] ?? 600,
-            'height' => $this->options['height'] ?? 400,
+            'width' => $this->options['width'] ?? '100%',
+            'height' => $this->options['height'] ?? 500,
             'useCdn' => $this->useCdn,
             'd3CdnUrl' => $this->d3CdnUrl,
             'd3Options' => $this->d3Options,
