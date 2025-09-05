@@ -10,6 +10,7 @@ use Efaturacim\Util\Ubl\Objects\UblDataTrait;
 use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 
+
 /**
  * Abstract base class for Turkish UBL documents.
  *
