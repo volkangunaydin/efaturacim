@@ -5,6 +5,26 @@ use Efaturacim\Util\Utils\CastUtil;
 use Efaturacim\Util\Utils\String\StrTo;
 
 class AssocArray{
+    public static function getValOfPath($arr,$path,$defVal=null,$typeForCast=null,$depth=0){
+        if($depth > 10){
+            return $defVal;
+        }
+        $r = $defVal;
+        if(is_array($arr) && is_array($path)){
+            foreach($path as $key){
+                if(key_exists($key,$arr)){
+                    $val = $arr[$key];
+                    $remainingPath = array_slice($path,1);
+                    if(count($remainingPath) > 0){
+                        return self::getValOfPath($val,$remainingPath,$defVal,$typeForCast,$depth+1);
+                    }else{
+                        return CastUtil::getAs($val,$defVal,$typeForCast);
+                    }
+                }
+            }
+        }
+        return $r;
+    }
     public static function newArray($options=null,$defVals=null,$initVals=null){
         $r = [];
         if(!is_null($initVals) && is_array($initVals)){
