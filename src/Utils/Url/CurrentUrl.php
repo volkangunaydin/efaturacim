@@ -89,7 +89,9 @@ class CurrentUrl{
         }
         return 'http';
    }
-   
+   public static function getHost(){
+      return self::detectHost();
+   }
    /**
     * Detect host with proxy support (similar to UrlUtil::getBaseHost)
     */
