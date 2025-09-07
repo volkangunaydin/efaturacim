@@ -24,6 +24,10 @@ class RestApiClient{
     public static function setDefaultUrl($url){
         self::$DEFAULT_API_URL = $url;
     }
+    public static function getDefaultUrl(){
+        self::init();
+        return self::$DEFAULT_API_URL;
+    }
     public static function setServerSecureKey($key){
         self::$SERVER_SECURE_KEY = $key;
     }
@@ -31,7 +35,7 @@ class RestApiClient{
         self::init();
         $r = new RestApiResult();
         if(is_null($baseApiUrl) && !is_null(self::$DEFAULT_API_URL) && strlen("".self::$DEFAULT_API_URL)>0){
-            $baseApiUrl = self::$DEFAULT_API_URL;
+            $baseApiUrl = self::getDefaultUrl();
         }
         if(StrUtil::notEmpty($baseApiUrl) && StrUtil::notEmpty($relPath) && Options::ensureParam($options) && $options instanceof Options){
             if(function_exists("curl_init")){
