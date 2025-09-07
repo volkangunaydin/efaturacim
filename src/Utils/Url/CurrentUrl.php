@@ -89,6 +89,7 @@ class CurrentUrl{
         }
         return 'http';
    }
+   // alias for detectHost
    public static function getHost(){
       return self::detectHost();
    }
