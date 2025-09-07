@@ -18,6 +18,7 @@ use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
  * used in the Turkish e-Invoice (e-Fatura) system. It establishes a contract
  * for subclasses to implement their specific XML generation and parsing logic.
  */
+
 abstract class UblDocument{
     use UblDataTrait;   
      

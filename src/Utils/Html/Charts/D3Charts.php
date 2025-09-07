@@ -800,13 +800,12 @@ class D3Charts extends ChartsBase
      * @param array $data Raw chart data
      * @return array Processed chart data
      */
+
     protected function prepareData($data)
     {
         if (!$this->validateData($data)) {
             return [];
         }
-        
-        // For stacked bar chart, ensure data is in correct format
         $processedData = [];
         foreach ($data as $item) {
             $processedItem = [];
@@ -822,4 +821,6 @@ class D3Charts extends ChartsBase
         return $processedData;
     }
 }
+
+
 ?>

@@ -3,6 +3,7 @@ namespace Efaturacim\Util\Data\GeoData\TR;
 
 class Iller{
     public static function getIller(){
+        
         return [
             ['id'=>1,'adi'=>'Adana','plaka'=>"01",'lat'=>'37.0000','long'=>'35.0000'],
             ['id'=>2,'adi'=>'Adıyaman','plaka'=>"02",'lat'=>'37.7500','long'=>'38.2833'],
