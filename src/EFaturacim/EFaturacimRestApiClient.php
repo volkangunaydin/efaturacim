@@ -37,6 +37,7 @@ class EFaturacimRestApiClient{
     public static function setDefaultBearer($bearer=null){
         self::$BEARERS["default"] = $bearer;
     }
+    
     public static function initUserDataIfNotSet(&$customer,&$user,&$pass,&$bearerKey){
         $bearerKey = null;
         if(is_null($customer) && is_null($user) && is_null($pass) && key_exists("customer",self::$DEFAULT_OPTIONS) && strlen("".self::$DEFAULT_OPTIONS["customer"])>0){
