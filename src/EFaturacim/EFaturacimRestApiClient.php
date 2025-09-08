@@ -11,6 +11,7 @@ class EFaturacimRestApiClient{
     public static  $DEFAULT_OPTIONS  = array();
     public static  $BEARERS          = array();
     public static  $BASE_API_URL     = "https://eservis.orkestra.com.tr/";
+    
     public static function setDefaultUserNamePassword($customer,$user,$pass,$isTest=null){
         self::$DEFAULT_OPTIONS["customer"] = $customer;
         self::$DEFAULT_OPTIONS["user"] = $user;
