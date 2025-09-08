@@ -49,7 +49,7 @@ class EFaturacimRestApiClient{
             $bearerKey = md5("".$customer."@@".$user."@@".$pass);
         }
     }
-    
+
     public static function getBearerKey($customer=null,$user=null,$pass=null,$checkWithPing=false){        
         $bearerKey = null;
         $isDefault = is_null($customer) && is_null($user) && is_null($pass) && key_exists("customer",self::$DEFAULT_OPTIONS);
@@ -78,6 +78,7 @@ class EFaturacimRestApiClient{
         }
         return null;
     }
+    
     public static function loginWithPing($customer=null,$user=null,$pass=null){
         return self::login($customer,$user,$pass,true);
     }
