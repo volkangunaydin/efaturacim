@@ -22,6 +22,7 @@ class EFaturacimRestApiClient{
             self::$BASE_API_URL = "https://eservistest.orkestra.com.tr/";
         }
     }
+    
     public static function getDefaultBearerFromSession(){
         self::setDefaultBearer(SessionUtil::getValue("efaturacim_bearer",null));
     }
