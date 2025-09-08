@@ -82,7 +82,6 @@ class EFaturacimRestApiClient{
     public static function loginWithPing($customer=null,$user=null,$pass=null){
         return self::login($customer,$user,$pass,true);
     }
-    
     public static function login($customer=null,$user=null,$pass=null,$checkWithPing=false){
         if($checkWithPing==false && is_null($customer) && is_null($user) && is_null($pass) && key_exists("customer",self::$DEFAULT_OPTIONS) && strlen("".@self::$BEARERS["default"])>0){
             return true;
