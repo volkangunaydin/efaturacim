@@ -131,6 +131,7 @@ class EFaturacimRestApiClient{
             return RestApiClient::getJsonResult(self::$BASE_API_URL,"EFaturacim/Mesaj/Icerik",self::getPostParams(array("firma"=>$firmaRef,"mesaj_ref"=>$mesajRef),$postParams));
         }
     } 
+    
       
 }
 
