@@ -124,6 +124,7 @@ class EFaturacimRestApiClient{
             return RestApiClient::getJsonResult(self::$BASE_API_URL,"EFaturacim/Mesaj/Liste",self::getPostParams(array("firma"=>$firmaRef),$postParams));
         }
     }
+    
     public static function getMesajIcerigi($firmaRef=null,$mesajRef=0,$postParams=null){
         if(self::login()){
             RestApiClient::$DEFAULT_BEARER_TOKEN = self::getBearerKey();
