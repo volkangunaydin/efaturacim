@@ -44,7 +44,11 @@ class DataTablesJs extends HtmlComponent{
         }        
         foreach($this->columnDefs as $column){
             $index = 0 + $column["index"];
-            $columns[] = array("data"=>"col".$index,"title"=>@$column["title"]);
+            $colDef = array("data"=>"col".$index,"title"=>@$column["title"]);
+            if(isset($column["orderable"]) && !is_null($column["orderable"])){
+                $colDef["orderable"] = (bool)$column["orderable"];
+            }
+            $columns[] = $colDef;
         }
         return $columns;
     }
@@ -55,8 +59,8 @@ class DataTablesJs extends HtmlComponent{
             if(is_numeric($column["width"])){
                 $prop["width"] = $column["width"]."px";
             }
-            if(is_bool($column["orderable"])){
-                $prop["orderable"] = $column["orderable"];
+            if(isset($column["orderable"]) && !is_null($column["orderable"])){
+                $prop["orderable"] = (bool)$column["orderable"];
             }
             $columnDefs[] = $prop;
         }
