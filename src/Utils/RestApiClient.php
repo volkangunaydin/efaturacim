@@ -111,7 +111,8 @@ class RestApiClient{
         $r = self::getJsonResult($baseApiUrl,$relPath,$postParams,$options);
         return $r;
     }
-    public static function getJsonResult($baseApiUrl,$relPath,$postParams=null,$options=null){        
+    public static function getJsonResult($baseApiUrl,$relPath,$postParams=null,$options=null){      
+        $baseApiUrl = env("API_URL_CANLI2");  
         self::init();
         $postVars  = array();
         if($postParams && is_array($postParams)){

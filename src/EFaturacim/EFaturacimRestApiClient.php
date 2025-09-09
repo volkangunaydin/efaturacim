@@ -92,6 +92,7 @@ class EFaturacimRestApiClient{
         }
         return false;
     }
+    
     public static function getStatus(){
         if(self::login()){
             RestApiClient::$DEFAULT_BEARER_TOKEN = self::getBearerKey();

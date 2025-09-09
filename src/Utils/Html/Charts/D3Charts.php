@@ -41,64 +41,64 @@ class D3Charts extends ChartsBase
      * @var string D3.js version to use
      */
     protected $d3Version = '5.16.0';
-    
+
     /**
      * @var array D3.js specific options
      */
     protected $d3Options = [];
-    
+
     /**
      * @var bool Whether to include D3.js from CDN
      */
     protected $useCdn = true;
-    
+
     /**
      * @var string D3.js CDN URL
      */
     protected $d3CdnUrl = 'https://d3js.org/d3.v5.min.js';
-    
+
     /**
      * @var array Processed chart data
      */
     protected $processedData = [];
-    
+
     /**
      * Initialize the D3 chart component
      */
     public function initMe()
     {
         parent::initMe();
-        
+
         // Set D3-specific asset path key
         $this->assetPathKey = 'd3';
-        
+
         // Set default chart type for D3
         if (empty($this->chartType)) {
             $this->chartType = 'stacked-bar';
         }
-        
+
         // Initialize processedData if not set
         if (!isset($this->processedData)) {
             $this->processedData = [];
         }
-        
+
         // Ensure data is set from options if not already set
         if (empty($this->data) && !empty($this->options['data'])) {
             $this->data = $this->options['data'];
         }
-        
+
         // Process data if not already processed
         if (!empty($this->data) && empty($this->processedData)) {
             $this->processedData = $this->prepareData($this->data);
         }
-        
+
         // Ensure chartType is set in options if not already set
         if (empty($this->options['chartType'])) {
             $this->options['chartType'] = $this->chartType;
         }
-        
+
     }
-    
+
     /**
      * Get default options for the D3 chart component
      * 
@@ -152,7 +152,7 @@ class D3Charts extends ChartsBase
             ]
         ]);
     }
-    
+
     /**
      * Set D3.js version
      * 
@@ -164,7 +164,7 @@ class D3Charts extends ChartsBase
         $this->d3Version = $version;
         return $this;
     }
-    
+
     /**
      * Get D3.js version
      * 
@@ -174,7 +174,7 @@ class D3Charts extends ChartsBase
     {
         return $this->d3Version;
     }
-    
+
     /**
      * Set D3.js specific options
      * 
@@ -186,7 +186,7 @@ class D3Charts extends ChartsBase
         $this->d3Options = array_merge($this->d3Options, $options);
         return $this;
     }
-    
+
     /**
      * Get D3.js options
      * 
@@ -196,7 +196,7 @@ class D3Charts extends ChartsBase
     {
         return $this->d3Options;
     }
-    
+
     /**
      * Set whether to use CDN for D3.js
      * 
@@ -208,7 +208,7 @@ class D3Charts extends ChartsBase
         $this->useCdn = $useCdn;
         return $this;
     }
-    
+
     /**
      * Get whether to use CDN for D3.js
      * 
@@ -218,7 +218,7 @@ class D3Charts extends ChartsBase
     {
         return $this->useCdn;
     }
-    
+
     /**
      * Render the D3 chart as HTML string
      * 
@@ -228,7 +228,7 @@ class D3Charts extends ChartsBase
     public function toHtmlAsString($doc = null)
     {
         $html = '';
-        
+
         // Add CSS files
         $cssFiles = $this->getCssFiles();
         if ($cssFiles) {
@@ -236,7 +236,7 @@ class D3Charts extends ChartsBase
                 $html .= '<link rel="stylesheet" href="' . $cssFile . '">' . "\n";
             }
         }
-        
+
         // Add minimal CSS
         $html .= '<style>' . "\n";
         $html .= '.d3-chart { width: 100%; }' . "\n";
@@ -249,7 +249,7 @@ class D3Charts extends ChartsBase
         $html .= '.d3-chart .legend-text { font-size: 12px; color: #666; }' . "\n";
         $html .= '.d3-tooltip { position: absolute; background: white; color: #333; padding: 10px 15px; border-radius: 6px; font-size: 12px; pointer-events: none; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.15); border: 1px solid #e0e0e0; }' . "\n";
         $html .= '</style>' . "\n";
-        
+
         // Add JavaScript files
         $jsFiles = $this->getJsFiles();
         if ($jsFiles) {
@@ -257,28 +257,28 @@ class D3Charts extends ChartsBase
                 $html .= '<script src="' . $jsFile . '"></script>' . "\n";
             }
         }
-        
+
         // Add chart container with responsive styling
         $width = $this->dimensions['width'];
         $height = $this->dimensions['height'];
-        
+
         // Handle percentage width for responsive design
         $widthStyle = is_numeric($width) ? $width . 'px' : $width;
-        
+
         $html .= '<div id="' . $this->chartId . '" class="' . $this->containerClass . ' d3-chart">';
-        
+
         if ($this->showTitle && !empty($this->title)) {
             $html .= '<h3 class="chart-title">' . htmlspecialchars($this->title) . '</h3>';
         }
-        
+
         if ($this->showLegend) {
             $html .= '<div class="chart-legend" id="' . $this->chartId . '_legend"></div>';
         }
-        
-        $html .= '<svg id="' . $this->chartId . '_svg" class="d3-svg" width="100%" height="' . $height . '"></svg>';
-        
+
+        $html .= '<svg id="' . $this->chartId . '_svg" class="d3-svg" width="100%" height="' . ($height + 100) . '"></svg>';
+
         $html .= '</div>';
-        
+
         // Add JavaScript code
         $jsLines = $this->getJsLines();
         if ($jsLines) {
@@ -288,10 +288,10 @@ class D3Charts extends ChartsBase
             }
             $html .= '</script>';
         }
-        
+
         return $html;
     }
-    
+
     /**
      * Get JavaScript code lines for the D3 chart
      * 
@@ -300,22 +300,22 @@ class D3Charts extends ChartsBase
     public function getJsLines()
     {
         $config = $this->generateConfig();
-        
+
         // Ensure data is processed
         if (empty($this->processedData) && !empty($this->data)) {
             $this->processedData = $this->prepareData($this->data);
         }
-        
+
         // Use processed data if available, otherwise use original data
         $dataToUse = !empty($this->processedData) ? $this->processedData : $this->data;
-        
-        
+
+
         $data = JsonUtil::toJsonStringWithOptions($dataToUse);
         $options = JsonUtil::toJsonStringWithOptions($this->d3Options);
-        
+
         return [
             '// D3 Chart Configuration for ' . $this->chartId,
-            'var chartConfig_' . $this->chartId . ' = ' . JsonUtil::toJsonStringWithOptions($config, ['pretty'=>$this->prettyPrint,'js_function'=>true,'jquery_selector'=>true]) . ';',
+            'var chartConfig_' . $this->chartId . ' = ' . JsonUtil::toJsonStringWithOptions($config, ['pretty' => $this->prettyPrint, 'js_function' => true, 'jquery_selector' => true]) . ';',
             'var chartData_' . $this->chartId . ' = ' . $data . ';',
             'var d3Options_' . $this->chartId . ' = ' . $options . ';',
             '',
@@ -350,7 +350,7 @@ class D3Charts extends ChartsBase
             '        var containerWidth = container.node().getBoundingClientRect().width;',
             '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
             '        svg.attr("width", actualWidth)',
-            '           .attr("height", config.height);',
+            '           .attr("height", config.height + 60);',
             '        ',
             '        // Create stacked bar chart',
             '        createStackedBarChart_' . $this->chartId . '(svg, data, config, options, container);',
@@ -370,116 +370,130 @@ class D3Charts extends ChartsBase
             '        var containerWidth = svg.node().getBoundingClientRect().width;',
             '        var actualWidth = typeof config.width === "string" && config.width.includes("%") ? containerWidth : config.width;',
             '        var width = actualWidth;',
-            '        var height = config.height;',
+            '        var height = config.height + 20;',
             '        ',
             '        var g = svg.append("g");',
             '        ',
-            '        // Create scales',
-            '        var x = d3.scaleBand()',
-            '            .range([0, width - 30])',
-            '            .padding(0.2);',
+        '        // Create scales',
+        '        var x = d3.scaleBand()',
+        '            .range([0, width - 60])',
+        '            .padding(0.2);',
             '        ',
             '        var y = d3.scaleLinear()',
             '            .range([height - 20, 0]);',
             '        ',
             '                // Get all original keys for consistent colors',
-        '        var allOriginalKeys = Object.keys(chartData_' . $this->chartId . '[0]).filter(function(key) { return key !== "category"; });',
-        '        ',
-        '        var z = d3.scaleOrdinal()',
-        '            .range(config.colors || ["#dc3545", "#fd7e14", "#20c997", "#0d6efd", "#6f42c1"]);',
-        '        ',
-        '        // Set color domain with ALL original keys (for consistent colors)',
-        '        z.domain(allOriginalKeys);',
-        '        ',
-        '        // Process data for stacked bar chart',
-        '        var keys = Object.keys(data[0]).filter(function(key) { return key !== "category"; });',
-        '        var stack = d3.stack().keys(keys);',
-        '        var series = stack(data);',
-        '        ',
-        '        // Set domains',
-        '        x.domain(data.map(function(d) { return d.category; }));',
-        '        y.domain([0, d3.max(series, function(d) { return d3.max(d, function(d) { return d[1]; }); })]).nice();',
+            '        var allOriginalKeys = Object.keys(chartData_' . $this->chartId . '[0]).filter(function(key) { return key !== "category"; });',
+            '        ',
+            '        var z = d3.scaleOrdinal()',
+            '            .range(config.colors || ["#dc3545", "#fd7e14", "#20c997", "#0d6efd", "#6f42c1"]);',
+            '        ',
+            '        // Set color domain with ALL original keys (for consistent colors)',
+            '        z.domain(allOriginalKeys);',
+            '        ',
+            '        // Process data for stacked bar chart',
+            '        var keys = Object.keys(data[0]).filter(function(key) { return key !== "category"; });',
+            '        var stack = d3.stack().keys(keys);',
+            '        var series = stack(data);',
+            '        ',
+            '        // Set domains',
+            '        x.domain(data.map(function(d) { return d.category; }));',
+            '        // Calculate max value from stacked data (each category\'s total)',
+            '        var maxValue = d3.max(data, function(d) {',
+            '            var total = 0;',
+            '            keys.forEach(function(key) {',
+            '                total += d[key] || 0;',
+            '            });',
+            '            return total;',
+            '        });',
+            '        ',
+            '        // Debug: log the max value',
+            '        console.log("Max value calculated:", maxValue);',
+            '        console.log("Keys:", keys);',
+            '        console.log("Data sample:", data[0]);',
+            '        ',
+            '        y.domain([0, maxValue]).nice();',
             '        ',
             '                // Create legend with ALL original keys (not just visible ones)',
-        '        var legend = container.select(".chart-legend");',
-        '        ',
-        '        // Store current legend states before clearing',
-        '        var legendStates = {};',
-        '        var existingLegendItems = legend.selectAll(".legend-item");',
-        '        existingLegendItems.each(function(d, i) {',
-        '            var item = d3.select(this);',
-        '            if (allOriginalKeys[i]) {',
-        '                legendStates[allOriginalKeys[i]] = item.classed("disabled");',
-        '            }',
-        '        });',
-        '        ',
-        '        // Clear existing legend items',
-        '        legend.selectAll(".legend-item").remove();',
-        '        ',
-        '        // Create legend with ALL original keys',
-        '        var legendItems = legend.selectAll(".legend-item")',
-        '            .data(allOriginalKeys);',
-        '        ',
-        '        var legendEnter = legendItems.enter()',
-        '            .append("div")',
-        '            .attr("class", "legend-item")',
-        '            .style("opacity", 1);',
-        '        ',
-        '        legendEnter.append("span")',
-        '            .attr("class", "legend-color")',
-        '            .style("background-color", function(d) { return z(d); });',
-        '        ',
-        '        legendEnter.append("span")',
-        '            .attr("class", "legend-text")',
-        '            .text(function(d) { return d; });',
-        '        ',
-        '        // Restore legend states',
-        '        legendItems.merge(legendEnter).each(function(d, i) {',
-        '            var item = d3.select(this);',
-        '            if (legendStates[d]) {',
-        '                item.classed("disabled", true);',
-        '            }',
-        '        });',
+            '        var legend = container.select(".chart-legend");',
+            '        ',
+            '        // Store current legend states before clearing',
+            '        var legendStates = {};',
+            '        var existingLegendItems = legend.selectAll(".legend-item");',
+            '        existingLegendItems.each(function(d, i) {',
+            '            var item = d3.select(this);',
+            '            if (allOriginalKeys[i]) {',
+            '                legendStates[allOriginalKeys[i]] = item.classed("disabled");',
+            '            }',
+            '        });',
+            '        ',
+            '        // Clear existing legend items',
+            '        legend.selectAll(".legend-item").remove();',
+            '        ',
+            '        // Create legend with ALL original keys',
+            '        var legendItems = legend.selectAll(".legend-item")',
+            '            .data(allOriginalKeys);',
+            '        ',
+            '        var legendEnter = legendItems.enter()',
+            '            .append("div")',
+            '            .attr("class", "legend-item")',
+            '            .style("opacity", 1);',
+            '        ',
+            '        legendEnter.append("span")',
+            '            .attr("class", "legend-color")',
+            '            .style("background-color", function(d) { return z(d); });',
+            '        ',
+            '        legendEnter.append("span")',
+            '            .attr("class", "legend-text")',
+            '            .text(function(d) { return d; });',
+            '        ',
+            '        // Restore legend states',
+            '        legendItems.merge(legendEnter).each(function(d, i) {',
+            '            var item = d3.select(this);',
+            '            if (legendStates[d]) {',
+            '                item.classed("disabled", true);',
+            '            }',
+            '        });',
             '        ',
             '                // Legend click handler for filtering (NVD3 style)',
-        '        legendItems.merge(legendEnter)',
-        '            .on("click", function(event, d) {',
-        '                var legendItem = d3.select(this);',
-        '                var isActive = !legendItem.classed("disabled");',
-        '                ',
-        '                ',
-        '                // Toggle legend item visual state',
-        '                if (isActive) {',
-        '                    legendItem.classed("disabled", true);',
-        '                } else {',
-        '                    legendItem.classed("disabled", false);',
-        '                }',
-        '                ',
-        '                                // Get all visible keys (not disabled)',
-                '                var visibleKeys = [];',
-                '                var allLegendItems = container.selectAll(".legend-item");',
-                '                allLegendItems.each(function(legendData, i) {',
-                '                    var item = d3.select(this);',
-                '                    if (!item.classed("disabled")) {',
-                '                        visibleKeys.push(legendData);',
-                '                    }',
-                '                });',
-        '                ',
-        '                ',
-        '                                // Create new data with only visible series',
-                '                var newData = chartData_' . $this->chartId . '.map(function(d) {',
-                '                    var newItem = { category: d.category };',
-                '                    visibleKeys.forEach(function(key) {',
-                '                        newItem[key] = d[key];',
-                '                    });',
-                '                    return newItem;',
-                '                });',
-        '                ',
-        '                ',
-        '                // Clear and re-render the chart with new data',
-        '                svg.selectAll("*").remove();',
-        '                createStackedBarChart_' . $this->chartId . '(svg, newData, config, options, container);',
-        '            });',
+            '        legendItems.merge(legendEnter)',
+            '            .on("click", function(event, d) {',
+            '                var legendItem = d3.select(this);',
+            '                var isActive = !legendItem.classed("disabled");',
+            '                ',
+            '                ',
+            '                // Toggle legend item visual state',
+            '                if (isActive) {',
+            '                    legendItem.classed("disabled", true);',
+            '                } else {',
+            '                    legendItem.classed("disabled", false);',
+            '                }',
+            '                ',
+            '                                // Get all visible keys (not disabled)',
+            '                var visibleKeys = [];',
+            '                var allLegendItems = container.selectAll(".legend-item");',
+            '                allLegendItems.each(function(legendData, i) {',
+            '                    var item = d3.select(this);',
+            '                    if (!item.classed("disabled")) {',
+            '                        visibleKeys.push(legendData);',
+            '                    }',
+            '                });',
+            '                ',
+            '                ',
+            '                                // Create new data with only visible series',
+            '                var newData = chartData_' . $this->chartId . '.map(function(d) {',
+            '                    var newItem = { category: d.category };',
+            '                    visibleKeys.forEach(function(key) {',
+            '                        newItem[key] = d[key];',
+            '                    });',
+            '                    return newItem;',
+            '                });',
+            '                ',
+            '                ',
+            '                // Clear and re-render the chart with new data',
+            '                svg.selectAll("*").remove();',
+            '                createStackedBarChart_' . $this->chartId . '(svg, newData, config, options, container);',
+            '            });',
             '        ',
             '        // Add bars with professional styling',
             '        g.append("g")',
@@ -490,7 +504,7 @@ class D3Charts extends ChartsBase
             '            .selectAll("rect")',
             '            .data(function(d) { return d; })',
             '            .enter().append("rect")',
-            '            .attr("x", function(d) { return x(d.data.category) + 30; })',
+            '            .attr("x", function(d) { return x(d.data.category) + 60; })',
             '            .attr("y", function(d) { return y(d[1]); })',
             '            .attr("height", function(d) { return y(d[0]) - y(d[1]); })',
             '            .attr("width", x.bandwidth())',
@@ -556,9 +570,9 @@ class D3Charts extends ChartsBase
             '            .attr("y", function(d) { return y(d[1]); })',
             '            .attr("height", function(d) { return y(d[0]) - y(d[1]); });',
             '        ',
-            '        // Add axes with custom tick format for multi-line labels',
-            '        g.append("g")',
-            '            .attr("transform", "translate(30," + (height - 20) + ")")',
+        '        // Add axes with custom tick format for multi-line labels',
+        '        g.append("g")',
+        '            .attr("transform", "translate(60," + (height - 20) + ")")',
             '            .call(d3.axisBottom(x).tickFormat(function(d) {',
             '                var parts = d.split(" ");',
             '                if (parts.length >= 2) {',
@@ -569,7 +583,7 @@ class D3Charts extends ChartsBase
             '            .style("font-size", "12px")',
             '            .style("color", "#666")',
             '            .selectAll("text")',
-            '            .attr("dy", "20pt");',
+            '            .attr("transform", "translate(0, 20)");',
             '        ',
             '        // Format tick labels to display on multiple lines',
             '        g.selectAll(".tick text")',
@@ -585,39 +599,49 @@ class D3Charts extends ChartsBase
             '                });',
             '            });',
             '        ',
-            '        g.append("g")',
-            '            .attr("transform", "translate(30, 0)")',
-            '            .call(d3.axisLeft(y))',
+        '        g.append("g")',
+        '            .attr("transform", "translate(60, 0)")',
+            '            .call(d3.axisLeft(y).tickFormat(function(d) {',
+            '                // Format large numbers with K, M suffixes',
+            '                if (d >= 1000000) {',
+            '                    return (d / 1000000).toFixed(1) + "M";',
+            '                } else if (d >= 1000) {',
+            '                    return (d / 1000).toFixed(1) + "K";',
+            '                }',
+            '                return d;',
+            '            }))',
             '            .style("font-size", "12px")',
-            '            .style("color", "#666");',
+            '            .style("color", "#666")',
+            '            .selectAll("text")',
+            '            .attr("transform", "translate(0, 0)");',
             '        ',
-            '        // Add grid lines',
-            '        g.append("g")',
-            '            .attr("class", "grid")',
-            '            .attr("transform", "translate(30," + (height - 20) + ")")',
-            '            .call(d3.axisBottom(x)',
-            '                .tickSize(-(height - 20))',
-            '                .tickFormat("")',
-            '            )',
-            '            .style("stroke-dasharray", "3,3")',
-            '            .style("opacity", 0.3);',
-            '        ',
-            '        g.append("g")',
-            '            .attr("class", "grid")',
-            '            .attr("transform", "translate(30, 0)")',
-            '            .call(d3.axisLeft(y)',
-            '                .tickSize(-(width - 30))',
-            '                .tickFormat("")',
-            '            )',
-            '            .style("stroke-dasharray", "3,3")',
-            '            .style("opacity", 0.3);',
+        '        // Add grid lines',
+        '        g.append("g")',
+        '            .attr("class", "grid")',
+        '            .attr("transform", "translate(60," + (height - 20) + ")")',
+        '            .call(d3.axisBottom(x)',
+        '                .tickSize(-(height - 20))',
+        '                .tickFormat("")',
+        '            )',
+        '            .style("stroke-dasharray", "3,3")',
+        '            .style("opacity", 0.3);',
+        '        ',
+        '        g.append("g")',
+        '            .attr("class", "grid")',
+        '            .attr("transform", "translate(60, 0)")',
+        '            .call(d3.axisLeft(y)',
+        '                .tickSize(-(width - 60))',
+        '                .tickFormat("")',
+        '            )',
+        '            .style("stroke-dasharray", "3,3")',
+        '            .style("opacity", 0.3);',
             '    } catch (error) {',
             '        console.error("Error creating stacked bar chart:", error);',
             '    }',
             '}'
         ];
     }
-    
+
     /**
      * Get JavaScript files required by the D3 chart
      * 
@@ -629,7 +653,7 @@ class D3Charts extends ChartsBase
             'd3' => 'https://d3js.org/d3.v5.min.js'
         ];
     }
-    
+
     /**
      * Get CSS files required by the D3 chart
      * 
@@ -639,7 +663,7 @@ class D3Charts extends ChartsBase
     {
         return null; // D3.js doesn't have a CSS file
     }
-    
+
     /**
      * Create a simple stacked bar chart
      * 
@@ -657,17 +681,22 @@ class D3Charts extends ChartsBase
     public static function createStackedBarChart($data, $options = [])
     {
         echo "<pre>";
-        /*print_r($data);
-        echo "</pre>";
-        exit;*/
         $defaultOptions = [
             'chartType' => 'stacked-bar',
             'title' => 'Stacked Bar Chart',
             'width' => '100%',
-            'height' => 500,
+            'height' => 1400,
             'colors' => [
-                '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-                '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+                '#1f77b4',
+                '#ff7f0e',
+                '#2ca02c',
+                '#d62728',
+                '#9467bd',
+                '#8c564b',
+                '#e377c2',
+                '#7f7f7f',
+                '#bcbd22',
+                '#17becf'
             ],
             'margin' => [
                 'top' => 10,
@@ -678,30 +707,30 @@ class D3Charts extends ChartsBase
             'showLegend' => true,
             'showTitle' => true
         ];
-        
+
         $mergedOptions = array_merge($defaultOptions, $options);
-        
+
         $chart = new self([
             'data' => $data
         ], $mergedOptions);
-        
+
         // Set chart type explicitly
         $chart->chartType = 'stacked-bar';
-        
+
         // Ensure data is set
         $chart->data = $data;
-        
+
         // Initialize the chart to process data
         $chart->initMe();
-        
-        
+
+
         return $chart;
     }
-    
-    
-    
-    
-    
+
+
+
+
+
     /**
      * Generate D3-specific configuration
      * 
@@ -710,12 +739,12 @@ class D3Charts extends ChartsBase
     protected function generateConfig()
     {
         $config = parent::generateConfig();
-        
+
         return array_merge($config, [
             'type' => $this->chartType ?: 'stacked-bar',
             'd3Version' => $this->d3Version,
             'width' => $this->options['width'] ?? '100%',
-            'height' => $this->options['height'] ?? 500,
+            'height' => $this->options['height'] ?? 1400,
             'useCdn' => $this->useCdn,
             'd3CdnUrl' => $this->d3CdnUrl,
             'd3Options' => $this->d3Options,
@@ -758,7 +787,7 @@ class D3Charts extends ChartsBase
             ]
         ]);
     }
-    
+
     /**
      * Validate D3 chart data
      * 
@@ -770,18 +799,18 @@ class D3Charts extends ChartsBase
         if (!parent::validateData($data)) {
             return false;
         }
-        
+
         // For stacked bar chart, data should be an array of objects
         // with at least one category and one series
         if (!isset($data[0]) || !is_array($data[0])) {
             return false;
         }
-        
+
         $firstItem = $data[0];
         if (!isset($firstItem['category'])) {
             return false;
         }
-        
+
         // Check if there's at least one series column
         $hasSeries = false;
         foreach ($firstItem as $key => $value) {
@@ -790,10 +819,10 @@ class D3Charts extends ChartsBase
                 break;
             }
         }
-        
+
         return $hasSeries;
     }
-    
+
     /**
      * Prepare D3 chart data for rendering
      * 
