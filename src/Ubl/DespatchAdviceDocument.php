@@ -1,8 +1,9 @@
 <?php
 namespace Efaturacim\Util\Ubl;
 
-use Efaturacim\Util\Ubl\Objects\AccountingCustomerParty;
-use Efaturacim\Util\Ubl\Objects\AccountingSupplierParty;
+use Efaturacim\Util\Ubl\Objects\DeliveryCustomerParty;
+use Efaturacim\Util\Ubl\Objects\CarrierParty;
+use Efaturacim\Util\Ubl\Objects\DespatchSupplierParty;
 use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
 use Efaturacim\Util\Ubl\Objects\Delivery;
@@ -10,6 +11,7 @@ use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
 use Efaturacim\Util\Ubl\Objects\DespatchLine;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Note;
+use Efaturacim\Util\Ubl\Objects\Shipment;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
@@ -41,19 +43,29 @@ class DespatchAdviceDocument extends UblDocument
     public ?string $invoiceTypeCode = 'SATIS';
 
     /**
-     * @var AccountingCustomerParty
+     * @var DeliveryCustomerParty
      */
-    public $accountingCustomerParty = null;
+    public $deliveryCustomerParty = null;
 
     /**
      * @var BuyerCustomerParty
      */
     public $buyerCustomerParty = null;
 
-    /**
-     * @var AccountingSupplierParty
+        /**
+     * @var Shipment
      */
-    public $accountingSupplierParty = null;
+    public $shipment = null;
+
+        /**
+     * @var CarrierParty
+     */
+    public $carrierParty = null;
+
+    /**
+     * @var DespatchSupplierParty
+     */
+    public $despatchSupplierParty = null;
 
     /**
      * @var LegalMonetaryTotal
@@ -138,13 +150,15 @@ class DespatchAdviceDocument extends UblDocument
         $this->setIssueTime(date('H:i:s'));
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
-        $this->accountingCustomerParty     = new AccountingCustomerParty();
-        $this->accountingSupplierParty     = new AccountingSupplierParty();
+        $this->deliveryCustomerParty     = new DeliveryCustomerParty();
+        $this->despatchSupplierParty     = new DespatchSupplierParty();
+        $this->carrierParty              = new CarrierParty();
         $this->buyerCustomerParty          = new BuyerCustomerParty();
         $this->delivery                    = new Delivery();
         $this->orderReference              = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference   = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note                        = new UblDataTypeList(Note::class);
+        $this->shipment                    = new Shipment();
         $this->despatchLine                = new UblDataTypeListForDespatchLine(DespatchLine::class);
         $this->taxTotal                    = new TaxTotal();
         $this->withholdingTaxTotal         = new WithholdingTaxTotal();
@@ -176,8 +190,9 @@ class DespatchAdviceDocument extends UblDocument
         $this->appendElementList($this->orderReference);
         $this->appendElementList($this->despatchDocumentReference);
         $this->appendElementList($this->note);
-        $this->appendAccountingSupplierParty();
-        $this->appendAccountingCustomerParty();
+        $this->appendDespatchSupplierParty();
+        $this->appendDeliveryCustomerParty();
+        $this->appendCarrierParty();
         $this->appendBuyerCustomerParty();
         $this->appendDelivery();
         $this->appendElement('cbc:LineCountNumeric', $this->despatchLine->getCount());
@@ -185,6 +200,7 @@ class DespatchAdviceDocument extends UblDocument
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
+        $this->appendShipment();
         $this->appendElementList($this->despatchLine);
         return $this->document->saveXML();
     }
@@ -193,13 +209,17 @@ class DespatchAdviceDocument extends UblDocument
     {
         $this->appendElement('cac:LegalMonetaryTotal', $this->legalMonetaryTotal ? $this->legalMonetaryTotal->toDOMElement($this->document) : null);
     }
-    public function appendAccountingSupplierParty()
+    public function appendDespatchSupplierParty()
     {
-        $this->appendElement('cac:AccountingSupplierParty', $this->accountingSupplierParty->toDOMElement($this->document));
+        $this->appendElement('cac:DespatchSupplierParty', $this->despatchSupplierParty->toDOMElement($this->document));
     }
-    public function appendAccountingCustomerParty()
+    public function appendDeliveryCustomerParty()
     {
-        $this->appendElement('cac:AccountingCustomerParty', $this->accountingCustomerParty->toDOMElement($this->document));
+        $this->appendElement('cac:DeliveryCustomerParty', $this->deliveryCustomerParty->toDOMElement($this->document));
+    }
+    public function appendCarrierParty()
+    {
+        $this->appendElement('cac:CarrierParty', $this->carrierParty->toDOMElement($this->document));
     }
     public function appendBuyerCustomerParty()
     {
@@ -225,6 +245,10 @@ class DespatchAdviceDocument extends UblDocument
     {
         $this->appendElement('cac:Delivery', $this->delivery->toDOMElement($this->document));
     }
+    public function appendShipment()
+    {
+        $this->appendElement('cac:Shipment', $this->shipment->toDOMElement($this->document));
+    }
 
     /**
      * getPropertyAlias array den yyukleme yaparken yasanabilecek yanlis yazilmari engellemek veya daha kolay yazim icin olusturuldu
@@ -234,7 +258,7 @@ class DespatchAdviceDocument extends UblDocument
     public function getPropertyAlias($k, $v)
     {
         if (in_array($k, ["satici"])) {
-            return "accountingSupplierParty";
+            return "despatchSupplierParty";
         } else if (in_array($k, ["alici", "musteri"])) {
             return "accountingCustomerParty";
         } else if (in_array($k, ["notlar", "notes"])) {

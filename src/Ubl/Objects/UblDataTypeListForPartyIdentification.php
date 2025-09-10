@@ -25,6 +25,9 @@ class UblDataTypeListForPartyIdentification extends UblDataTypeList{
     public function setMersisNo($value){
         $this->getSchemeID("MERSISNO")->setValue($value);    
     }
+    public function setDorse($value){
+        $this->getSchemeID("DORSEPLAKA")->setValue($value);    
+    }
     public function setTicaretSicilNo($value){
         $this->getSchemeID("TICARETSICILNO")->setValue($value);    
     }

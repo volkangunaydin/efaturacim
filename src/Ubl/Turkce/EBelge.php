@@ -68,11 +68,11 @@ class EBelge{
         return DateUtil::newDate($this->ubl->getIssueDate()." ".$this->ubl->getIssueTime());
     }
     public function setSaticiBilgileri($options=null,$clear=false){
-        $this->ubl->accountingSupplierParty->loadFromOptions($options,$clear);
+        $this->ubl->despatchSupplierParty->loadFromOptions($options,$clear);
         return $this;
     }
     public function setAliciBilgileri($options=null,$clear=false){
-        $this->ubl->accountingCustomerParty->loadFromOptions($options,$clear);
+        $this->ubl->deliveryCustomerParty->loadFromOptions($options,$clear);
         return $this;
     }
     public function &getSatici(){
