@@ -117,6 +117,7 @@ class EFaturacimRestApiClient{
         } 
         return $r;
     }
+    
     public static function getMesajListesi($firmaRef=null,$postParams=null){
         if(self::login()){
             RestApiClient::$DEFAULT_BEARER_TOKEN = self::getBearerKey();
