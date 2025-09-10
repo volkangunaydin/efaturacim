@@ -33,6 +33,7 @@ class StrUtil{
 
         return $loaded !== false && empty($errors);
     }
+    
     public static function isJson($string,$softCheck=false) {
         $string = trim("".$string);
         if (self::isEmpty($string)) {
