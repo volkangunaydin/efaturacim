@@ -9,17 +9,17 @@ use Efaturacim\Util\Utils\String\StrUtil;
 class TransportHandlingUnit extends UblDataType
 {
     public ?UblDataTypeList $actualPackage;
-    public ?UblDataTypeListForTransportEquipment $transportEquipment;
+    public ?TransportEquipment $transportEquipment = null;
 
     public function initMe()
     {
         $this->actualPackage = new UblDataTypeList(ActualPackage::class);
-        $this->transportEquipment = new UblDataTypeListForTransportEquipment(TransportEquipment::class);
+        $this->transportEquipment = new TransportEquipment();
     }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, array("dorse", "dorseno")) && StrUtil::notEmpty($v)) {
-            $this->transportEquipment->setDorse($v);
+        if ($this->transportEquipment->setPropertyFromOptions($k, $v, $options)) {
+            return true;
         }
         $this->actualPackage = new UblDataTypeList(ActualPackage::class);
         return false;
@@ -27,7 +27,7 @@ class TransportHandlingUnit extends UblDataType
 
     public function isEmpty(): bool
     {
-        return is_null($this->actualPackage) && is_null($this->transportEquipment);
+        return is_null($this->actualPackage) && is_null($this->transportEquipment) || $this->transportEquipment->isEmpty();
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement

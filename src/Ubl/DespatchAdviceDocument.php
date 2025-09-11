@@ -40,7 +40,7 @@ class DespatchAdviceDocument extends UblDocument
      * @var string|null
      */
 
-    public ?string $invoiceTypeCode = 'SATIS';
+    public ?string $despatchAdviceTypeCode = 'SATIS';
 
     /**
      * @var DeliveryCustomerParty
@@ -185,7 +185,7 @@ class DespatchAdviceDocument extends UblDocument
         $this->setNamespaces();
         $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
         $this->appendCommonElements();
-        $this->appendElement('cbc:DespatchAdviceTypeCode', $this->invoiceTypeCode);
+        $this->appendElement('cbc:DespatchAdviceTypeCode', $this->despatchAdviceTypeCode);
         $this->appendElementList($this->additionalDocumentReference);
         $this->appendElementList($this->orderReference);
         $this->appendElementList($this->despatchDocumentReference);

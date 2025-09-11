@@ -11,7 +11,15 @@ class ID extends UblDataType{
     public function isEmpty(){
         return !StrUtil::notEmpty($this->textContent);
     }
-    public function setPropertyFromOptions($k,$v,$options){        
+    public function setPropertyFromOptions($k,$v,$options){
+        if (in_array($k, ['id', 'ID', 'value']) && StrUtil::notEmpty($v)) {
+            $this->setValue($v);
+            return true;
+        }
+        if (in_array($k, ['schemeID', 'scheme_id']) && StrUtil::notEmpty($v)) {
+            $this->attributes["schemeID"] = $v;
+            return true;
+        }
         return false;
     }    
     public function toDOMElement(DOMDocument $document): ?DOMElement{
@@ -23,5 +31,8 @@ class ID extends UblDataType{
     }
     public static function newNote($str){
         return new Note(array("value"=>$str));
+    }
+    public function setValue($value){
+        $this->textContent = $value;
     }
 }

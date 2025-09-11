@@ -12,6 +12,7 @@ class Shipment extends UblDataType
     public ?UblDataTypeList $goodsItem;
     public ?UblDataTypeList $shipmentStage;
     public ?UblDataTypeList $transportHandlingUnit;
+    public ?ShipmentDelivery $delivery = null;
 
     public function __construct($options = null)
     {
@@ -23,6 +24,7 @@ class Shipment extends UblDataType
         $this->goodsItem = new UblDataTypeList(GoodsItem::class);
         $this->shipmentStage = new UblDataTypeList(ShipmentStage::class);
         $this->transportHandlingUnit = new UblDataTypeList(TransportHandlingUnit::class);
+        $this->delivery = new ShipmentDelivery();
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool
@@ -32,12 +34,24 @@ class Shipment extends UblDataType
             return true;
         }
 
+        if (in_array($k, ['delivery', 'Delivery', 'DELIVERY']) && StrUtil::notEmpty($v)) {
+            $this->delivery = new ShipmentDelivery($v);
+            return true;
+        }
+
         return false;
     }
 
     public function isEmpty(): bool
     {
-        return is_null($this->id);
+        $idIsEmpty = is_null($this->id);
+        $deliveryIsEmpty = is_null($this->delivery) || $this->delivery->isEmpty();
+        $goodsItemIsEmpty = is_null($this->goodsItem) || $this->goodsItem->isEmpty();
+        $shipmentStageIsEmpty = is_null($this->shipmentStage) || $this->shipmentStage->isEmpty();
+        $transportHandlingUnitIsEmpty = is_null($this->transportHandlingUnit) || $this->transportHandlingUnit->isEmpty();
+
+        // Shipment ancak tüm öğeler BOŞ ise boş kabul edilmeli
+        return $idIsEmpty && $deliveryIsEmpty && $goodsItemIsEmpty && $shipmentStageIsEmpty && $transportHandlingUnitIsEmpty;
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
@@ -48,6 +62,14 @@ class Shipment extends UblDataType
         $element = $document->createElement('cac:Shipment');
 
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
+        
+        if ($this->delivery && !$this->delivery->isEmpty()) {
+            $deliveryElement = $this->delivery->toDOMElement($document);
+            if ($deliveryElement) {
+                $this->appendChild($element, $deliveryElement);
+            }
+        }
+        
         $this->appendChild($element,$this->goodsItem->toDOMElement($document));
         $this->appendChild($element,$this->shipmentStage->toDOMElement($document));
         $this->appendChild($element,$this->transportHandlingUnit->toDOMElement($document));

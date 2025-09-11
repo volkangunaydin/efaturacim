@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Utils\Header;
+namespace Efaturacim\Util\Utils\Header;
 
 use Efaturacim\Util\Utils\IO\IO_Util;
+use Efaturacim\Util\Utils\IO\MimeTypes;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
 
@@ -22,6 +23,8 @@ class HeaderUtil
             $extension   = IO_Util::getExtensionFromName($fileName);
             $contentType = MimeTypes::getMimeType($extension);
         }
+
+        
         
         // Set default content type if still empty
         if(StrUtil::isEmpty($contentType)){

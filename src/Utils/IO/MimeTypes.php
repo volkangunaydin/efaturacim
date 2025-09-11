@@ -1,5 +1,5 @@
 <?php
-namespace App\Utils\Header;
+namespace Efaturacim\Util\Utils\IO;
 class MimeTypes{
 
         protected static $mimeMap = [

@@ -62,7 +62,7 @@ class PricingExchangeRate extends UblDataType
 
         $this->appendElement($document, $element, 'cbc:SourceCurrencyCode', $this->sourceCurrencyCode);
         $this->appendElement($document, $element, 'cbc:TargetCurrencyCode', $this->targetCurrencyCode);
-        $this->appendElement($document, $element, 'cbc:CalculationRate', number_format($this->calculationRate, 6, '.', ''));
+        $this->appendElement($document, $element, 'cbc:CalculationRate', $this->calculationRate);
 
         return $element;
     }
