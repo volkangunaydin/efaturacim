@@ -28,7 +28,7 @@ use Efaturacim\Util\Utils\Array\ArrayUtil;
 use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
-use Efaturacim\Util\Utils\xml\XmlToArray;
+use Efaturacim\Util\Utils\Xml\XmlToArray;
 
 /**
  * Represents a UBL Invoice document for the Turkish e-Invoice system.

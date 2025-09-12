@@ -28,23 +28,23 @@ class Address extends UblDataType
     }
     public function setPropertyFromOptions($k, $v, $options)
     {
-        if (in_array($k, array("sokak")) && StrUtil::notEmpty($v)) {
+        if (in_array($k, array("sokak","streetName")) && StrUtil::notEmpty($v)) {
             $this->streetName = $v;
         } else if (in_array($k, array("id")) && StrUtil::notEmpty($v)) {
             $this->id = $v;
-        } else if (in_array($k, array("bina")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("bina","buildingName")) && StrUtil::notEmpty($v)) {
             $this->buildingName = $v;
-        } else if (in_array($k, array("bina_no")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("bina_no","buildingNumber")) && StrUtil::notEmpty($v)) {
             $this->buildingNumber = $v;
-        } else if (in_array($k, array("ilce")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("ilce","citySubdivisionName")) && StrUtil::notEmpty($v)) {
             $this->citySubdivisionName = $v;
-        } else if (in_array($k, array("il")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("il","cityName")) && StrUtil::notEmpty($v)) {
             $this->cityName = $v;
-        } else if (in_array($k, array("posta_kodu")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("posta_kodu","postalZone")) && StrUtil::notEmpty($v)) {
             $this->postalZone = $v;
-        } else if (in_array($k, array("bolge")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("bolge","region")) && StrUtil::notEmpty($v)) {
             $this->region = $v;
-        } else if (in_array($k, array("semt")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("semt","district")) && StrUtil::notEmpty($v)) {
             $this->district = $v;
         } else {
             //\Vulcan\V::dump(array($k,$v,$options));
