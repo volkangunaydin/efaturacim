@@ -11,4 +11,5 @@ class AccountingSupplierParty extends UblDataTypeForPartyContainer
         $this->setDefaultTagNameIfNotSet("cac:AccountingSupplierParty");
         parent::initMe();
     }
+    
 }
