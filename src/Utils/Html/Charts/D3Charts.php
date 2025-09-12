@@ -718,6 +718,7 @@ class D3Charts extends ChartsBase
             'showLegend' => true,
             'showTitle' => true
         ];
+        
 
         $mergedOptions = array_merge($defaultOptions, $options);
 
