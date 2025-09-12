@@ -349,7 +349,7 @@ class DespatchAdviceDocument extends UblDocument
         return new Options([
             "nextLineId"           => $this->despatchLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "despatchAdvice"       => $this->invoiceTypeCode,
+            "despatchAdvice"       => $this->despatchAdviceTypeCode,
         ]);
     }
 
