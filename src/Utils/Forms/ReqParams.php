@@ -17,5 +17,7 @@ class ReqParams{
     public static function isEqualToString($name,$value){     
         return self::getVal($name,null,"string")===$value;
     }
+
+    
 }
 ?>
