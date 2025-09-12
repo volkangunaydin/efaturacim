@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils\Json;
 
 use Efaturacim\Util\Utils\Options;
+use Efaturacim\Util\Utils\SimpleResult;
 use Efaturacim\Util\Utils\String\StrUtil;
 use Exception;
 
@@ -141,5 +142,18 @@ class JsonUtil{
             }
             return false;
         }        
+        public static function writeAsJsonFile($path,$arr,$options=null){
+            $r = new SimpleResult();
+            try {
+                $a = file_put_contents($path,self::toJsonStringWithOptions($arr,$options));
+                $r->setIsOk(true);
+                $r->value = $a;
+            } catch (\Throwable $th) {
+                //throw $th;
+                $r->setIsOk(false);
+                $r->addError($th->getMessage());
+            }
+            return $r;
+        }
 }
 ?>

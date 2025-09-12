@@ -43,5 +43,14 @@ class IO_Util{
     public static function getExtensionFromName($name,$toLower=false,$canBeExtension=true){
         return FileExtensions::getExtensionFromName($name,$toLower,$canBeExtension);
     }   
+    public static function file_exists($path){
+        return file_exists($path);
+    }
+    public static function is_writable($path){
+        return file_exists($path) && is_writable($path);
+    }
+    public static function writeFileAsString($path,$content){
+        return file_put_contents($path,$content);
+    }
 }
 ?>
