@@ -113,6 +113,18 @@ class D3Charts extends ChartsBase
             'd3Options' => [
                 'type' => 'stacked-bar'
             ],
+            'colors' => [
+                '#bd3141',  // Soft pastel blue
+                '#bd3141',  // Soft pastel pink/red
+                '#bd3141',  // Soft pastel green
+                '#bd3141',  // Soft pastel orange
+                '#bd3141',  // Soft pastel lavender
+                '#bd3141',  // Soft pastel yellow
+                '#bd3141',  // Soft pastel purple
+                '#bd3141',  // Soft pastel aqua
+                '#bd3141',  // Soft pastel mint
+                '#bd3141'   // Soft pastel gray
+            ],
             'margin' => [
                 'top' => 10,
                 'right' => 10,
@@ -386,7 +398,7 @@ class D3Charts extends ChartsBase
             '        var allOriginalKeys = Object.keys(chartData_' . $this->chartId . '[0]).filter(function(key) { return key !== "category"; });',
             '        ',
             '        var z = d3.scaleOrdinal()',
-            '            .range(config.colors || ["#dc3545", "#fd7e14", "#20c997", "#0d6efd", "#6f42c1"]);',
+            '            .range(config.colors || ["#bd3141", "#bd3141", "#bd3141", "#bd3141", "#bd3141"]);',
             '        ',
             '        // Set color domain with ALL original keys (for consistent colors)',
             '        z.domain(allOriginalKeys);',
@@ -686,16 +698,16 @@ class D3Charts extends ChartsBase
             'width' => '100%',
             'height' => 1400,
             'colors' => [
-                '#1f77b4',
-                '#ff7f0e',
-                '#2ca02c',
-                '#d62728',
-                '#9467bd',
-                '#8c564b',
-                '#e377c2',
-                '#7f7f7f',
-                '#bcbd22',
-                '#17becf'
+                '#bd3141',  // Soft pastel blue
+                '#bd3141',  // Soft pastel pink/red
+                '#bd3141',  // Soft pastel green
+                '#bd3141',  // Soft pastel orange
+                '#bd3141',  // Soft pastel lavender
+                '#bd3141',  // Soft pastel yellow
+                '#bd3141',  // Soft pastel purple
+                '#bd3141',  // Soft pastel aqua
+                '#bd3141',  // Soft pastel mint
+                '#bd3141'   // Soft pastel gray
             ],
             'margin' => [
                 'top' => 10,
@@ -744,6 +756,18 @@ class D3Charts extends ChartsBase
             'd3Version' => $this->d3Version,
             'width' => $this->options['width'] ?? '100%',
             'height' => $this->options['height'] ?? 1400,
+            'colors' => $this->options['colors'] ?? [
+                '#bd3141',  // Soft pastel green
+                '#bd3141',  // Soft pastel orange
+                '#bd3141',  // Soft pastel blue
+                '#bd3141',  // Soft pastel pink
+                '#bd3141',  // Soft pastel purple
+                '#bd3141',  // Soft pastel yellow
+                '#bd3141',  // Soft pastel lavender
+                '#bd3141',  // Soft pastel gray
+                '#bd3141',  // Soft pastel mint
+                '#bd3141'   // Soft pastel aqua
+            ],
             'useCdn' => $this->useCdn,
             'd3CdnUrl' => $this->d3CdnUrl,
             'd3Options' => $this->d3Options,
