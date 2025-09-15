@@ -28,6 +28,7 @@ class DocumentReference extends UblDataType
         }
         return false;
     }
+    
     public function isEmpty(){  
         return StrUtil::isEmpty($this->id);        
     }
