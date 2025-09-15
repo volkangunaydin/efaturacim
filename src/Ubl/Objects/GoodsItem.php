@@ -15,9 +15,11 @@ class GoodsItem extends UblDataType
      * @var ValueAmount
      */
     public ?ValueAmount $valueAmount = null;   
+    public ?InvoiceLine $invoiceLine = null;
     
     public function initMe(){
         $this->valueAmount = new ValueAmount();
+        $this->invoiceLine = new InvoiceLine();
     }
     public function setPropertyFromOptions($k, $v, $options): bool
     {        
@@ -29,6 +31,10 @@ class GoodsItem extends UblDataType
             $this->valueAmount->setCurrencyID($v);
             return true;
         } 
+        if (in_array($k, ['invoiceLine', 'fatura_satir']) && StrUtil::notEmpty($v)) {
+            $this->invoiceLine->id = $v;
+            return true;
+        }
         return false;
     }
 
@@ -45,6 +51,7 @@ class GoodsItem extends UblDataType
         $element = $document->createElement('cac:GoodsItem');
         $this->appendElement($document, $element, 'cbc:RequiredCustomsID', $this->requiredCustomsID);
         $this->appendChild($element,$this->valueAmount->toDOMElement($document));
+        $this->appendChild($element,$this->invoiceLine->toDOMElement($document));
         return $element;
     }
 }
