@@ -28,6 +28,7 @@ class DocumentReference extends UblDataType
         }
         return false;
     }
+    
     public function isEmpty(){  
         return StrUtil::isEmpty($this->id);        
     }
@@ -38,4 +39,5 @@ class DocumentReference extends UblDataType
         $this->appendElement($document, $element, 'cbc:IssueDate', DateUtil::getAsDbDate($this->issueDate));
         return $element;
     }
+    
 }

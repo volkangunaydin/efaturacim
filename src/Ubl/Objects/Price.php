@@ -29,7 +29,7 @@ class Price extends UblDataType
 
     public function isEmpty(): bool
     {
-        return is_null($this->priceAmount);
+        return is_null($this->priceAmount) || $this->priceAmount->isEmpty();
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement

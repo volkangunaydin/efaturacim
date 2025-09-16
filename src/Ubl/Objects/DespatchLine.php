@@ -13,7 +13,8 @@ class DespatchLine extends UblDataType
 {
     public ?ID $id = null;
     public ?InvoicedQuantity $invoicedQuantity = null;
-
+    public ?DeliveredQuantity $deliveredQuantity = null;
+    public ?OrderLineReference $orderLineReference = null;
     public ?LineExtensionAmount $lineExtensionAmount = null;
     public ?TaxExclusiveAmount $taxExclusiveAmount = null;
     public ?TaxInclusiveAmount $taxInclusiveAmount = null;
@@ -21,6 +22,7 @@ class DespatchLine extends UblDataType
     public ?ChargeTotalAmount $chargeTotalAmount = null;
     public ?PayableAmount $payableAmount = null;
     public ?Delivery $delivery = null;
+    public ?Shipment $shipment = null;
 
 
     /**     
@@ -46,6 +48,7 @@ class DespatchLine extends UblDataType
     {
         $this->id = new ID();
         $this->invoicedQuantity = new InvoicedQuantity();
+        $this->deliveredQuantity = new DeliveredQuantity();
         $this->allowanceCharge = new UblDataTypeList(AllowanceCharge::class);
         $this->withholdingTaxTotal = new UblDataTypeList(WithholdingTaxTotal::class);
         $this->lineExtensionAmount = new LineExtensionAmount();
@@ -59,6 +62,8 @@ class DespatchLine extends UblDataType
         $this->price = new Price();
         $this->note = new Note();
         $this->delivery = new Delivery();
+        $this->orderLineReference = new OrderLineReference();
+        $this->shipment = new Shipment();
     }
     public function addAllowanceCharge(array $options): self
     {
@@ -94,6 +99,14 @@ class DespatchLine extends UblDataType
             $this->invoicedQuantity->setCode($v);
             return true;
         }
+        if (in_array($k, ['deliveredQuantity', 'quantity', 'miktar']) && is_numeric($v)) {
+            $this->deliveredQuantity->setQuantity($v);
+            return true;
+        }
+        if (in_array($k, ['deliveredQuantityUnitCode', 'unitCode', 'birim_kodu']) && StrUtil::notEmpty($v)) {
+            $this->deliveredQuantity->setCode($v);
+            return true;
+        }
         if (in_array($k, ['lineExtensionAmount', 'line_amount', 'satir_tutari']) && is_numeric($v)) {
             $this->lineExtensionAmount->setValue($v);
             return true;
@@ -102,7 +115,14 @@ class DespatchLine extends UblDataType
             $this->lineExtensionAmount->setCurrencyID($v);
             return true;
         }
-
+        if (in_array($k, ['orderLineReference', 'order_line_reference']) && StrUtil::notEmpty($v)) {
+            $this->orderLineReference->lineId = $v;
+            return true;
+        }
+        if (in_array($k, ['shipment', 'shipment_id']) && StrUtil::notEmpty($v)) {
+            $this->shipment->id = $v;
+            return true;
+        }
         // Handle allowance charges array
         if (in_array(strtolower($k), ['allowancecharges', 'discounts', 'charges', 'iskontolar']) && is_array($v)) {
             foreach ($v as $acOptions) {
@@ -126,9 +146,8 @@ class DespatchLine extends UblDataType
 
     public function isEmpty(): bool
     {
-        // An invoice line must have an ID, a quantity, an amount, and an item.
-        //|| is_null($this->invoicedQuantity)  || $this->item->isEmpty()
-        return is_null($this->id) || $this->id->isEmpty();
+        // A despatch line must have an ID and delivered quantity
+        return is_null($this->id) || $this->id->isEmpty() || is_null($this->deliveredQuantity) || $this->deliveredQuantity->isEmpty();
     }
     public function getInvoicedQuantity()
     {
@@ -151,9 +170,13 @@ class DespatchLine extends UblDataType
 
         $this->appendChild($element, $this->invoicedQuantity->toDOMElement($document));
 
+        $this->appendChild($element, $this->deliveredQuantity->toDOMElement($document));
+
         $this->appendChild($element, $this->lineExtensionAmount->toDOMElement($document));
 
         $this->appendChild($element, $this->delivery->toDOMElement($document));
+        $this->appendChild($element, $this->orderLineReference->toDOMElement($document));
+        $this->appendChild($element, $this->shipment->toDOMElement($document));
 
         foreach ($this->allowanceCharge->list as $ac) {
             $this->appendChild($element, $ac->toDOMElement($document));
@@ -165,7 +188,11 @@ class DespatchLine extends UblDataType
 
         $this->appendChild($element, $this->taxTotal->toDOMElement($document));
         $this->appendChild($element, $this->item->toDOMElement($document));
-        $this->appendChild($element, $this->price->toDOMElement($document));
+        
+        // Only add price if it's not empty
+        if (!$this->price->isEmpty()) {
+            $this->appendChild($element, $this->price->toDOMElement($document));
+        }
 
         return $element;
     }

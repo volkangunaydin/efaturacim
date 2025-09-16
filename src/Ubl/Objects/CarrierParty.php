@@ -9,9 +9,9 @@ use Efaturacim\Util\Utils\String\StrUtil;
 
 class CarrierParty extends UblDataType
 {
-    public ?PartyIdentification $partyIdentification = null;
+    public ?UblDataTypeListForPartyIdentification $partyIdentification = null;
     public ?PartyName $partyName = null;
-    public ?Address $address = null;
+    public ?Address $postalAddress = null;
 
     public function __construct($options = null)
     {
@@ -19,23 +19,27 @@ class CarrierParty extends UblDataType
     }
     public function initMe()
     {
-        $this->partyIdentification = new PartyIdentification();
+        $this->partyIdentification = new UblDataTypeListForPartyIdentification(PartyIdentification::class);
         $this->partyName = new PartyName();
-        $this->address = new Address();
+        $this->postalAddress = new Address();
     }
     public function setPropertyFromOptions($k, $v, $options): bool
     {
         if (in_array($k, ['partyIdentification', 'party_identification']) && StrUtil::notEmpty($v)) {
             $this->partyIdentification = $v;
             return true;
-        }
-        if (in_array($k, ['partyName', 'party_name']) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("mersis", "mersisno")) && StrUtil::notEmpty($v)) {
+            $this->partyIdentification->setMersisNo($v);
+        } else if (in_array($k, array("ticaret_sicil_no", "ticaret_sicil", "sicil", "ticaretsicilno", "ticari_sicil")) && StrUtil::notEmpty($v)) {
+            $this->partyIdentification->setTicaretSicilNo($v);
+        } else if (in_array($k, array("vkn", "tckn", "tc", "vergino", "vergi_no")) && StrUtil::notEmpty($v)) {
+            $this->partyIdentification->setVkn($v);
+            return true;
+        } elseif (in_array($k, ['partyName', 'party_name']) && StrUtil::notEmpty($v)) {
             $this->partyName = $v;
             return true;
-        }
-        if (in_array($k, ['postalAddress', 'address']) && StrUtil::notEmpty($v)) {
-            $this->address = $v;
-            return true;
+        } else if (in_array($k, array("sokak", "bina", "ilce", "il", "ulke")) && StrUtil::notEmpty($v)) {
+            return $this->postalAddress->setPropertyFromOptions($k, $v, $options);
         }
         return false;
     }
@@ -44,8 +48,8 @@ class CarrierParty extends UblDataType
     {
         $partyIdentificationIsEmpty = is_null($this->partyIdentification) || $this->partyIdentification->isEmpty();
         $partyNameIsEmpty = is_null($this->partyName) || $this->partyName->isEmpty();
-        $addressIsEmpty = is_null($this->address) || $this->address->isEmpty();
-        
+        $addressIsEmpty = is_null($this->postalAddress) || $this->postalAddress->isEmpty();
+
         // CarrierParty ancak tüm alt öğeler BOŞ ise boş kabul edilmeli
         return $partyIdentificationIsEmpty && $partyNameIsEmpty && $addressIsEmpty;
     }
@@ -55,30 +59,17 @@ class CarrierParty extends UblDataType
         if ($this->isEmpty()) {
             return null;
         }
-        
+
         $element = $document->createElement('cac:CarrierParty');
-        
-        if ($this->partyIdentification && !$this->partyIdentification->isEmpty()) {
-            $partyIdentificationElement = $this->partyIdentification->toDOMElement($document);
-            if ($partyIdentificationElement) {
-                $this->appendChild($element, $partyIdentificationElement);
-            }
-        }
-        
+        $this->appendChild($element, $this->partyIdentification->toDOMElement($document));
         if ($this->partyName && !$this->partyName->isEmpty()) {
             $partyNameElement = $this->partyName->toDOMElement($document);
             if ($partyNameElement) {
                 $this->appendChild($element, $partyNameElement);
             }
         }
-        
-        if ($this->address && !$this->address->isEmpty()) {
-            $addressElement = $this->address->toDOMElement($document);
-            if ($addressElement) {
-                $this->appendChild($element, $addressElement);
-            }
-        }
-        
+        $this->appendChild($element,$this->postalAddress->toDOMElement($document));
+
         return $element;
     }
 }

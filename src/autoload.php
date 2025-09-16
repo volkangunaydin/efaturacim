@@ -19,6 +19,7 @@ spl_autoload_register(function ($className) {
         return;
     }
     
+    
     // Get the relative class name
     $relativeClass = substr($className, $len);
     
