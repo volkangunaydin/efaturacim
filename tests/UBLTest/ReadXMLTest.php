@@ -2,7 +2,7 @@
 
 namespace Efaturacim\Util\Tests\UBLTest;
 
-use Efaturacim\Util\Utils\Xml\XMLToArray;
+use Efaturacim\Util\Utils\Xml\XmlToArray;
 use PHPUnit\Framework\TestCase;
 
 class ReadXMLTest extends TestCase
@@ -14,7 +14,7 @@ class ReadXMLTest extends TestCase
     {
         // Buraya örnek XML gelecek
         $exampleXml = '<?xml version="1.0" encoding="UTF-8"?><root><item>test</item></root>';        
-        $result = XMLToArray::toArray($exampleXml, true);        
+        $result = XmlToArray::toArray($exampleXml, true);        
         // Array'in boş olmadığını kontrol et
         $this->assertNotEmpty($result);
         

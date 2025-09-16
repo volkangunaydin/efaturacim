@@ -7,7 +7,7 @@ use DOMNode;
 use Efaturacim\Util\Utils\Array\ArrayCopy;
 use Efaturacim\Util\Utils\Options;
 
-class XMLToArray{
+class XmlToArray{
     public static $LAST_ERRORS = array();
   /**
      * Converts an XML string to a structured PHP array.

@@ -10,7 +10,7 @@ use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\PreviewUtil;
 use Efaturacim\Util\Ubl\InvoiceDocument;
 use Efaturacim\Util\Ubl\UblDocument;
-use Efaturacim\Util\Utils\Xml\XMLToArray;
+use Efaturacim\Util\Utils\Xml\XmlToArray;
 
 /**
  * Abstract base class for all UBL data objects.
