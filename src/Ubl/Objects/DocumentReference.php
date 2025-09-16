@@ -39,4 +39,5 @@ class DocumentReference extends UblDataType
         $this->appendElement($document, $element, 'cbc:IssueDate', DateUtil::getAsDbDate($this->issueDate));
         return $element;
     }
+    
 }
