@@ -9,7 +9,7 @@ class CurrentUrl{
    protected static $urlFullPath = '';
    protected static $folders = [];
    protected static $isSsl = null;
-   protected static function initIfNot(){
+   protected static function initIfNot(){    
         if(count(self::$urlParts) === 0){
             if (!isset($_SERVER)) {
                 self::$urlParts = [
@@ -96,7 +96,7 @@ class CurrentUrl{
    /**
     * Detect host with proxy support (similar to UrlUtil::getBaseHost)
     */
-   protected static function detectHost() {
+   protected static function detectHost() {        
         if (isset($_SERVER['HTTP_X_FORWARDED_HOST']) && strlen("".$_SERVER['HTTP_X_FORWARDED_HOST'])>0) {
             // The proxy has provided the original host requested by the client.
             return $_SERVER['HTTP_X_FORWARDED_HOST'];
@@ -121,8 +121,8 @@ class CurrentUrl{
         self::initIfNot();  
         return self::$urlParts["basePath"];
    }
-   public static function getBaseUrl($path="/"){
-    self::initIfNot();  
+   public static function getBaseUrl($path="/"){    
+    self::initIfNot();          
     return (self::isSsl() ? "https://" : "http://") . self::detectHost().$path;
    }
    public static function getFolderIndex($index=1){
@@ -140,4 +140,4 @@ class CurrentUrl{
     }
 }
 
-?>  
+?>
