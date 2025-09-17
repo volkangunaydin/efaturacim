@@ -9,6 +9,7 @@ class StrUtil{
     public static function notEmpty($str){
         return !is_null($str) && is_scalar($str) && strlen("".$str)>0;
     }
+    
     public static function isEmpty($str){
         if(is_null($str) || $str==="" || (is_string($str) && trim($str)==="") || !is_scalar($str) ){
             return true;
