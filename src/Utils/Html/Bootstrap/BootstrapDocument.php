@@ -21,12 +21,10 @@ class BootstrapDocument extends HtmlDocument{
         if(HtmlComponent::isPathDefined("bootstrap")){            
             $assetPath = HtmlComponent::getPathDefined("bootstrap");
             if($assetPath!="none"){
-                $this->addCss($assetPath.'css/bootstrap.min.css','bootstrap');
-                $this->addJsFileOnEnd($assetPath.'js/bootstrap.bundle.min.js','bootstrap');        
+                $this->addCss($assetPath.'css/bootstrap.min.css','bootstrap');    
             }            
         }else{
-            $this->addCss('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css','bootstrap');
-            $this->addJsFileOnEnd('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js','bootstrap');    
+            $this->addCss('https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css','bootstrap'); 
         }
         $this->ensureJQuery();
     }
