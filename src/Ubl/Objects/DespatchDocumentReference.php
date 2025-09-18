@@ -36,6 +36,7 @@ class DespatchDocumentReference extends UblDataType
         }
         return false;
     }
+    
     public function isEmpty(){  
         return is_null($this->id);
     }
