@@ -122,10 +122,6 @@ class InvoiceDocument extends UblDocument
      * @var UblDataTypeList
      */
     public $invoiceLine = null;
-    /**
-     * @var UblDataTypeList
-     */
-    public $additionalDocumentReference = null;
 
     // TODO: Add properties for invoice lines, parties, totals etc.
     // public array $invoiceLines = [];

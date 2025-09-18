@@ -4,6 +4,8 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\Utils\String\StrBase64;
+use Efaturacim\Util\Utils\String\StrContains;
 use Efaturacim\Util\Utils\String\StrUtil;
 
 class EmbeddedDocumentBinaryObject extends UblDataType
@@ -52,5 +54,19 @@ class EmbeddedDocumentBinaryObject extends UblDataType
         }        
         $element = $this->createElement($document,'cbc:EmbeddedDocumentBinaryObject');        
         return $element;
+    }
+    public function isXslt(): bool
+    {
+        if($this->attributes && StrContains::endsWith(strtolower("".$this->attributes["filename"]),"xslt")){
+            return true;
+        }
+        return false;
+    }
+    public function getAsXsltString(): string
+    {
+        if(StrUtil::notEmpty($this->value)){
+            return StrBase64::decode($this->textContent);
+        }
+        return '';
     }
 }

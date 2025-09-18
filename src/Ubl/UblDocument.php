@@ -4,12 +4,17 @@ namespace Efaturacim\Util\Ubl;
 
 use DOMDocument;
 use DOMElement;
+use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
+use Efaturacim\Util\Ubl\Objects\Attachment;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Ubl\Objects\UblDataTrait;
 use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
-
+use Efaturacim\Util\Utils\IO\IO_Util;
+use Efaturacim\Util\Utils\String\StrBase64;
+use Efaturacim\Util\Utils\String\StrSegment;
+use Efaturacim\Util\Utils\String\StrSerialize;
 
 /**
  * Abstract base class for Turkish UBL documents.
@@ -21,6 +26,12 @@ use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
 
 abstract class UblDocument{
     use UblDataTrait;   
+
+    /**
+     * @var UblDataTypeList
+    */
+    public $additionalDocumentReference = null;
+
      
     /**
      * Summary of options
@@ -101,6 +112,8 @@ abstract class UblDocument{
      */
     protected string $documentCurrencyCode = 'TRY';
 
+    public $orgXmlString = null;
+
     /**
      * Constructor.
      * Initializes the DOMDocument.
@@ -111,6 +124,12 @@ abstract class UblDocument{
         $this->document->formatOutput = true;
         $this->options = new Options($options);
         $this->initMe();
+    }
+    public function isOK(){
+        if(!is_null($this->root) && $this->root instanceof DOMElement){
+            return true;
+        }
+        return false;
     }
     abstract public function initMe();
     /**
@@ -363,4 +382,38 @@ abstract class UblDocument{
         self::setNamespacesFor($root,$rootElementName);
         return $document;      
     }      
+    public function getXsltStringOrDefaultXslt(){
+        $xsltString = $this->getXsltString();        
+        if(StrUtil::isEmpty($xsltString)){
+            $xsltString = $this->getDefaultXsltString();
+        }
+        return $xsltString;
+    }
+    public function getXsltString(){
+        if(!is_null($this->additionalDocumentReference) && !$this->additionalDocumentReference->isEmpty()){
+            foreach($this->additionalDocumentReference->list as $item){                
+                if($item instanceof AdditionalDocumentReference && $item->hasAttachment() ){
+                    foreach($item->attachment->list as $attachment){
+                        if($attachment instanceof Attachment && $attachment->hasEmbeddedDocumentBinaryObject() && $attachment->isXslt()){                            
+                            return $attachment->getAsXsltString();
+                        }
+                    }
+                }
+            }
+        }        
+        return null;
+    }
+    public function getBaseClassName(){
+        return StrSegment::getLastSegmentOf(get_class($this),array("\\","/"),true);
+    }
+    public function getDefaultXsltString(){        
+        $path            = IO_Util::getSafePath(__DIR__);
+        $possiblePaths   = array($path."Xslt/".$this->getBaseClassName().".xslt",$path."Xslt/".$this->rootElementName.".xslt");
+        foreach($possiblePaths as $path){
+            if(file_exists($path)){
+                return IO_Util::readFileAsString($path);
+            }
+        }
+        return null;
+    }
 }

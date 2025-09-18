@@ -81,4 +81,8 @@ class AdditionalDocumentReference extends UblDataType
 
         return $element;
     }
+    public function hasAttachment(): bool
+    {
+        return !$this->attachment->isEmpty();
+    }
 }

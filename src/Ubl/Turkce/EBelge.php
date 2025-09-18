@@ -4,14 +4,21 @@ namespace Efaturacim\Util\Ubl\Turkce;
 use Efaturacim\Util\Ubl\CreditNoteDocument;
 use Efaturacim\Util\Ubl\DespatchAdviceDocument;
 use Efaturacim\Util\Ubl\InvoiceDocument;
+use Efaturacim\Util\Ubl\Preview\UblPreview;
+use Efaturacim\Util\Ubl\Preview\XsltUtil;
+use Efaturacim\Util\Ubl\UblDocument;
+use Efaturacim\Util\Utils\Cache\MemoryCache;
 use Efaturacim\Util\Utils\Date\DateUtil;
 use Efaturacim\Util\Utils\IO\IO_Util;
+use Efaturacim\Util\Utils\Pdf\PdfUtil;
 use Efaturacim\Util\Utils\PreviewUtil;
+use Efaturacim\Util\Utils\SimpleResult;
+use Efaturacim\Util\Utils\String\StrUtil;
 
 class EBelge{
     /**
      * Summary of ubl
-     * @var InvoiceDocument|DespatchAdviceDocument|CreditNoteDocument|null
+     * @var InvoiceDocument|DespatchAdviceDocument|CreditNoteDocument|UblDocument
      */
     public $ubl = null;
     public function __construct($type=null){
@@ -23,10 +30,16 @@ class EBelge{
             $this->ubl = new CreditNoteDocument();
         }
     }
+    public function isOK(){
+        if(!is_null($this->ubl) && $this->ubl instanceof UblDocument){
+            return true;
+        }
+        return false;
+    }
     public static function fromXmlFile($filePath=null){
         return self::fromXmlContent(IO_Util::readFileAsString($filePath));
     }
-    public static function fromXmlContent($xmlString=null){
+    public static function fromXmlContent($xmlString=null,$readOnly=false){
         if (is_string($xmlString) && !empty($xmlString)) {
             if (preg_match('/<([a-zA-Z0-9_:]+)/', $xmlString, $matches)) {
                 $rootTagName = $matches[1];
@@ -49,6 +62,9 @@ class EBelge{
                 }
                 if ($belge) {
                     $belge->ubl->loadFromXml($xmlString);
+                    if($readOnly){
+                        $belge->ubl->orgXmlString = $xmlString;
+                    }
                     return $belge;
                 }
             }            
@@ -58,14 +74,52 @@ class EBelge{
     public function getBelgeNo(){
         return $this->ubl->getId();
     }
+    public function getBelgeTip(){
+        if($this->ubl){
+            return $this->ubl->getProfileId();
+        }
+        return null;
+    }
+    public function getGonderenVkn(){
+        $gonderen = $this->getSatici();        
+        if($gonderen){
+            return $gonderen->getVknOrTckn();
+        }
+        return null;
+    }
+    public function getGonderenUnvan(){
+        $gonderen = $this->getSatici();
+        if($gonderen){
+            return $gonderen->getName();
+        }
+        return null;
+    }    
+    public function getAliciVkn(){
+        $alici = $this->getAlici();
+        if($alici){
+            return $alici->getVknOrTckn();
+        }
+        return null;
+    }
+    public function getAliciUnvan(){
+        $alici = $this->getAlici();
+        if($alici){
+            return $alici->getName();
+        }
+        return null;
+    }      
     public function getCopyIndicator(){
         return $this->ubl->getCopyIndicator();
     }
     public function getBelgeGuid(){
        return  $this->ubl->getGUID();
     }
-    public function getBelgeTarihi(){
-        return DateUtil::newDate($this->ubl->getIssueDate()." ".$this->ubl->getIssueTime());
+    public function getBelgeTarihi($asDbDateTime=true){
+        if($asDbDateTime){
+            return DateUtil::newDate($this->ubl->getIssueDate()." ".$this->ubl->getIssueTime());
+        }else{
+            return DateUtil::newDate($this->ubl->getIssueDate()." ".$this->ubl->getIssueTime())->toDbDateTime();
+        }        
     }
     public function setSaticiBilgileri($options=null,$clear=false){
         $this->ubl->despatchSupplierParty->loadFromOptions($options,$clear);
@@ -76,10 +130,22 @@ class EBelge{
         return $this;
     }
     public function &getSatici(){
-        return $this->ubl->accountingSupplierParty;
+        $null = null;        
+        if($this->ubl instanceof InvoiceDocument){            
+            return $this->ubl->accountingSupplierParty; 
+        }else if($this->ubl instanceof CreditNoteDocument){
+            return $this->ubl->accountingSupplierParty; 
+        }else if($this->ubl instanceof DespatchAdviceDocument){
+            return $this->ubl->despatchSupplierParty; 
+        }            
+        return $null;
     }
     public function &getAlici(){
-        return $this->ubl->accountingCustomerParty;
+        $null = null;
+        if($this->ubl instanceof InvoiceDocument || $this->ubl instanceof DespatchAdviceDocument || $this->ubl instanceof CreditNoteDocument || $this->ubl instanceof DespatchAdviceDocument){
+            return $this->ubl->accountingCustomerParty;
+        }
+        return $null;
     }
     public function ekleSiparis($sipKodu=null,$tarih=null){
         if(is_null($tarih)){ $tarih = date('Y-m-d'); }
@@ -137,6 +203,63 @@ class EBelge{
             return $this->ubl->invoiceLine->getCount();        
         }        
         return 0;
+    }
+    public function getHtmlResult($useCache=true){
+        $r = new SimpleResult();
+        if(!is_null($this->ubl) ){
+            $xmlString = $this->ubl->orgXmlString;
+            if(StrUtil::isEmpty($xmlString) && !is_null($this->ubl)){
+                $xmlString = $this->ubl->toXml();
+            }
+            if(StrUtil::notEmpty($xmlString) ){
+                $xsltString = $this->ubl->getXsltStringOrDefaultXslt();
+                if(StrUtil::notEmpty($xsltString)){                                        
+                    if($useCache){
+                        $cacheKey = MemoryCache::getKey($xmlString.$xsltString);                        
+                        if(MemoryCache::hasKey($cacheKey)){
+                            $r->value = MemoryCache::get($cacheKey);
+                            return $r;
+                        }
+                    }
+                    $r->value = XsltUtil::getHtmlFromXml($xmlString,$xsltString,array());                    
+                    if($useCache){
+                        MemoryCache::set($cacheKey,$r->value);
+                    }
+                }                
+            }
+        }        
+        return $r;
+    }
+    public function getHtmlString(){
+        return $this->getHtmlResult()->value;        
+    }
+    public function getPdfResult($useCache=true){    
+        $r = new SimpleResult();        
+        if(!is_null($this->ubl) ){
+            $html = $this->getHtmlString($useCache);
+            if(StrUtil::notEmpty($html)){
+                if($useCache){
+                    $cacheKey = MemoryCache::getKey($html);                        
+                    if(MemoryCache::hasKey($cacheKey)){
+                        $r->value = MemoryCache::get($cacheKey);
+                        return $r;
+                    }
+                }
+                $resPdf = PdfUtil::getPdfFromHtml($html,array("template"=>"ubl"));                                
+                if($resPdf->isOK()){
+                    $r->value = $resPdf->value;
+                    if($useCache){
+                        MemoryCache::set($cacheKey,$r->value);
+                    }    
+                }else{
+                    return $resPdf;
+                }
+            }
+        }
+        return $r;
+    }
+    public function getPdfString(){
+        return $this->getPdfResult()->value;
     }
 }
 ?>
