@@ -50,8 +50,15 @@ class GoodsItem extends UblDataType
         }
         $element = $document->createElement('cac:GoodsItem');
         $this->appendElement($document, $element, 'cbc:RequiredCustomsID', $this->requiredCustomsID);
-        $this->appendChild($element,$this->valueAmount->toDOMElement($document));
-        $this->appendChild($element,$this->invoiceLine->toDOMElement($document));
+        
+        if ($this->valueAmount && !$this->valueAmount->isEmpty()) {
+            $this->appendChild($element, $this->valueAmount->toDOMElement($document));
+        }
+        
+        if ($this->invoiceLine && !$this->invoiceLine->isEmpty()) {
+            $this->appendChild($element, $this->invoiceLine->toDOMElement($document));
+        }
+        
         return $element;
     }
 }

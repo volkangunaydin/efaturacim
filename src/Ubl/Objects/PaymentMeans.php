@@ -53,12 +53,13 @@ class PaymentMeans extends UblDataType
         return false;
     }
     public function isEmpty(){
-        return is_null($this->paymentMeansCode);
+        return is_null($this->paymentMeansCode) || $this->paymentMeansCode->isEmpty();
     }
     public function toDOMElement(DOMDocument $document){
         if ($this->isEmpty()) {            
             return null;
         }
+        
         $element = $this->createElement($document,'cac:PaymentMeans');        
         $element->appendChild($this->paymentMeansCode->toDOMElement($document));
         $this->appendElement($document, $element, 'cbc:PaymentChannelCode', $this->paymentChannelCode);
