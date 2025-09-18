@@ -52,5 +52,21 @@ class IO_Util{
     public static function writeFileAsString($path,$content){
         return file_put_contents($path,$content);
     }
+    public static function writeTextFile($path,$content){
+        return file_put_contents($path,$content);
+    }
+    public static function deleteFile($path){
+        $r = new SimpleResult();        
+        if(file_exists($path)){
+            $a  = unlink($path);
+            $r->setIsOk($a);
+            if($a){
+                $r->value = true;
+            }else{
+                $r->addError("Dosya silinemedi");
+            }
+        }
+        return $r;
+    }
 }
 ?>
