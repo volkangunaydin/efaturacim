@@ -139,21 +139,21 @@ class CreditNoteDocument extends UblDocument
         $this->setIssueTime(date('H:i:s'));
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
-        $this->accountingCustomerParty     = new AccountingCustomerParty();
-        $this->accountingSupplierParty     = new AccountingSupplierParty();
-        $this->buyerCustomerParty          = new BuyerCustomerParty();
-        $this->delivery                    = new Delivery();
-        $this->orderReference              = new UblDataTypeList(OrderReference::class);
-        $this->despatchDocumentReference   = new UblDataTypeList(DespatchDocumentReference::class);
-        $this->note                        = new UblDataTypeList(Note::class);
-        $this->invoiceLine                 = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
-        $this->taxTotal                    = new TaxTotal();
-        $this->withholdingTaxTotal         = new WithholdingTaxTotal();
-        $this->pricingExchangeRate         = new PricingExchangeRate();
-        $this->paymentMeans                = new PaymentMeans();
-        $this->legalMonetaryTotal          = new LegalMonetaryTotal();
+        $this->accountingCustomerParty = new AccountingCustomerParty();
+        $this->accountingSupplierParty = new AccountingSupplierParty();
+        $this->buyerCustomerParty = new BuyerCustomerParty();
+        $this->delivery = new Delivery();
+        $this->orderReference = new UblDataTypeList(OrderReference::class);
+        $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
+        $this->note = new UblDataTypeList(Note::class);
+        $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
+        $this->taxTotal = new TaxTotal();
+        $this->withholdingTaxTotal = new WithholdingTaxTotal();
+        $this->pricingExchangeRate = new PricingExchangeRate();
+        $this->paymentMeans = new PaymentMeans();
+        $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
-        $this->UBLExtensions               = new UBLExtensions();
+        $this->UBLExtensions = new UBLExtensions();
     }
     public function setLineCount()
     {
@@ -261,6 +261,9 @@ class CreditNoteDocument extends UblDocument
         } else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
             $this->profileId = $v;
             return true;
+        } else if (in_array($k, ["customizationid", "customization_id", "CustomizationID", "customizationId"]) && StrUtil::notEmpty($v)) {
+            $this->customizationId = $v;
+            return true;
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
             return true;
@@ -331,19 +334,19 @@ class CreditNoteDocument extends UblDocument
     public function getContextArray()
     {
         return new Options([
-            "nextLineId"           => $this->invoiceLine->getCount() + 1,
+            "nextLineId" => $this->invoiceLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "creditNote"           => $this->invoiceTypeCode,
+            "creditNote" => $this->invoiceTypeCode,
         ]);
     }
     public function rebuildValues()
     {
-        $totalLineExtensionAmount  = 0;
-        $totalTaxExclusiveAmount   = 0;
-        $totalTaxInclusiveAmount   = 0;
+        $totalLineExtensionAmount = 0;
+        $totalTaxExclusiveAmount = 0;
+        $totalTaxInclusiveAmount = 0;
         $totalAllowanceTotalAmount = 0;
-        $totalChargeTotalAmount    = 0;
-        $totalPayableAmount        = 0;
+        $totalChargeTotalAmount = 0;
+        $totalPayableAmount = 0;
 
         // Rebuild invoice line values and collect totals
         foreach ($this->invoiceLine->list as &$invLine) {
@@ -380,7 +383,7 @@ class CreditNoteDocument extends UblDocument
                 $vat = $line->getVatAsArray();
                 if ($vat && is_array($vat) && count($vat) > 0 && key_exists("percent", $vat)) {
                     $percent = @$vat["percent"];
-                    if (! key_exists($percent, $arr)) {
+                    if (!key_exists($percent, $arr)) {
                         $arr[$percent] = [];
                     }
                     foreach ($vat as $kk => $vv) {

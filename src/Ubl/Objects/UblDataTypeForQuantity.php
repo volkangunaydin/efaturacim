@@ -9,13 +9,19 @@ use Efaturacim\Util\Utils\String\StrUtil;
 
 class UblDataTypeForQuantity extends UblDataType{
     public function initMe(){
-        $this->attributes["unitCode"] = "C62"; // Default to "unit"]
+        // Don't set unitCode by default - only when explicitly provided
+        // $this->attributes["unitCode"] = "C62"; // Default to "unit"]
     }
     public function isEmpty(){        
         return StrUtil::isEmpty($this->textContent);
     }    
     public function setCode($code=null){
-        $this->attributes["unitCode"] = $code; // Default to "unit"]
+        if ($code !== null && $code !== '') {
+            $this->attributes["unitCode"] = $code;
+        } else {
+            // Remove unitCode attribute if it exists
+            unset($this->attributes["unitCode"]);
+        }
     }    
     public function setPropertyFromOptions($k,$v,$options){        
         return false;

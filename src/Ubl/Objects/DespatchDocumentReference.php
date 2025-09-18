@@ -30,21 +30,21 @@ class DespatchDocumentReference extends UblDataType
         }else if (in_array($k, ['issueDate', 'tarih','date']) && StrUtil::notEmpty($v)) {
             $this->issueDate = $v;
             return true;
-        }else if (in_array($k, ['validityPeriod', 'validityperiod', 'validityPeriod']) && StrUtil::notEmpty($v)) {
-            $this->validityPeriod = $v;
+        }
+        if ($this->validityPeriod->setPropertyFromOptions($k, $v, $options)) {
             return true;
         }
         return false;
     }
     public function isEmpty(){  
-        return StrUtil::isEmpty($this->id);        
+        return is_null($this->id);
     }
     public function toDOMElement(DOMDocument $document){
         if($this->isEmpty()){ return null; }
         $element = $document->createElement('cac:DespatchDocumentReference');
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
         $this->appendElement($document, $element, 'cbc:IssueDate', DateUtil::getAsDbDate($this->issueDate));
-        $element->appendChild($this->validityPeriod->toDOMElement($document));
+        $this->appendChild($element, $this->validityPeriod->toDOMElement($document));
         return $element;
     }
 }

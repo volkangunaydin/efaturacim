@@ -52,12 +52,12 @@ class DespatchAdviceDocument extends UblDocument
      */
     public $buyerCustomerParty = null;
 
-        /**
+    /**
      * @var Shipment
      */
     public $shipment = null;
 
-        /**
+    /**
      * @var CarrierParty
      */
     public $carrierParty = null;
@@ -150,22 +150,22 @@ class DespatchAdviceDocument extends UblDocument
         $this->setIssueTime(date('H:i:s'));
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
-        $this->deliveryCustomerParty     = new DeliveryCustomerParty();
-        $this->despatchSupplierParty     = new DespatchSupplierParty();
-        $this->carrierParty              = new CarrierParty();
-        $this->buyerCustomerParty          = new BuyerCustomerParty();
-        $this->delivery                    = new Delivery();
-        $this->orderReference              = new UblDataTypeList(OrderReference::class);
-        $this->despatchDocumentReference   = new UblDataTypeList(DespatchDocumentReference::class);
-        $this->note                        = new UblDataTypeList(Note::class);
-        $this->shipment                    = new Shipment();
-        $this->despatchLine                = new UblDataTypeListForDespatchLine(DespatchLine::class);
-        $this->taxTotal                    = new TaxTotal();
-        $this->withholdingTaxTotal         = new WithholdingTaxTotal();
-        $this->pricingExchangeRate         = new PricingExchangeRate();
-        $this->paymentMeans                = new PaymentMeans();
+        $this->deliveryCustomerParty = new DeliveryCustomerParty();
+        $this->despatchSupplierParty = new DespatchSupplierParty();
+        $this->carrierParty = new CarrierParty();
+        $this->buyerCustomerParty = new BuyerCustomerParty();
+        $this->delivery = new Delivery();
+        $this->orderReference = new UblDataTypeList(OrderReference::class);
+        $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
+        $this->note = new UblDataTypeList(Note::class);
+        $this->shipment = new Shipment();
+        $this->despatchLine = new UblDataTypeListForDespatchLine(DespatchLine::class);
+        $this->taxTotal = new TaxTotal();
+        $this->withholdingTaxTotal = new WithholdingTaxTotal();
+        $this->pricingExchangeRate = new PricingExchangeRate();
+        $this->paymentMeans = new PaymentMeans();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
-        $this->UBLExtensions               = new UBLExtensions();
+        $this->UBLExtensions = new UBLExtensions();
     }
     public function setLineCount()
     {
@@ -277,7 +277,10 @@ class DespatchAdviceDocument extends UblDocument
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
             return true;
-        }else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, ["customizationid", "customization_id", "CustomizationID", "customizationId"]) && StrUtil::notEmpty($v)) {
+            $this->customizationId = $v;
+            return true;
+        } else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
             $this->profileId = $v;
             return true;
         } else if (in_array($k, ["note", "notes", "Note"]) && ArrayUtil::notEmpty($v)) {
@@ -347,9 +350,9 @@ class DespatchAdviceDocument extends UblDocument
     public function getContextArray()
     {
         return new Options([
-            "nextLineId"           => $this->despatchLine->getCount() + 1,
+            "nextLineId" => $this->despatchLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "despatchAdvice"       => $this->despatchAdviceTypeCode,
+            "despatchAdvice" => $this->despatchAdviceTypeCode,
         ]);
     }
 
@@ -361,7 +364,7 @@ class DespatchAdviceDocument extends UblDocument
                 $vat = $line->getVatAsArray();
                 if ($vat && is_array($vat) && count($vat) > 0 && key_exists("percent", $vat)) {
                     $percent = @$vat["percent"];
-                    if (! key_exists($percent, $arr)) {
+                    if (!key_exists($percent, $arr)) {
                         $arr[$percent] = [];
                     }
                     foreach ($vat as $kk => $vv) {

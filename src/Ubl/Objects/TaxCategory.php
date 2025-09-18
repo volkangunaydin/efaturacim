@@ -40,8 +40,6 @@ class TaxCategory extends UblDataType
             $this->taxExemptionReason = $v;
             return true;
         }
-
-        // Pass other options to taxScheme
         if ($this->taxScheme->setPropertyFromOptions($k, $v, $options)) {
             return true;
         }

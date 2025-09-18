@@ -48,6 +48,9 @@ class DespatchLineReference extends UblDataType
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
+        if ($this->isEmpty()) {
+            return null;
+        }
         $element = $document->createElement('cac:DespatchLineReference');
         $this->appendElement($document, $element, 'cbc:LineID', $this->lineId);
         $this->appendChild($element, $this->documentReference->toDOMElement($document));

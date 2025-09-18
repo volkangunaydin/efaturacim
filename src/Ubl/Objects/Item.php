@@ -9,6 +9,7 @@ use Efaturacim\Util\Utils\String\StrUtil;
 class Item extends UblDataType
 {
     public ?string $name = null;
+    public ?string $brandName = null;
     public ?string $description = null;
     public ?BuyersItemIdentification $buyersItemIdentification = null;
     public ?SellersItemIdentification $sellersItemIdentification = null;
@@ -47,6 +48,11 @@ class Item extends UblDataType
     {
         if (in_array($k, ['name', 'ad', 'urun_adi']) && StrUtil::notEmpty($v)) {
             $this->name = $v;
+            return true;
+        }
+
+        if (in_array($k, ['brandName', 'marka_adi']) && StrUtil::notEmpty($v)) {
+            $this->brandName = $v;
             return true;
         }
 
@@ -91,6 +97,7 @@ class Item extends UblDataType
         $element = $document->createElement('cac:Item');
 
         $this->appendElement($document, $element, 'cbc:Name', $this->name);
+        $this->appendElement($document, $element, 'cbc:BrandName', $this->brandName);
         $this->appendElement($document, $element, 'cbc:Description', $this->description);
 
         if ($this->buyersItemIdentification) {

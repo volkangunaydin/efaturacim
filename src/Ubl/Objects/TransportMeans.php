@@ -34,6 +34,10 @@ class TransportMeans extends UblDataType
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
+        if ($this->isEmpty()) {
+            return null;
+        }
+        
         $element = $document->createElement('cac:TransportMeans');
         $this->appendChild($element, $this->roadTransport->toDOMElement($document));
         return $element;

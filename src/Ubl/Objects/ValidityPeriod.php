@@ -9,8 +9,8 @@ use PDO;
 
 class ValidityPeriod extends UblDataType
 {
-    public ?string $StartDate = null;
-    public ?string $StartTime = null;
+    public ?string $startDate = null;
+    public ?string $startTime = null;
 
     public function __construct($options = null)
     {
@@ -19,24 +19,23 @@ class ValidityPeriod extends UblDataType
 
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, ['StartDate', 'startdate', 'startDate']) && StrUtil::notEmpty($v)) {
-            $this->StartDate = $v;
+        if (in_array($k, ['startDate', 'start_date', 'StartDate']) && StrUtil::notEmpty($v)) {
+            $this->startDate = $v;
             return true;
-        }
-        if (in_array($k, ['StartTime', 'starttime', 'startTime']) && StrUtil::notEmpty($v)) {
-            $this->StartTime = $v;
+        }else if(in_array($k, ['startTime', 'start_time', 'StartTime']) && StrUtil::notEmpty($v)) {
+            $this->startTime = $v;
             return true;
         }
         return false;
     }
     public function isEmpty(){  
-        return is_null($this->StartDate) || is_null($this->StartTime);
+        return StrUtil::isEmpty($this->startDate) && StrUtil::isEmpty($this->startTime);        
     }
     public function toDOMElement(DOMDocument $document){
         if($this->isEmpty()){ return null; }
         $element = $document->createElement('cac:ValidityPeriod');
-        $this->appendElement($document, $element, 'cbc:StartDate', $this->StartDate);
-        $this->appendElement($document, $element, 'cbc:StartTime', $this->StartTime);
+        $this->appendElement($document, $element, 'cbc:StartDate', $this->startDate);
+        $this->appendElement($document, $element, 'cbc:StartTime', $this->startTime);
         return $element;
     }
 }

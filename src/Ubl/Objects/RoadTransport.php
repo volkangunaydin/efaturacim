@@ -28,9 +28,13 @@ class RoadTransport extends UblDataType
         return false;
     }
     public function isEmpty(){  
-        return StrUtil::isEmpty($this->licensePlateID);        
+        return StrUtil::isEmpty($this->licensePlateID) || $this->licensePlateID->isEmpty();        
     }
     public function toDOMElement(DOMDocument $document){
+        if ($this->isEmpty()) {
+            return null;
+        }
+        
         $element = $document->createElement('cac:RoadTransport');
         $this->appendChild($element, $this->licensePlateID->toDOMElement($document));
         return $element;

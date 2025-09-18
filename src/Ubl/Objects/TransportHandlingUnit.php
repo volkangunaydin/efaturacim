@@ -32,6 +32,9 @@ class TransportHandlingUnit extends UblDataType
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {
+        if ($this->isEmpty()) {
+            return null;
+        }
         $element = $document->createElement('cac:TransportHandlingUnit');
         $this->appendChild($element, $this->actualPackage->toDOMElement($document));
         $this->appendChild($element, $this->transportEquipment->toDOMElement($document));

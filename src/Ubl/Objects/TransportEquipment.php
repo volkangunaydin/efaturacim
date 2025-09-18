@@ -35,6 +35,9 @@ class TransportEquipment extends UblDataType
         return StrUtil::isEmpty($this->id);        
     }
     public function toDOMElement(DOMDocument $document){
+        if ($this->isEmpty()) {
+            return null;
+        }
         $element = $document->createElement('cac:TransportEquipment');
         $this->appendChild($element, $this->id->toDOMElement($document));
         return $element;

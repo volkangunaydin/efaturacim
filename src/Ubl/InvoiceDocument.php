@@ -298,6 +298,9 @@ class InvoiceDocument extends UblDocument
         } else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
             $this->profileId = $v;
             return true;
+        } else if (in_array($k, ["customizationid", "customization_id", "CustomizationID", "customizationId"]) && StrUtil::notEmpty($v)) {
+            $this->customizationId = $v;
+            return true;
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {
             $this->uuid = $v;
             return true;
