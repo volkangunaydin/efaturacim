@@ -14,6 +14,7 @@ class Item extends UblDataType
     public ?BuyersItemIdentification $buyersItemIdentification = null;
     public ?SellersItemIdentification $sellersItemIdentification = null;
     public ?ManufacturersItemIdentification $manufacturersItemIdentification = null;
+    public ?UblDataTypeListForAdditionalItemIdentification $additionalItemIdentification = null;
     public ?CommodityClassification $commodityClassification = null;
     public function __construct($options = null)
     {
@@ -37,11 +38,13 @@ class Item extends UblDataType
         }
     }
 
-    public function initMe(){
-        $this->sellersItemIdentification   = new SellersItemIdentification();
-        $this->buyersItemIdentification   = new BuyersItemIdentification();
-        $this->manufacturersItemIdentification   = new ManufacturersItemIdentification();
-        $this->commodityClassification   = new CommodityClassification();
+    public function initMe()
+    {
+        $this->sellersItemIdentification = new SellersItemIdentification();
+        $this->buyersItemIdentification = new BuyersItemIdentification();
+        $this->manufacturersItemIdentification = new ManufacturersItemIdentification();
+        $this->additionalItemIdentification = new UblDataTypeListForAdditionalItemIdentification(AdditionalItemIdentification::class);
+        $this->commodityClassification = new CommodityClassification();
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool
@@ -71,6 +74,10 @@ class Item extends UblDataType
         }
         if (in_array($k, ['manufacturersItemID', 'uretici_stok_kodu']) && StrUtil::notEmpty($v)) {
             $this->manufacturersItemIdentification = new ManufacturersItemIdentification(['id' => $v]);
+            return true;
+        } else if (in_array($k, array("additionalItemID", "ek_stok_kodu")) && StrUtil::notEmpty($v)) {
+            $schemeID = $options['schemeID'] ?? null;
+            $this->additionalItemIdentification->setAdditionalItemID($v, $schemeID);
             return true;
         }
 
@@ -111,6 +118,9 @@ class Item extends UblDataType
         }
         if ($this->commodityClassification) {
             $this->appendChild($element, $this->commodityClassification->toDOMElement($document));
+        }
+        if ($this->additionalItemIdentification && !$this->additionalItemIdentification->isEmpty()) {
+            $this->appendChild($element, $this->additionalItemIdentification->toDOMElement($document));
         }
         return $element;
     }
