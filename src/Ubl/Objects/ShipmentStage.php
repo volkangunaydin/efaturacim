@@ -21,11 +21,20 @@ class ShipmentStage extends UblDataType
     public function setPropertyFromOptions($k, $v, $options): bool
     {                       
         if (in_array($k, ['TransportMeans', 'transportMeans', 'TRANSPORTMEANS'])) {
-            $this->transportMeans = $v;
+            if (is_array($v)) {
+                $this->transportMeans = new TransportMeans($v);
+            } else {
+                $this->transportMeans = $v;
+            }
             return true;
         }
         if (in_array($k, ['DriverPerson', 'driverPerson', 'DRIVERPERSON'])) {
-            $this->driverPerson = $v;
+            if (is_array($v)) {
+                $this->driverPerson = new UblDataTypeList(DriverPerson::class);
+                $this->driverPerson->loadFromArray($v);
+            } else {
+                $this->driverPerson = $v;
+            }
             return true;
         }
         return false;

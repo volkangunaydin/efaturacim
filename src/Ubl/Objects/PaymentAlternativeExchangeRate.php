@@ -6,7 +6,7 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Utils\String\StrUtil;
 
-class PricingExchangeRate extends UblDataType
+class PaymentAlternativeExchangeRate extends UblDataType
 {
     public ?string $sourceCurrencyCode = null;
     public ?string $targetCurrencyCode = 'TRY';
@@ -52,7 +52,7 @@ class PricingExchangeRate extends UblDataType
             return null;
         }
 
-        $element = $document->createElement('cac:PricingExchangeRate');
+        $element = $document->createElement('cac:PaymentAlternativeExchangeRate');
 
         $this->appendElement($document, $element, 'cbc:SourceCurrencyCode', $this->sourceCurrencyCode);
         $this->appendElement($document, $element, 'cbc:TargetCurrencyCode', $this->targetCurrencyCode);

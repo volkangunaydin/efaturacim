@@ -9,7 +9,10 @@ use Efaturacim\Util\Utils\String\StrUtil;
 
 class PaymentTerms extends UblDataType
 {
-    public ?string $note = null;
+    /**
+     * @var UblDataTypeList
+     */
+    public $note;
     public ?string $paymentDueDate = null;
 
     public function __construct($options = null)
@@ -17,10 +20,31 @@ class PaymentTerms extends UblDataType
         parent::__construct($options);
     }
 
+    public function initMe()
+    {
+        $this->note = new UblDataTypeList(Note::class);
+    }
+
+    public function addNote(array $options): self
+    {
+        $this->note->add(new Note($options));
+        return $this;
+    }
+
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, ['note', 'not']) && StrUtil::notEmpty($v)) {
-            $this->note = $v;
+        if (in_array(strtolower($k), ['note', 'not', 'notes', 'notlar'])) {
+            if (is_array($v)) {
+                foreach ($v as $noteValue) {
+                    if (is_array($noteValue)) {
+                        $this->addNote($noteValue);
+                    } elseif (StrUtil::notEmpty($noteValue)) {
+                        $this->addNote(['value' => $noteValue]);
+                    }
+                }
+            } elseif (StrUtil::notEmpty($v)) {
+                $this->addNote(['value' => $v]);
+            }
             return true;
         }
         if (in_array($k, ['paymentDueDate', 'vade_tarihi', 'odeme_tarihi']) && StrUtil::notEmpty($v)) {
@@ -33,7 +57,7 @@ class PaymentTerms extends UblDataType
     public function isEmpty(): bool
     {
         // PaymentTerms is considered empty if it has no note and no due date.
-        return StrUtil::isEmpty($this->note) && StrUtil::isEmpty($this->paymentDueDate);
+        return $this->note->isEmpty() && StrUtil::isEmpty($this->paymentDueDate);
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
@@ -44,7 +68,7 @@ class PaymentTerms extends UblDataType
 
         $element = $document->createElement('cac:PaymentTerms');
 
-        $this->appendElement($document, $element, 'cbc:Note', $this->note);
+        $this->appendChild($element, $this->note->toDOMElement($document));
         $this->appendElement($document, $element, 'cbc:PaymentDueDate', $this->paymentDueDate);
 
         return $element;

@@ -7,7 +7,7 @@ use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\BuyerCustomerParty;
 use Efaturacim\Util\Ubl\Objects\Delivery;
 use Efaturacim\Util\Ubl\Objects\DespatchDocumentReference;
-use Efaturacim\Util\Ubl\Objects\InvoiceLine;
+use Efaturacim\Util\Ubl\Objects\CreditNoteLine;
 use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
@@ -17,7 +17,7 @@ use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
 use Efaturacim\Util\Ubl\Objects\TaxTotal;
 use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
-use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
+use Efaturacim\Util\Ubl\Objects\UblDataTypeListForCreditNoteLine;
 use Efaturacim\Util\Ubl\Objects\UBLExtensions;
 use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Utils\Array\ArrayUtil;
@@ -101,7 +101,7 @@ class CreditNoteDocument extends UblDocument
     /**
      * @var UblDataTypeList
      */
-    public $invoiceLine = null;
+    public $creditNoteLine = null;
 
     // TODO: Add properties for invoice lines, parties, totals etc.
     // public array $invoiceLines = [];
@@ -142,7 +142,7 @@ class CreditNoteDocument extends UblDocument
         $this->orderReference = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note = new UblDataTypeList(Note::class);
-        $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
+        $this->invoiceLine = new UblDataTypeListForCreditNoteLine(CreditNoteLine::class);
         $this->taxTotal = new TaxTotal();
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
@@ -271,12 +271,12 @@ class CreditNoteDocument extends UblDocument
         } else if (in_array($k, ["note", "notes", "Note"]) && StrUtil::notEmpty($v)) {
             $this->note->add(Note::newNote($v));
             return true;
-        } else if (in_array($k, ["invoiceLine", "satirlar", "lines", "InvoiceLine"]) && ArrayUtil::notEmpty($v)) {
+        } else if (in_array($k, ["creditNoteLine", "satirlar", "lines", "CreditNoteLine"]) && ArrayUtil::notEmpty($v)) {
             if (ArrayUtil::isAssoc($v)) {
-                $this->invoiceLine->add(InvoiceLine::newLine($v), null, null, $this->getContextArray());
+                $this->creditNoteLine->add(CreditNoteLine::newLine($v), null, null, $this->getContextArray());
             } else {
                 foreach ($v as $vv) {
-                    $this->invoiceLine->add(InvoiceLine::newLine($vv), null, null, $this->getContextArray());
+                    $this->creditNoteLine->add(CreditNoteLine::newLine($vv), null, null, $this->getContextArray());
                 }
             }
             return true;

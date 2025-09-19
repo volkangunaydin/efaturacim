@@ -111,6 +111,8 @@ abstract class UblDocument{
      * @var string
      */
     protected string $documentCurrencyCode = 'TRY';
+    protected ?string $pricingCurrencyCode = null;
+
 
     public $orgXmlString = null;
 

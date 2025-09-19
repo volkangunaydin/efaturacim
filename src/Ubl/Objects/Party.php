@@ -18,6 +18,7 @@ class Party extends UblDataType
     public ?Contact $contact = null;
     public ?Person $person = null;
     public ?PartyLegalEntity $partyLegalEntity = null;  
+    public ?AgentParty $agentParty = null;
 
     public function __construct($options=null)
     {
@@ -32,6 +33,7 @@ class Party extends UblDataType
         $this->contact             = new Contact();
         $this->partyName           = new PartyName();
         $this->person              = new Person();
+        $this->agentParty          = new AgentParty();
     }
     public function setPropertyFromOptions($k,$v,$options){
         if(in_array($k,array("party_name","musteri_adi","unvan","cari_adi","partyName")) && StrUtil::notEmpty($v)){            
@@ -53,6 +55,8 @@ class Party extends UblDataType
         }else if(in_array($k,array("web","www","url")) && StrUtil::notEmpty($v)){
             $this->websiteURI = $v;
             return true;
+        }else if(in_array($k,array("agent_party")) && StrUtil::notEmpty($v)){
+            return $this->agentParty->setPropertyFromOptions($k, $v, $options);
         }else{
             if ($this->person->setPropertyFromOptions($k, $v, $options)) {
                 return true;
@@ -124,6 +128,7 @@ class Party extends UblDataType
             }            
         }
         $this->appendChild($element,$this->person->toDOMElement($document));
+        $this->appendChild($element,$this->agentParty->toDOMElement($document));
         return $element;
     }
     public function isEmpty(){        

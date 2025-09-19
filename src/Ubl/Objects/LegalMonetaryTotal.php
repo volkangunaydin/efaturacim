@@ -31,7 +31,11 @@ class LegalMonetaryTotal extends UblDataType
     /**
      * @var PayableAmount
      */
-    public $payableAmount = null;    
+    public $payableAmount = null;
+    /**
+     * @var PayableRoundingAmount
+     */
+    public $payableRoundingAmount = null;    
 
     
     public function initMe(){
@@ -42,6 +46,7 @@ class LegalMonetaryTotal extends UblDataType
         $this->allowanceTotalAmount= new AllowanceTotalAmount();
         $this->chargeTotalAmount   = new ChargeTotalAmount();
         $this->payableAmount       = new PayableAmount();
+        $this->payableRoundingAmount = new PayableRoundingAmount();
     }
     public function setPropertyFromOptions($k, $v, $options): bool {
         if(in_array($k, ['lineExtensionAmount', 'lineExtensionAmountCurrencyID'])){
@@ -92,6 +97,14 @@ class LegalMonetaryTotal extends UblDataType
             }
             return true;
         }
+        if(in_array($k, ['payableRoundingAmount', 'payableRoundingAmountCurrencyID'])){ 
+            if($k === 'payableRoundingAmount') {
+                $this->payableRoundingAmount->setValue($v);
+            } else {
+                $this->payableRoundingAmount->setCurrencyID($v);
+            }
+            return true;
+        }
         return false;
     }
     public function setCurrencyID($code=null){
@@ -117,6 +130,7 @@ class LegalMonetaryTotal extends UblDataType
         $this->appendChild($element,$this->allowanceTotalAmount->toDOMElement($document));    
         $this->appendChild($element,$this->chargeTotalAmount->toDOMElement($document));    
         $this->appendChild($element,$this->payableAmount->toDOMElement($document));    
+        $this->appendChild($element,$this->payableRoundingAmount->toDOMElement($document));    
         return $element;
     }
     public function getPayableAmount(){
@@ -136,6 +150,9 @@ class LegalMonetaryTotal extends UblDataType
     }
     public function getChargeTotalAmount(){
         return $this->chargeTotalAmount->toNumber();
+    }
+    public function getPayableRoundingAmount(){
+        return $this->payableRoundingAmount->toNumber();
     }
 }
 ?>

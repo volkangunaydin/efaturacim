@@ -8,13 +8,11 @@ use Efaturacim\Util\Utils\String\StrUtil;
 
 
 class LicensePlateID extends UblDataType{
-    public function initMe(): void{
-        $this->attributes["schemeID"] = "PLAKA"; 
-        $this->defaultTagName = "cbc:LicensePlateID";
+    public function isEmpty(){
+        return !StrUtil::notEmpty($this->textContent);
     }
-    
-    public function setPropertyFromOptions($k, $v, $options){
-        if (in_array($k, ['licensePlateID', 'plaka_id', 'value']) && StrUtil::notEmpty($v)) {
+    public function setPropertyFromOptions($k,$v,$options){
+        if (in_array($k, ['id', 'ID', 'value']) && StrUtil::notEmpty($v)) {
             $this->setValue($v);
             return true;
         }
@@ -23,16 +21,18 @@ class LicensePlateID extends UblDataType{
             return true;
         }
         return false;
-    }
-
-    public function setValue($value){
-        $this->textContent = $value;
-    }
-    
-    public function toDOMElement(DOMDocument $document){
+    }    
+    public function toDOMElement(DOMDocument $document): ?DOMElement{
         if ($this->isEmpty()) {
             return null;
         }
-        return $this->createElement($document, $this->defaultTagName);
+        // cbc:Note is a simple element with just a text value.
+        return $this->createElement($document,'cbc:LicensePlateID');
     }
-} 
+    public static function newNote($str){
+        return new LicensePlateID(array("value"=>$str));
+    }
+    public function setValue($value){
+        $this->textContent = $value;
+    }
+}

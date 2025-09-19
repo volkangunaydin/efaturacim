@@ -12,6 +12,7 @@ class InvoiceDocumentReference extends UblDataType
     public ?string $issueDate = null;
     public ?string $documentTypeCode = null;
     public ?string $documentType = null;
+    public ?string $documentDescription = null;
 
     public function setPropertyFromOptions($k, $v, $options)
     {
@@ -31,6 +32,10 @@ class InvoiceDocumentReference extends UblDataType
             $this->documentType = $v;
             return true;
         }
+        if (in_array($k, ['documentDescription', 'DocumentDescription', 'DOCUMENTDESCRIPTION']) && StrUtil::notEmpty($v)) {
+            $this->documentDescription = $v;
+            return true;
+        }
         return false;
     }
     public function toDOMElement(DOMDocument $document)
@@ -40,6 +45,7 @@ class InvoiceDocumentReference extends UblDataType
         $this->appendElement($document, $element, 'cbc:IssueDate', $this->issueDate);
         $this->appendElement($document, $element, 'cbc:DocumentTypeCode', $this->documentTypeCode);
         $this->appendElement($document, $element, 'cbc:DocumentType', $this->documentType);
+        $this->appendElement($document, $element, 'cbc:DocumentDescription', $this->documentDescription);
         return $element;
     }
     public function isEmpty()

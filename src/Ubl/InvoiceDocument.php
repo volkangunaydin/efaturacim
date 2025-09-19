@@ -16,8 +16,11 @@ use Efaturacim\Util\Ubl\Objects\LegalMonetaryTotal;
 use Efaturacim\Util\Ubl\Objects\Note;
 use Efaturacim\Util\Ubl\Objects\OrderReference;
 use Efaturacim\Util\Ubl\Objects\Party;
+use Efaturacim\Util\Ubl\Objects\PaymentTerms;
 use Efaturacim\Util\Ubl\Objects\PaymentMeans;
 use Efaturacim\Util\Ubl\Objects\PricingExchangeRate;
+use Efaturacim\Util\Ubl\Objects\PaymentExchangeRate;
+use Efaturacim\Util\Ubl\Objects\PaymentAlternativeExchangeRate;
 use Efaturacim\Util\Ubl\Objects\TaxTotal;
 use Efaturacim\Util\Ubl\Objects\UblDataType;
 use Efaturacim\Util\Ubl\Objects\UblDataTypeList;
@@ -45,6 +48,10 @@ class InvoiceDocument extends UblDocument
      */
 
     public ?string $invoiceTypeCode = null;
+    /**
+     * @var PaymentTerms
+     */
+    public $paymentTerms = null;
 
     public ?string $accountingCost = null;
 
@@ -91,6 +98,16 @@ class InvoiceDocument extends UblDocument
      * @var PricingExchangeRate
      */
     public $pricingExchangeRate = null;
+
+    /**
+     * @var PaymentExchangeRate
+     */
+    public $paymentExchangeRate = null;
+
+    /**
+     * @var PaymentAlternativeExchangeRate
+     */
+    public $paymentAlternativeExchangeRate = null;
 
     public $paymentMeans = null;
 
@@ -168,8 +185,11 @@ class InvoiceDocument extends UblDocument
         $this->invoiceLine = new UblDataTypeListForInvoiceLine(InvoiceLine::class);
         $this->allowanceCharge = new AllowanceCharge();
         $this->taxTotal = new TaxTotal();
+        $this->paymentTerms = new PaymentTerms();
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
+        $this->paymentExchangeRate = new PaymentExchangeRate();
+        $this->paymentAlternativeExchangeRate = new PaymentAlternativeExchangeRate();
         $this->paymentMeans = new UblDataTypeList(PaymentMeans::class);
         $this->legalMonetaryTotal = new LegalMonetaryTotal();
         $this->additionalDocumentReference = new UblDataTypeList(AdditionalDocumentReference::class);
@@ -196,6 +216,9 @@ class InvoiceDocument extends UblDocument
         $this->appendInvoicePeriod();
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
         $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);
+        if ($this->pricingCurrencyCode !== null) {
+            $this->appendElement('cbc:PricingCurrencyCode', $this->pricingCurrencyCode);
+        }
         $this->appendElement('cbc:AccountingCost', $this->accountingCost);
         $this->appendElementList($this->billingReference);
         $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
@@ -208,19 +231,27 @@ class InvoiceDocument extends UblDocument
         $this->appendAccountingCustomerParty();
         $this->appendBuyerCustomerParty();
         $this->appendDelivery();
+        $this->appendPaymentTerms();
         $this->appendElementList($this->paymentMeans);
         $this->appendAllowanceCharge();
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
+        $this->appendPaymentExchangeRate();
+        $this->appendPaymentAlternativeExchangeRate();
         $this->appendLegalMonetaryTotal();
         $this->appendElementList($this->invoiceLine);
+        
         return $this->document->saveXML();
     }
 
     public function appendLegalMonetaryTotal()
     {
         $this->appendElement('cac:LegalMonetaryTotal', $this->legalMonetaryTotal ? $this->legalMonetaryTotal->toDOMElement($this->document) : null);
+    }
+    public function appendPricingCurrencyCode()
+    {
+        $this->appendElement('cac:PricingCurrencyCode', $this->pricingCurrencyCode);
     }
     public function appendAccountingSupplierParty()
     {
@@ -250,6 +281,14 @@ class InvoiceDocument extends UblDocument
     {
         $this->appendElement('cac:PricingExchangeRate', $this->pricingExchangeRate->toDOMElement($this->document));
     }
+    public function appendPaymentExchangeRate()
+    {
+        $this->appendElement('cac:PaymentExchangeRate', $this->paymentExchangeRate->toDOMElement($this->document));
+    }
+    public function appendPaymentAlternativeExchangeRate()
+    {
+        $this->appendElement('cac:PaymentAlternativeExchangeRate', $this->paymentAlternativeExchangeRate->toDOMElement($this->document));
+    }
     public function appendInvoicePeriod()
     {
         $this->appendElement('cac:InvoicePeriod', $this->invoicePeriod->toDOMElement($this->document));
@@ -257,6 +296,10 @@ class InvoiceDocument extends UblDocument
     public function appendPaymentMeans()
     {
         $this->appendElement('cac:PaymentMeans', $this->paymentMeans->toDOMElement($this->document));
+    }
+    public function appendPaymentTerms()
+    {
+        $this->appendElement('cac:PaymentTerms', $this->paymentTerms->toDOMElement($this->document));
     }
     public function appendDelivery()
     {
@@ -294,7 +337,11 @@ class InvoiceDocument extends UblDocument
         } else if (in_array($k, ["profileid", "profile_id", "ProfileID", "profileID"]) && StrUtil::notEmpty($v)) {
             $this->profileId = $v;
             return true;
-        } else if (in_array($k, ["customizationid", "customization_id", "CustomizationID", "customizationId"]) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, ["pricingcurrencycode", "pricing_currency_code", "PricingCurrencyCode", "pricingCurrencyCode"])) {
+            $this->pricingCurrencyCode = StrUtil::notEmpty($v) ? $v : 'TRY';
+            return true;
+        }
+        else if (in_array($k, ["customizationid", "customization_id", "CustomizationID", "customizationId"]) && StrUtil::notEmpty($v)) {
             $this->customizationId = $v;
             return true;
         } else if (in_array($k, ["guid", "uid", "uuid"]) && StrUtil::notEmpty($v)) {

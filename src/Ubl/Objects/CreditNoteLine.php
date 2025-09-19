@@ -9,7 +9,7 @@ use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
 
-class InvoiceLine extends UblDataType
+class CreditNoteLine extends UblDataType
 {
     public ?ID $id = null;
     public ?InvoicedQuantity $invoicedQuantity = null;
@@ -22,10 +22,10 @@ class InvoiceLine extends UblDataType
     public ?Delivery $delivery = null;
     public ?DespatchLineReference $despatchLineReference = null;
 
-    /**
-     * @var UblDataTypeList
+    /**     
+     * @var Note
      */
-    public $note;
+    public ?Note $note = null;
     /**
      * @var UblDataTypeList
      */
@@ -56,19 +56,13 @@ class InvoiceLine extends UblDataType
         $this->taxTotal = new TaxTotal();
         $this->item = new Item();
         $this->price = new Price();
-        $this->note = new UblDataTypeList(Note::class);
+        $this->note = new Note();
         $this->delivery = new Delivery();
         $this->despatchLineReference = new DespatchLineReference();
     }
     public function addAllowanceCharge(array $options): self
     {
         $this->allowanceCharge->add(new AllowanceCharge($options));
-        return $this;
-    }
-
-    public function addNote(array $options): self
-    {
-        $this->note->add(new Note($options));
         return $this;
     }
 
@@ -88,18 +82,8 @@ class InvoiceLine extends UblDataType
             $this->price = new Price(array('priceAmount' => $v));
             return true;
         }
-        if (in_array(strtolower($k), ['note', 'not', 'notes', 'notlar'])) {
-            if (is_array($v)) {
-                foreach ($v as $noteValue) {
-                    if (is_array($noteValue)) {
-                        $this->addNote($noteValue);
-                    } elseif (StrUtil::notEmpty($noteValue)) {
-                        $this->addNote(['value' => $noteValue]);
-                    }
-                }
-            } elseif (StrUtil::notEmpty($v)) {
-                $this->addNote(['value' => $v]);
-            }
+        if (in_array($k, ['note', 'not']) && StrUtil::notEmpty($v)) {
+            $this->note = Note::newNote($v);
             return true;
         }
         if (in_array($k, ['invoicedQuantity', 'quantity', 'miktar']) && is_numeric($v)) {
@@ -140,7 +124,6 @@ class InvoiceLine extends UblDataType
             return true;
         }
 
-
         return false;
     }
 
@@ -163,13 +146,11 @@ class InvoiceLine extends UblDataType
             return null;
         }
 
-        $element = $document->createElement('cac:InvoiceLine');
+        $element = $document->createElement('cac:CreditNoteLine');
 
         $this->appendChild($element, $this->id->toDOMElement($document));
 
-        foreach ($this->note->list as $note) {
-            $this->appendChild($element, $note->toDOMElement($document));
-        }
+        $this->appendChild($element, $this->note->toDOMElement($document));
 
         $this->appendChild($element, $this->invoicedQuantity->toDOMElement($document));
 
@@ -194,7 +175,7 @@ class InvoiceLine extends UblDataType
     }
     public static function newLine($props)
     {
-        $line = new InvoiceLine($props);
+        $line = new CreditNoteLine($props);
         return $line;
     }
     public function onBeforeAdd($context = null)
