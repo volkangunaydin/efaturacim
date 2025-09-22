@@ -18,6 +18,7 @@ class StrTo{
         if(is_object($strOrObject)){
             return json_encode($strOrObject);
         }
+        
         return "".$strOrObject;
     }
 }
