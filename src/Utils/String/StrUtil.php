@@ -16,6 +16,7 @@ class StrUtil{
         }
         return false;
     }
+    
     public static function isXML($string,$softCheck=true) {
         $string = trim((string) $string);
         if (self::isEmpty($string)) {
