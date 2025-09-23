@@ -69,7 +69,7 @@ abstract class UblDataType{
      * @return DOMElement
      */
     protected function appendElement($document, $parent, string $name, ?string $value, array $attributes = []){
-        if(is_null($value) || is_null($parent) ){
+        if(is_null($value) || is_null($parent) || $value === "" ){
             return null;
         }        
         $element = $document->createElement($name, $value);

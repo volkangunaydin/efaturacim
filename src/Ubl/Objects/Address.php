@@ -54,16 +54,27 @@ class Address extends UblDataType
 
     public function isEmpty()
     {
-        return !StrUtil::notEmpty($this->cityName);
+        return !StrUtil::notEmpty($this->id) &&
+               !StrUtil::notEmpty($this->streetName) &&
+               !StrUtil::notEmpty($this->buildingName) &&
+               !StrUtil::notEmpty($this->buildingNumber) &&
+               !StrUtil::notEmpty($this->cityName) &&
+               !StrUtil::notEmpty($this->postalZone) &&
+               !StrUtil::notEmpty($this->citySubdivisionName) &&
+               !StrUtil::notEmpty($this->region) &&
+               !StrUtil::notEmpty($this->district) &&
+               (!$this->country || $this->country->isEmpty());
     }
 
     public function toDOMElement(DOMDocument $document): DOMElement
     {
+        if ($this->isEmpty()) {
+            return null;
+        }
         $element = $document->createElement('cac:PostalAddress');
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
         $this->appendElement($document, $element, 'cbc:StreetName', $this->streetName);
         $this->appendElement($document, $element, 'cbc:BuildingName', $this->buildingName);
-        $this->appendElement($document, $element, 'cbc:BuildingNumber', $this->buildingNumber);
         $this->appendElement($document, $element, 'cbc:CitySubdivisionName', $this->citySubdivisionName);
         $this->appendElement($document, $element, 'cbc:CityName', $this->cityName);
         $this->appendElement($document, $element, 'cbc:PostalZone', $this->postalZone);
