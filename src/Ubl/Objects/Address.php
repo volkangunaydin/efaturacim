@@ -84,6 +84,7 @@ class Address extends UblDataType
         if ($this->country) {
             $this->appendChild($element, $this->country->toDOMElement($document));
         }
+        
 
         return $element;
     }
