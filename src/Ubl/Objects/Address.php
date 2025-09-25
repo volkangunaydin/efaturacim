@@ -42,7 +42,7 @@ class Address extends UblDataType
             $this->cityName = $v;
         } else if (in_array($k, array("posta_kodu","postalZone")) && StrUtil::notEmpty($v)) {
             $this->postalZone = $v;
-        } else if (in_array($k, array("bolge","region")) && StrUtil::notEmpty($v)) {
+        } else if (in_array($k, array("bolge","region", "mahalle")) && StrUtil::notEmpty($v)) {
             $this->region = $v;
         } else if (in_array($k, array("semt","district")) && StrUtil::notEmpty($v)) {
             $this->district = $v;
