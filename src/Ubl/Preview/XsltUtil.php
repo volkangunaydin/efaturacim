@@ -9,6 +9,7 @@ namespace Efaturacim\Util\Ubl\Preview{
         public static function getHtmlFromXml($xml,$xslt,$options=null){
             return self::showXmlFileWithXslt($xml,$xslt,"html_string",$options);
         }
+        
         public static function showXmlFileWithXslt($xml,$xslt,$output=null,$opt=null){
             $retVal  = new SimpleResult();
             $options = new Options($opt);
