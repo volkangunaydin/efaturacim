@@ -36,10 +36,30 @@ class EBelge{
         }
         return false;
     }
+    public function isEFatura(){
+        if($this->ubl instanceof InvoiceDocument){
+            $profile = $this->ubl->getProfileId();            
+            return !in_array("".$profile,array("EARSIVFATURA","earsivfatura"));
+        }
+        return false;
+    }
+    public function isEArsivFatura(){
+        if($this->ubl instanceof InvoiceDocument){
+            $profile = $this->ubl->getProfileId();                  
+            return in_array("".$profile,array("EARSIVFATURA","earsivfatura"));
+        }
+        return false;
+    }
+    /**
+     * @return EBelge
+     */
     public static function fromXmlFile($filePath=null){
         return self::fromXmlContent(IO_Util::readFileAsString($filePath));
     }
-    public static function fromXmlContent($xmlString=null,$readOnly=false){
+    /**
+     * @return EBelge
+     */
+    public static function fromXmlContent($xmlString=null,$readOnly=false,$forceToCreate=false){
         if (is_string($xmlString) && !empty($xmlString)) {
             if (preg_match('/<([a-zA-Z0-9_:]+)/', $xmlString, $matches)) {
                 $rootTagName = $matches[1];
@@ -68,6 +88,12 @@ class EBelge{
                     return $belge;
                 }
             }            
+        }
+        if($forceToCreate){
+            $belge = new EBelge();
+            $belge->ubl = new InvoiceDocument();
+            $belge->ubl->loadFromXml($xmlString);
+            return $belge;
         }
         return null;
     }
@@ -142,8 +168,13 @@ class EBelge{
     }
     public function &getAlici(){
         $null = null;
-        if($this->ubl instanceof InvoiceDocument || $this->ubl instanceof DespatchAdviceDocument || $this->ubl instanceof CreditNoteDocument || $this->ubl instanceof DespatchAdviceDocument){
+        if($this->ubl instanceof InvoiceDocument){
             return $this->ubl->accountingCustomerParty;
+        }else if($this->ubl instanceof DespatchAdviceDocument){
+            return $this->ubl->deliveryCustomerParty;
+        }else if($this->ubl instanceof CreditNoteDocument){
+            return $this->ubl->accountingCustomerParty;
+            //|| $this->ubl instanceof DespatchAdviceDocument || $this->ubl instanceof CreditNoteDocument || $this->ubl instanceof DespatchAdviceDocument                        
         }
         return $null;
     }
@@ -217,12 +248,14 @@ class EBelge{
                     if($useCache){
                         $cacheKey = MemoryCache::getKey($xmlString.$xsltString);                        
                         if(MemoryCache::hasKey($cacheKey)){
+                            $r->setIsOk(true);
                             $r->value = MemoryCache::get($cacheKey);
                             return $r;
                         }
                     }
+                    $r->setIsOk(true);
                     $r->value = XsltUtil::getHtmlFromXml($xmlString,$xsltString,array());                    
-                    if($useCache){
+                    if($useCache && StrUtil::notEmpty($r->value)){
                         MemoryCache::set($cacheKey,$r->value);
                     }
                 }                
@@ -241,12 +274,14 @@ class EBelge{
                 if($useCache){
                     $cacheKey = MemoryCache::getKey($html);                        
                     if(MemoryCache::hasKey($cacheKey)){
+                        $r->setIsOk(true);
                         $r->value = MemoryCache::get($cacheKey);
                         return $r;
                     }
                 }
                 $resPdf = PdfUtil::getPdfFromHtml($html,array("template"=>"ubl"));                                
                 if($resPdf->isOK()){
+                    $r->setIsOk(true);
                     $r->value = $resPdf->value;
                     if($useCache){
                         MemoryCache::set($cacheKey,$r->value);
@@ -260,6 +295,9 @@ class EBelge{
     }
     public function getPdfString(){
         return $this->getPdfResult()->value;
+    }
+    public function getKontrolResult(){        
+        return EBelgeKontolUtil::getKontrolResult($this->ubl);   
     }
 }
 ?>
