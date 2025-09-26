@@ -22,6 +22,7 @@ namespace Efaturacim\Util\Ubl\Preview{
             }else if($xml && strlen($xml)>0){
                 $retVal->attributes["xml"] = $xml;
             }
+            
             if(is_null($xslt) && $options->hasValue("xslt")){
                 $xslt = $options->getAsString("xslt",null);
             }   
