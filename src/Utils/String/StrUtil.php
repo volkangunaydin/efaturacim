@@ -35,6 +35,7 @@ class StrUtil{
 
         return $loaded !== false && empty($errors);
     }
+
     
     public static function isJson($string,$softCheck=false) {
         $string = trim("".$string);
@@ -72,6 +73,7 @@ class StrUtil{
                 return (!is_null($str) && !is_null($startText) && strlen($str)>=strlen($startText) && (substr($str, 0,strlen($startText))."")==($startText."")); 
             }            
         }
+        
         public static function endsWith($str,$endText) { return (!is_null($str) && !is_null($endText) && strlen($str)>=strlen($endText) && (substr($str, -1*strlen($endText))."")==($endText."")); }    
         public static function startsWithNumber($str) { return preg_match('/^\d/', $str) === 1; }
         public static function upper($str){ return self::toUpperTurkish($str); }
