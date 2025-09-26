@@ -8,7 +8,7 @@ use Efaturacim\Util\Utils\String\StrUtil;
 
 class Country extends UblDataType{
     public $identificationCode = null; // e.g., "TR"
-    public $name = "TURKIYE";               // e.g., "Türkiye"
+    public $name = null;               // e.g., "Türkiye"
 
     public function __construct( $name = null,$identificationCode = null)
     {
@@ -28,7 +28,10 @@ class Country extends UblDataType{
         }
         return false;
     }
-    public function toDOMElement(DOMDocument $document): DOMElement{
+    public function toDOMElement(DOMDocument $document): ?DOMElement{
+        if ($this->isEmpty()) {
+            return null;
+        }
         $element = $document->createElement('cac:Country');
         if ($this->identificationCode !== null) {
             $this->appendElement($document, $element, 'cbc:IdentificationCode', $this->identificationCode);

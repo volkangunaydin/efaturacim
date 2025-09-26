@@ -8,7 +8,7 @@ use DOMElement;
 class ActualPackage extends UblDataType
 {
     public ?string $id = null;
-    public ?int $quantity = null;
+    public ?string $quantity = null;
     public ?string $packagingTypeCode = null;
     
     public function initMe(){
@@ -21,7 +21,7 @@ class ActualPackage extends UblDataType
 
     public function isEmpty(): bool
     {
-        return is_null($this->id);
+        return empty($this->id) && empty($this->quantity) && empty($this->packagingTypeCode);
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement

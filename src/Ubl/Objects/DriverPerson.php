@@ -41,7 +41,9 @@ class DriverPerson extends UblDataType
     }
 
     public function isEmpty(){        
-        return !StrUtil::notEmpty($this->firstName);
+        return !StrUtil::notEmpty($this->firstName) && 
+               !StrUtil::notEmpty($this->familyName) && 
+               !StrUtil::notEmpty($this->nationalityID);
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement
@@ -53,7 +55,7 @@ class DriverPerson extends UblDataType
         
         $this->appendElement($document, $element, 'cbc:FirstName', $this->firstName);
         $this->appendElement($document, $element, 'cbc:FamilyName', $this->familyName);
-        $this->appendElement($document, $element, 'cbc:Title', 'Söför');
+        $this->appendElement($document, $element, 'cbc:Title', $this->title);
         $this->appendElement($document, $element, 'cbc:NationalityID', $this->nationalityID);
         
         return $element;

@@ -66,7 +66,7 @@ class Address extends UblDataType
                (!$this->country || $this->country->isEmpty());
     }
 
-    public function toDOMElement(DOMDocument $document): DOMElement
+    public function toDOMElement(DOMDocument $document): ?DOMElement
     {
         if ($this->isEmpty()) {
             return null;
@@ -81,8 +81,11 @@ class Address extends UblDataType
         $this->appendElement($document, $element, 'cbc:Region', $this->region);
         $this->appendElement($document, $element, 'cbc:District', $this->district);
         //\Vulcan\V::dump($this->country);
-        if ($this->country) {
-            $this->appendChild($element, $this->country->toDOMElement($document));
+        if ($this->country && !$this->country->isEmpty()) {
+            $countryElement = $this->country->toDOMElement($document);
+            if ($countryElement) {
+                $this->appendChild($element, $countryElement);
+            }
         }
         
 
