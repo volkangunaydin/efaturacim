@@ -13,6 +13,7 @@ class StrNameSurname
         if ($ad == $ad2 && $soyad == $soyad2) {
             return true;
         }
+        
         $ad = trim("" . @$ad);
         $soyad = trim("" . @$soyad);
         $ad2 = trim("" . $ad2);
