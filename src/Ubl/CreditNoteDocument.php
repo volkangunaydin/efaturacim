@@ -113,9 +113,9 @@ class CreditNoteDocument extends UblDocument
      * Constructor.
      * Sets the default profile ID for a commercial invoice.
      */
-    public function __construct()
+    public function __construct($xmlString=null,$options=null)
     {
-        parent::__construct();
+        parent::__construct($xmlString,$options);
         // Default profile for a commercial invoice. Can be overridden for "TEMELFATURA".
 
     }

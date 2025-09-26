@@ -120,15 +120,21 @@ abstract class UblDocument{
      * Constructor.
      * Initializes the DOMDocument.
      */
-    public function __construct($options=null)
+    public function __construct($xmlString=null,$options=null)
     {
         $this->document = new DOMDocument('1.0', 'UTF-8');
         $this->document->formatOutput = true;
         $this->options = new Options($options);
         $this->initMe();
+        if(StrUtil::notEmpty($xmlString)){
+            $this->loadFromXml($xmlString);
+            if($this->isOK()){
+                $this->orgXmlString = $xmlString;
+            }
+        }
     }
     public function isOK(){
-        if(!is_null($this->root) && $this->root instanceof DOMElement){
+        if(!is_null($this->rootElementName) && StrUtil::notEmpty($this->rootElementName) && StrUtil::notEmpty($this->profileId)){
             return true;
         }
         return false;
@@ -417,5 +423,8 @@ abstract class UblDocument{
             }
         }
         return null;
+    }
+    public function getDocNo(){
+        return $this->id;
     }
 }
