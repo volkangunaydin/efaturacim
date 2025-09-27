@@ -142,7 +142,7 @@ class CreditNoteDocument extends UblDocument
         $this->orderReference = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note = new UblDataTypeList(Note::class);
-        $this->invoiceLine = new UblDataTypeListForCreditNoteLine(CreditNoteLine::class);
+        //$this->invoiceLine = new UblDataTypeListForCreditNoteLine(CreditNoteLine::class);
         $this->taxTotal = new TaxTotal();
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
