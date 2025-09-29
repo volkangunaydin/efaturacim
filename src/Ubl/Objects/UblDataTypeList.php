@@ -48,7 +48,7 @@ class UblDataTypeList{
         }
         return array();
     }
-    public function loadFromArray($arr,$depth=0){
+    public function loadFromArray($arr,$depth,$isDebug,$dieOnDebug,&$debugArray){
         if($depth>10){  return; }
         if(!is_null($arr) && is_array($arr)){   
             if(key_exists(0,$arr)){
@@ -60,13 +60,13 @@ class UblDataTypeList{
                     }                
                     if(!is_null($v) && is_array($v) && count($v)>0 && strlen("".$this->className)>0 && class_exists($this->className,true)  ){                    
                         $obj = new $this->className();
-                        $obj->loadFromArray($v,$depth+1);
+                        $obj->loadFromArray($v,$depth+1,$isDebug,$dieOnDebug,$debugArray);
                         $this->add($obj);
                     }
                 }
             }else if(count($arr)>0){
                 $obj = new $this->className();
-                $obj->loadFromArray($arr,$depth+1);
+                $obj->loadFromArray($arr,$depth+1,$isDebug,$dieOnDebug,$debugArray);
                 $this->add($obj);                
             }         
 

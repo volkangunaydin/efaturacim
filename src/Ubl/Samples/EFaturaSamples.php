@@ -56,7 +56,8 @@ class EFaturaSamples{
                 "web" => "www.gyazilim.com"
             ]);            
             if(ArrayUtil::notEmpty(arr: $extraArray)){
-                $efatura->ubl->loadFromArray($extraArray);
+                $debugArray = array();
+                $efatura->ubl->loadFromArray($extraArray,0,$debug,false,$debugArray);
             }            
         }
         return $efatura;

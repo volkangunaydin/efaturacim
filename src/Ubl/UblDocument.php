@@ -6,6 +6,7 @@ use DOMDocument;
 use DOMElement;
 use Efaturacim\Util\Ubl\Objects\AdditionalDocumentReference;
 use Efaturacim\Util\Ubl\Objects\Attachment;
+use Efaturacim\Util\Ubl\Objects\Signature;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Ubl\Objects\UblDataTrait;
@@ -112,7 +113,7 @@ abstract class UblDocument{
      */
     protected string $documentCurrencyCode = 'TRY';
     protected ?string $pricingCurrencyCode = null;
-
+    protected ?Signature $signature = null;
 
     public $orgXmlString = null;
 
@@ -125,6 +126,7 @@ abstract class UblDocument{
         $this->document = new DOMDocument('1.0', 'UTF-8');
         $this->document->formatOutput = true;
         $this->options = new Options($options);
+        $this->signature = new Signature();
         $this->initMe();
         if(StrUtil::notEmpty($xmlString)){
             $this->loadFromXml($xmlString);
@@ -410,6 +412,16 @@ abstract class UblDocument{
             }
         }        
         return null;
+    }
+    public function setOptions($options=null,$override=false,$merge=true){
+        if($merge){
+            if(is_null($this->options) || !($this->options instanceof Options)){
+                $this->options = new Options($options);    
+            }
+            $this->options->merge($options,$override);
+        }else{
+            $this->options = new Options($options);
+        }
     }
     public function getBaseClassName(){
         return StrSegment::getLastSegmentOf(get_class($this),array("\\","/"),true);

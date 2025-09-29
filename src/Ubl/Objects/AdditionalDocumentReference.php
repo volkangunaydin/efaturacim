@@ -53,10 +53,9 @@ class AdditionalDocumentReference extends UblDataType
         }
         return false;
     }
-    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)
-    {
+    public function loadFromArray($arr, $depth, $isDebug, $dieOnDebug, &$debugArray){
         //\Vulcan\V::dump($arr);
-        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);
+        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug, $debugArray);
     }
     public function isEmpty(): bool
     {

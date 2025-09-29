@@ -8,8 +8,10 @@ use Efaturacim\Util\Ubl\Preview\UblPreview;
 use Efaturacim\Util\Ubl\Preview\XsltUtil;
 use Efaturacim\Util\Ubl\UblDocument;
 use Efaturacim\Util\Utils\Cache\MemoryCache;
+use Efaturacim\Util\Utils\CastUtil;
 use Efaturacim\Util\Utils\Date\DateUtil;
 use Efaturacim\Util\Utils\IO\IO_Util;
+use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\Pdf\PdfUtil;
 use Efaturacim\Util\Utils\PreviewUtil;
 use Efaturacim\Util\Utils\SimpleResult;
@@ -36,6 +38,27 @@ class EBelge{
         }
         return false;
     }
+    public function isFatura(){
+        if($this->ubl instanceof InvoiceDocument){
+            return true;
+        }
+        return false;
+    }
+    public function isMustahsil(){
+        if($this->ubl instanceof CreditNoteDocument){
+            return true;
+        }
+        return false;
+    }
+    public function isEIrsaliye(){
+        return $this->isIrsaliye();
+    }
+    public function isIrsaliye(){
+        if($this->ubl instanceof DespatchAdviceDocument){
+            return true;
+        }
+        return false;
+    }
     public function isEFatura(){
         if($this->ubl instanceof InvoiceDocument){
             $profile = $this->ubl->getProfileId();            
@@ -50,17 +73,24 @@ class EBelge{
         }
         return false;
     }
-    /**
-     * @return EBelge
-     */
-    public static function fromXmlFile($filePath=null){
-        return self::fromXmlContent(IO_Util::readFileAsString($filePath));
+    public function isEMustahsil(){
+        if($this->ubl instanceof CreditNoteDocument){
+            return true;
+        }
+        return false;
     }
     /**
      * @return EBelge
      */
-    public static function fromXmlContent($xmlString=null,$readOnly=false,$forceToCreate=false){
-        if (is_string($xmlString) && !empty($xmlString)) {
+    public static function fromXmlFile($filePath=null,$readOnly=false,$forceToCreate=false,$options=null){
+        return self::fromXmlContent(IO_Util::readFileAsString($filePath),$readOnly,$forceToCreate,$options);
+    }
+    /**
+     * @return EBelge
+     */
+    public static function fromXmlContent($xmlString=null,$readOnly=false,$forceToCreate=false,$options=null){
+        if (is_string($xmlString) && !empty($xmlString) && Options::ensureParam($options) && $options instanceof Options) {
+            $debug = $options->getAs(array("debug_document","debug_this_array","debug"),false,CastUtil::$DATA_BOOL);
             if (preg_match('/<([a-zA-Z0-9_:]+)/', $xmlString, $matches)) {
                 $rootTagName = $matches[1];
                 // Remove namespace prefix if present to get the local name.
@@ -79,9 +109,10 @@ class EBelge{
                     case 'CreditNote':
                         $belge = new EMustahsilBelgesi();
                         break;
-                }
+                }                
                 if ($belge) {
-                    $belge->ubl->loadFromXml($xmlString);
+                    $belge->ubl->setOptions($options);
+                    $belge->ubl->loadFromXml($xmlString,$debug);
                     if($readOnly){
                         $belge->ubl->orgXmlString = $xmlString;
                     }
@@ -92,7 +123,7 @@ class EBelge{
         if($forceToCreate){
             $belge = new EBelge();
             $belge->ubl = new InvoiceDocument();
-            $belge->ubl->loadFromXml($xmlString);
+            $belge->ubl->loadFromXml($xmlString,$debug);
             return $belge;
         }
         return null;
@@ -230,8 +261,12 @@ class EBelge{
         EBelgeDebugger::debug($this);
     }
     public function getSatirSayisi(){
-        if($this->ubl && property_exists($this->ubl, 'invoiceLine')){
+        if($this->isFatura()){
             return $this->ubl->invoiceLine->getCount();        
+        }else if($this->isMustahsil()){
+            return $this->ubl->creditNoteLine->getCount();
+        }else if($this->isIrsaliye()){
+            return $this->ubl->despatchLine->getCount();            
         }        
         return 0;
     }

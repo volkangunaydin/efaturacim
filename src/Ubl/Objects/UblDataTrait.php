@@ -3,43 +3,60 @@ namespace Efaturacim\Util\Ubl\Objects;
 
 use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Ubl\UblDocument;
+use Efaturacim\Util\Utils\CastUtil;
+use Efaturacim\Util\Utils\Options;
+use Vulcan\Base\Util\StringUtil\StrUtil as StringUtilStrUtil;
 
 trait UblDataTrait{
-    public function loadSmart($loadObject,$type=null,$debug=false){
+    public function loadSmart($loadObject,$type,$debug,&$debugArray){
         if($type && $type==="json"){            
             return $this->loadFromJson($loadObject);
         }else if($type && $type==="array"){            
-            $this->loadFromArray($loadObject,0,$debug);
+            $this->loadFromArray($loadObject,0,$debug,false,$debugArray);
         }else if(!is_null($loadObject) && is_string($loadObject)){            
             if(is_array($loadObject)){
-                $this->loadFromArray($loadObject,0,$debug);
+                $this->loadFromArray($loadObject,0,$debug,false,$debugArray);
             }else if(StrUtil::isJson($loadObject)){
-                $this->loadFromJson($loadObject);          
+                $this->loadFromJson($loadObject,false,$debugArray);          
             }else if(StrUtil::isXml($loadObject)){              
-                $this->loadFromXml($loadObject,$debug);          
+                $this->loadFromXml($loadObject,$debug,false,$debugArray);          
             }                        
         }
     }
     public function loadFromJson($jsonString){
         //try {            
+            $debugArray = array();
             $arr = json_decode($jsonString,true);            
             if(is_array($arr) && count($arr)>0){    
                 //\Vulcan\V::dump($arr);            
-                return $this->loadFromArray($arr);
+                return $this->loadFromArray($arr,0,false,false,$debugArray);
             }
         //} catch (\Throwable $th) {       }
     }
-    public function loadFromArray($arr,$depth=0,$isDebug=false,$dieOnDebug=true){
-        if($depth>10){  return; }        
-        $debugArray = array("log"=>array());        
+    public function loadFromArray($arr,$depth,$isDebug,$dieOnDebug,&$debugArray){
+        if($depth>50){  return; }        
+        if(is_null($debugArray)){
+            $debugArray = array("class"=>get_class($this),"counter"=>0,"errors"=>array(),"log"=>array());        
+        }
         if($isDebug){
-            $debugArray["class"]    = get_class($this);
-            $debugArray["org_data"] = $arr;      
+            if(!key_exists("class",$debugArray)){
+                $debugArray["class"]    = get_class($this);
+            }            
+            if(!key_exists("counter",$debugArray)){
+                $debugArray["counter"] = 0;      
+            }
+            if(!key_exists("errors",$debugArray)){
+                $debugArray["errors"] = array();
+            }
+            if(!key_exists("log",$debugArray)){
+                $debugArray["log"] = array();
+            }
+            $debugArray["counter"]++;
         }
         if(!is_null($arr) && is_array($arr)){   
             if($isDebug){
-                $debugArray["log"][] = "Array found for loadFromArray";
-            }         
+                $debugArray["log"][] = "Array found for loadFromArray => Search ERROR for errors";
+            }       
             foreach($arr as $k=>$v){           
                 $paramArray = array();     
                 if(!is_null($v)){                      
@@ -70,10 +87,10 @@ trait UblDataTrait{
                             continue;                    
                         }
                     }                    
-                    $k_safe     = strtolower(substr($k,0,1)).substr($k,1);
-                    $k_up       = strtoupper(substr($k,0,1)).substr($k,1);
-                    $k_lower    = strtolower($k);
-                    $k_upper    = strtoupper($k);
+                    $k_safe     = StrUtil::toLowerEng(substr($k,0,1)).substr($k,1);
+                    $k_up       = StrUtil::toUpperEng(substr($k,0,1)).substr($k,1);
+                    $k_lower    = StrUtil::toLowerEng($k);
+                    $k_upper    = StrUtil::toUpperEng($k);
                     
                     if(!in_array($k_safe,$paramArray)){$paramArray[] = $k_safe;}                    
                     if(!in_array($k_up,$paramArray)){$paramArray[] = $k_up;}
@@ -90,7 +107,7 @@ trait UblDataTrait{
                                      $debugArray["log"][] = "getPropertyAlias => ".$k." => ".$key;
                                 }
                                 if(is_array($v)){
-                                    $this->loadFromArray( array("".$key => $v),$depth+1);
+                                    $this->loadFromArray( array("".$key => $v),$depth+1,$isDebug,$dieOnDebug,$debugArray);
                                 }
                             }
                         }
@@ -146,7 +163,7 @@ trait UblDataTrait{
                                     if(strlen($valStr)>200){ $valStr = mb_substr($valStr,0,200)."..."; }
                                     $debugArray["log"][] = "loadFromArray for ".$paramName." @".get_class($this->$paramName)."  := ".$valStr."";
                                 }               
-                                $rr = $this->$paramName->loadFromArray($v,$depth+1,$isDebug,false);                                                            
+                                $rr = $this->$paramName->loadFromArray($v,$depth+1,$isDebug,false,$debugArray);                                                            
                                 
                                 if($isDebug && is_array($rr) && key_exists("log",$rr)){
                                     $sep = "=============  ".$paramName."  ===============";
@@ -161,13 +178,20 @@ trait UblDataTrait{
                             break;
                         }                        
                     }
-                    
+                    if($isFound===false && $isDebug){
+                        if(in_array("".$paramName,array("@ATTRIBUTES","UBLVERSIONID"))){
+                                                        
+                        }else{
+                            $debugArray["errors"][] = "Field not found : ".$paramName;
+                        }
+                        
+                    }
                 }
             }            
         }else if (is_object($arr) && method_exists($arr,"toArrayOrObject")){
             $arr2 = $arr->toArrayOrObject();
             if(is_array($arr2)){
-                return $this->loadFromArray($arr2);
+                return $this->loadFromArray($arr2,$depth+1,$isDebug,$dieOnDebug,$debugArray);
             }            
         }
         if($isDebug){
@@ -177,7 +201,7 @@ trait UblDataTrait{
             if($dieOnDebug){
                 \Vulcan\V::dump($debugArray);
             }else{
-                return $debugArray;
+                //return $debugArray;
             }      
         }
         $this->onAfterLoadComplete($arr,$debugArray);

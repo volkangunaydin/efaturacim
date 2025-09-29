@@ -31,8 +31,8 @@ class TaxTotal extends UblDataType
         $this->taxAmount   = new TaxAmount();
         $this->taxSubtotal = new UblDataTypeList(TaxSubtotal::class);
     }
-    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true) {
-        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);
+    public function loadFromArray($arr, $depth, $isDebug, $dieOnDebug, &$debugArray) {
+        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug, $debugArray);
     }
     public function addTaxSubtotal(array $options, $context = null): self
     {

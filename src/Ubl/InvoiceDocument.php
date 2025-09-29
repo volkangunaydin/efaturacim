@@ -378,7 +378,9 @@ class InvoiceDocument extends UblDocument
     {
         $arr = XmlToArray::xmlStringToArray($xmlString, false);
         if ($arr && is_array($arr) && key_exists("Invoice", $arr)) {
-            $this->loadFromArray($arr["Invoice"], 0, $debug);
+            $dieOnDebug = $this->options->getAs(array("debug_this_array","debug_document","die_on_debug"),false,CastUtil::$DATA_BOOL);
+            $debugArray = array();
+            $this->loadFromArray($arr["Invoice"], 0, $debug,$dieOnDebug,$debugArray);
             //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
         }
         //\Vulcan\V::dump($arr["Invoice"]["AccountingCustomerParty"]["Party"]);

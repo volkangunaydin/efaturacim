@@ -273,9 +273,8 @@ class CreditNoteLine extends UblDataType
         }
         return $arr;
     }
-    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)
-    {
-        parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);
+    public function loadFromArray($arr, $depth, $isDebug, $dieOnDebug, &$debugArray){
+        parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug, $debugArray);
     }
     public function onAfterLoadComplete($arr, $debugArray)
     {
