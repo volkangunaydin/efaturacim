@@ -199,7 +199,7 @@ trait UblDataTrait{
                 $debugArray["xml"] = $this->getAsXmlString(null);            
             }            
             if($dieOnDebug){
-                \Vulcan\V::dump($debugArray);
+                dd($debugArray);
             }else{
                 //return $debugArray;
             }      

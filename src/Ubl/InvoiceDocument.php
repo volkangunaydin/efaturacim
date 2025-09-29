@@ -28,6 +28,7 @@ use Efaturacim\Util\Ubl\Objects\UblDataTypeListForInvoiceLine;
 use Efaturacim\Util\Ubl\Objects\UBLExtensions;
 use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Utils\Array\ArrayUtil;
+use Efaturacim\Util\Utils\CastUtil;
 use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;

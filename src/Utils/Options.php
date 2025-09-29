@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils;
 
 use Efaturacim\Util\Utils\Array\ArrayUtil;
+use Efaturacim\Util\Utils\CastUtil;
 
 class Options{    
         /** @var Array */

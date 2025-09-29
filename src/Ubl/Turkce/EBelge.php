@@ -240,7 +240,8 @@ class EBelge{
     }    
     public static function smart($strOrObject,$type=null,$debug=false){        
         $a = new static();
-        $a->ubl->loadSmart($strOrObject,$type,$debug);
+        $debugArray = array();
+        $a->ubl->loadSmart($strOrObject,$type,$debug,$debugArray);
         return $a;        
     }    
     public function ekleSatir($name,$quantity=1,$price=0,$kdv=20){        

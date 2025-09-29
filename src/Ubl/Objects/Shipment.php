@@ -57,7 +57,8 @@ class Shipment extends UblDataType
         if (in_array($k, ['TransportHandlingUnit', 'transportHandlingUnit', 'TRANSPORTHANDLINGUNIT'])) {
             if (is_array($v)) {
                 $this->transportHandlingUnit = new UblDataTypeList(TransportHandlingUnit::class);
-                $this->transportHandlingUnit->loadFromArray($v);
+                $debugArray = array();
+                $this->transportHandlingUnit->loadFromArray($v, 0, false, false, $debugArray);
             } else {
                 $this->transportHandlingUnit = $v;
             }

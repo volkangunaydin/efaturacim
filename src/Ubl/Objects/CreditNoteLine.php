@@ -12,7 +12,7 @@ use Efaturacim\Util\Utils\String\StrUtil;
 class CreditNoteLine extends UblDataType
 {
     public ?ID $id = null;
-    public ?InvoicedQuantity $invoicedQuantity = null;
+    public ?CreditedQuantity $creditedQuantity = null;
     public ?LineExtensionAmount $lineExtensionAmount = null;
     public ?TaxExclusiveAmount $taxExclusiveAmount = null;
     public ?TaxInclusiveAmount $taxInclusiveAmount = null;
@@ -44,7 +44,7 @@ class CreditNoteLine extends UblDataType
     public function initMe()
     {
         $this->id = new ID();
-        $this->invoicedQuantity = new InvoicedQuantity();
+        $this->creditedQuantity = new CreditedQuantity();
         $this->allowanceCharge = new UblDataTypeList(AllowanceCharge::class);
         $this->withholdingTaxTotal = new UblDataTypeList(WithholdingTaxTotal::class);
         $this->lineExtensionAmount = new LineExtensionAmount();
@@ -86,12 +86,12 @@ class CreditNoteLine extends UblDataType
             $this->note = Note::newNote($v);
             return true;
         }
-        if (in_array($k, ['invoicedQuantity', 'quantity', 'miktar']) && is_numeric($v)) {
-            $this->invoicedQuantity->setQuantity($v);
+        if (in_array($k, ['creditedQuantity', 'quantity', 'miktar']) && is_numeric($v)) {
+            $this->creditedQuantity->setQuantity($v);
             return true;
         }
-        if (in_array($k, ['invoicedQuantityUnitCode', 'unitCode', 'birim_kodu']) && StrUtil::notEmpty($v)) {
-            $this->invoicedQuantity->setCode($v);
+        if (in_array($k, ['creditedQuantityUnitCode', 'unitCode', 'birim_kodu']) && StrUtil::notEmpty($v)) {
+            $this->creditedQuantity->setCode($v);
             return true;
         }
         if (in_array($k, ['lineExtensionAmount', 'line_amount', 'satir_tutari']) && is_numeric($v)) {
@@ -129,14 +129,14 @@ class CreditNoteLine extends UblDataType
 
     public function isEmpty(): bool
     {
-        // An invoice line must have an ID, a quantity, an amount, and an item.
-        //|| is_null($this->invoicedQuantity)  || $this->item->isEmpty()
+        // An credit note line must have an ID, a quantity, an amount, and an item.
+        //|| is_null($this->creditedQuantity)  || $this->item->isEmpty()
         return is_null($this->id) || $this->id->isEmpty();
     }
-    public function getInvoicedQuantity()
+    public function getCreditedQuantity()
     {
-        if ($this->invoicedQuantity) {
-            return $this->invoicedQuantity;
+        if ($this->creditedQuantity) {
+            return $this->creditedQuantity;
         }
         return 0;
     }
@@ -152,7 +152,7 @@ class CreditNoteLine extends UblDataType
 
         $this->appendChild($element, $this->note->toDOMElement($document));
 
-        $this->appendChild($element, $this->invoicedQuantity->toDOMElement($document));
+        $this->appendChild($element, $this->creditedQuantity->toDOMElement($document));
 
         $this->appendChild($element, $this->lineExtensionAmount->toDOMElement($document));
 
@@ -192,7 +192,7 @@ class CreditNoteLine extends UblDataType
             }
             if (is_null($this->lineExtensionAmount)) {
                 $this->lineExtensionAmount = new LineExtensionAmount();
-                $this->lineExtensionAmount->setValue($this->invoicedQuantity * NumberUtil::coalesce($this->price->priceAmount, 0));
+                $this->lineExtensionAmount->setValue($this->creditedQuantity * NumberUtil::coalesce($this->price->priceAmount, 0));
             }
         }
     }
@@ -206,7 +206,7 @@ class CreditNoteLine extends UblDataType
     }
     public function calculateLineExtensionAmount()
     {
-        return NumberUtil::asMoneyVal($this->invoicedQuantity->toNumber() * NumberUtil::coalesce($this->price->priceAmount, 0));
+        return NumberUtil::asMoneyVal($this->creditedQuantity->toNumber() * NumberUtil::coalesce($this->price->priceAmount, 0));
     }
     public function getLineExtensionAmount()
     {

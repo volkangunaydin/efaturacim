@@ -184,13 +184,13 @@ class CreditNoteDocument extends UblDocument
         $this->appendAccountingCustomerParty();
         $this->appendBuyerCustomerParty();
         $this->appendDelivery();
-        $this->appendElement('cbc:LineCountNumeric', $this->invoiceLine->getCount());
+        $this->appendElement('cbc:LineCountNumeric', $this->creditNoteLine->getCount());
         $this->appendPaymentMeans();
         $this->appendTaxTotal();
         $this->appendWithholdingTaxTotal();
         $this->appendPricingExchangeRate();
         $this->appendLegalMonetaryTotal();
-        $this->appendElementList($this->invoiceLine);
+        $this->appendElementList($this->creditNoteLine);
         return $this->document->saveXML();
     }
 
@@ -297,7 +297,7 @@ class CreditNoteDocument extends UblDocument
             $debugArray = array();
             $this->loadFromArray($arr["CreditNote"], 0, ($debug || $dieOnDebug),false,$debugArray);
             if($dieOnDebug){
-                \Vulcan\V::dump($debugArray);
+                dd($debugArray);
             }
             //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
         }
