@@ -12,5 +12,4 @@ class AccountingSupplierParty extends UblDataTypeForPartyContainer
         parent::initMe();
     }
     
-    
 }
