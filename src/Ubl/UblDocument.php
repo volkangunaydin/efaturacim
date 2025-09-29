@@ -113,6 +113,7 @@ abstract class UblDocument{
      */
     protected string $documentCurrencyCode = 'TRY';
     protected ?string $pricingCurrencyCode = null;
+    protected ?string $taxCurrencyCode = null;
     protected ?Signature $signature = null;
 
     public $orgXmlString = null;
@@ -251,8 +252,18 @@ abstract class UblDocument{
         return $this;
     }
 
+    public function setTaxCurrencyCode(string $currencyCode): static
+    {
+        $this->taxCurrencyCode = $currencyCode;
+        return $this;
+    }
+
     public function getDocumentCurrencyCode(){
         return $this->documentCurrencyCode;
+    }
+
+    public function getTaxCurrencyCode(){
+        return $this->taxCurrencyCode;
     }
 
     /**

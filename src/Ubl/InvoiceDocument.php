@@ -174,6 +174,7 @@ class InvoiceDocument extends UblDocument
         $this->setIssueDate(date('Y-m-d'));
         $this->setIssueTime(date('H:i:s'));
         $this->invoicePeriod = new InvoicePeriod();
+        $this->setTaxCurrencyCode("TRY");
         $this->setDocumentCurrencyCode("TRY");
         $this->setCopyIndicator(false);
         $this->billingReference = new UblDataTypeList(BillingReference::class);
@@ -219,6 +220,7 @@ class InvoiceDocument extends UblDocument
         $this->appendInvoicePeriod();
         $this->appendElement('cbc:InvoiceTypeCode', $this->invoiceTypeCode);
         $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);
+        $this->appendElement('cbc:TaxCurrencyCode', $this->taxCurrencyCode);
         if ($this->pricingCurrencyCode !== null) {
             $this->appendElement('cbc:PricingCurrencyCode', $this->pricingCurrencyCode);
         }
@@ -421,6 +423,7 @@ class InvoiceDocument extends UblDocument
         return new Options([
             "nextLineId" => $this->invoiceLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
+            "taxCurrencyCode" => $this->taxCurrencyCode,
             "invoiceTypeCode" => $this->invoiceTypeCode,
             "accountingCost" => $this->accountingCost,
         ]);
@@ -454,6 +457,7 @@ class InvoiceDocument extends UblDocument
 
         // Set LegalMonetaryTotal values
         $this->legalMonetaryTotal->setCurrencyID($this->documentCurrencyCode);
+        $this->legalMonetaryTotal->setTaxCurrencyID($this->taxCurrencyCode);
         $this->legalMonetaryTotal->lineExtensionAmount->setValue($totalLineExtensionAmount);
         $this->legalMonetaryTotal->taxExclusiveAmount->setValue($totalTaxExclusiveAmount);
         $this->legalMonetaryTotal->taxInclusiveAmount->setValue($totalTaxInclusiveAmount);
