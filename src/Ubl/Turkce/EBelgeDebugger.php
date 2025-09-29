@@ -25,11 +25,26 @@ class EBelgeDebugger{
                 ,"PayableAmount"=>$obj->ubl->getPayableAmount()
                 ,"PayableAmount_from_lines"=>$obj->ubl->getPayableAmountFromLines()
                 ,"kdv"=>$obj->ubl->getVatsAsArray()
-            );                        
+            );                   
+        }else if($obj instanceof EMustahsilBelgesi){
+            $arrDebug = array(
+                "belge_turu"=>"mustahsil"
+                ,"belge_no"=>$obj->getBelgeNo()
+                ,"belge_tarihi"=>$obj->getBelgeTarihi()->toDbDateTime()
+                ,"satir_sayisi"=>$obj->getSatirSayisi()
+                ,"gonderen"=>$obj->ubl->accountingSupplierParty->getName()
+                ,"gonderen_vkn"=>$obj->ubl->accountingSupplierParty->getVknOrTckn()
+                ,"alan"=>$obj->ubl->accountingCustomerParty->getName()
+                ,"alan_vkn"=>$obj->ubl->accountingCustomerParty->getVknOrTckn()
+                ,"LineExtensionAmount"=>$obj->ubl->getLineExtensionAmount()
+                ,"LineExtensionAmount_from_lines"=>$obj->ubl->getLineExtensionAmountFromLines()
+                ,"TaxExclusiveAmount"=>$obj->ubl->getTaxExclusiveAmount()
+            );
         }else{
             $arrDebug = array(
                 "belge_turu"=>"?"
                 ,"error"=>"BELGE TÜRÜ ANLAŞILAMADI"
+                ,"method"=>"EBelgeDebugger:debug"
             );            
         }
         echo "<pre>";

@@ -134,7 +134,8 @@ abstract class UblDataType{
     }
     public function loadFromOptions($options,$clear=false,$debug=false){
         if(Options::ensureParam(op: $options) && $options instanceof Options){
-            $this->loadFromArray($options->params,0,$debug);
+            $debugArray = array();
+            $this->loadFromArray($options->params,0,$debug,false,$debugArray);
         }
     }
     public function toXmlString($document=null){
@@ -181,7 +182,8 @@ abstract class UblDataType{
     }
     public static function newFromXml($xmlString=null,$debug=false){
         $a = new static();                
-        $a->loadFromArray(XmlToArray::xmlStringToArray($xmlString,false,true),0,$debug);
+        $debugArray = array();
+        $a->loadFromArray(XmlToArray::xmlStringToArray($xmlString,false,true),0,$debug,false,$debugArray);
         return $a;
     }
 }

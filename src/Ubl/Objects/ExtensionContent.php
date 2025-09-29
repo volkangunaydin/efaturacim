@@ -7,14 +7,14 @@ use DOMElement;
 use Efaturacim\Util\Utils\String\StrUtil;
 
 /**
- * UBL Extensions class for handling custom extensions in UBL documents.
+ * ExtensionContent class for UBL documents
  * 
- * This class allows adding custom data to UBL documents through the
- * ext:UBLExtensions element structure.
+ * Represents the ExtensionContent element that can contain various
+ * extension data including SignedInfo for digital signatures.
  */
-class UBLExtension extends UblDataType
+class ExtensionContent extends UblDataType
 {
-    public ?ExtensionContent $extensionContent = null;
+    public ?XmlSignature $signature = null;
 
     public function __construct($options = null)
     {
@@ -23,14 +23,13 @@ class UBLExtension extends UblDataType
 
     public function initMe()
     {
-        $this->extensionContent = new ExtensionContent();
-        $this->textContent = " ";
+        $this->signature = new XmlSignature();
     }
 
     public function setPropertyFromOptions($k, $v, $options): bool
     {
-        if (in_array($k, ['extension_content', 'extensionContent', 'ExtensionContent']) && is_array($v)) {
-            return $this->extensionContent->setPropertyFromOptions($k, $v, $options);
+        if (in_array($k, ['xml_signature', 'xmlSignature', 'XmlSignature', 'signature', 'Signature']) && is_array($v)) {
+            return $this->signature->setPropertyFromOptions($k, $v, $options);
         }
         if (in_array($k, ['content', 'text', 'value']) && StrUtil::notEmpty($v)) {
             $this->textContent = $v;
@@ -41,7 +40,7 @@ class UBLExtension extends UblDataType
 
     public function isEmpty(): bool
     {
-        return (is_null($this->extensionContent) || $this->extensionContent->isEmpty()) && 
+        return (is_null($this->signature) || $this->signature->isEmpty()) && 
                !StrUtil::notEmpty($this->textContent);
     }
 
@@ -51,11 +50,11 @@ class UBLExtension extends UblDataType
             return null;
         }
 
-        $element = $document->createElement('ext:UBLExtension');
+        $element = $document->createElement('ext:ExtensionContent');
         
-        // Add ExtensionContent if present
-        if (!$this->extensionContent->isEmpty()) {
-            $element->appendChild($this->extensionContent->toDOMElement($document));
+        // Add Signature if present
+        if (!$this->signature->isEmpty()) {
+            $element->appendChild($this->signature->toDOMElement($document));
         }
         
         // Add text content if present
@@ -65,4 +64,6 @@ class UBLExtension extends UblDataType
         
         return $element;
     }
-} 
+}
+
+?>

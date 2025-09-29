@@ -21,6 +21,7 @@ use Efaturacim\Util\Ubl\Objects\UblDataTypeListForCreditNoteLine;
 use Efaturacim\Util\Ubl\Objects\UBLExtensions;
 use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Utils\Array\ArrayUtil;
+use Efaturacim\Util\Utils\CastUtil;
 use Efaturacim\Util\Utils\Number\NumberUtil;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
@@ -39,7 +40,7 @@ class CreditNoteDocument extends UblDocument
      * Invoice type code. e.g., "SATIS", "IADE"
      * @var string|null
      */
-    public ?string $invoiceTypeCode = 'SATIS';
+    public ?string $creditNoteTypeCode = 'MUSTAHSILMAKBUZ';
 
     /**
      * @var AccountingCustomerParty
@@ -142,7 +143,7 @@ class CreditNoteDocument extends UblDocument
         $this->orderReference = new UblDataTypeList(OrderReference::class);
         $this->despatchDocumentReference = new UblDataTypeList(DespatchDocumentReference::class);
         $this->note = new UblDataTypeList(Note::class);
-        $this->invoiceLine = new UblDataTypeListForCreditNoteLine(CreditNoteLine::class);
+        $this->creditNoteLine = new UblDataTypeListForCreditNoteLine(CreditNoteLine::class);
         $this->taxTotal = new TaxTotal();
         $this->withholdingTaxTotal = new WithholdingTaxTotal();
         $this->pricingExchangeRate = new PricingExchangeRate();
@@ -169,7 +170,7 @@ class CreditNoteDocument extends UblDocument
         $this->setNamespaces();
         $this->appendElement(null, $this->UBLExtensions->toDOMElement($this->document));
         $this->appendCommonElements();
-        $this->appendElement('cbc:CreditNoteTypeCode', $this->invoiceTypeCode);
+        $this->appendElement('cbc:CreditNoteTypeCode', $this->creditNoteTypeCode);
         // Ensure currency code element is present in XML
         $this->appendElement('cbc:DocumentCurrencyCode', $this->documentCurrencyCode);
 
@@ -292,7 +293,12 @@ class CreditNoteDocument extends UblDocument
     {
         $arr = XmlToArray::xmlStringToArray($xmlString, false);
         if ($arr && is_array($arr) && key_exists("CreditNote", $arr)) {
-            $this->loadFromArray($arr["CreditNote"], 0, $debug);
+            $dieOnDebug = $this->options->getAs(array("debug_this_array","debug_document","die_on_debug"),false,CastUtil::$DATA_BOOL);
+            $debugArray = array();
+            $this->loadFromArray($arr["CreditNote"], 0, ($debug || $dieOnDebug),false,$debugArray);
+            if($dieOnDebug){
+                \Vulcan\V::dump($debugArray);
+            }
             //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
         }
         //\Vulcan\V::dump($arr["Invoice"]["AccountingCustomerParty"]["Party"]);
@@ -325,14 +331,14 @@ class CreditNoteDocument extends UblDocument
     }
     public function addLineFromArray($props)
     {
-        $this->invoiceLine->add(InvoiceLine::newLine($props), null, null, $this->getContextArray());
+        $this->creditNoteLine->add(CreditNoteLine::newLine($props), null, null, $this->getContextArray());
     }
     public function getContextArray()
     {
         return new Options([
-            "nextLineId" => $this->invoiceLine->getCount() + 1,
+            "nextLineId" => $this->creditNoteLine->getCount() + 1,
             "documentCurrencyCode" => $this->documentCurrencyCode,
-            "creditNote" => $this->invoiceTypeCode,
+            "creditNote" => $this->creditNoteTypeCode,
         ]);
     }
     public function rebuildValues()
@@ -345,8 +351,8 @@ class CreditNoteDocument extends UblDocument
         $totalPayableAmount = 0;
 
         // Rebuild invoice line values and collect totals
-        foreach ($this->invoiceLine->list as &$invLine) {
-            if ($invLine instanceof InvoiceLine) {
+        foreach ($this->creditNoteLine->list as &$invLine) {
+            if ($invLine instanceof CreditNoteLine) {
                 $invLine->rebuildValues();
 
                 // Get calculated values from line context
@@ -374,8 +380,8 @@ class CreditNoteDocument extends UblDocument
     public function getVatsAsArray()
     {
         $arr = [];
-        foreach ($this->invoiceLine->list as $line) {
-            if ($line instanceof InvoiceLine) {
+        foreach ($this->creditNoteLine->list as $line) {
+            if ($line instanceof CreditNoteLine) {
                 $vat = $line->getVatAsArray();
                 if ($vat && is_array($vat) && count($vat) > 0 && key_exists("percent", $vat)) {
                     $percent = @$vat["percent"];
@@ -424,48 +430,48 @@ class CreditNoteDocument extends UblDocument
     }
     public function getLineExtensionAmountFromLines()
     {
-        return $this->invoiceLine->sum(function ($line) {
-            if ($line instanceof InvoiceLine) {
+        return $this->creditNoteLine->sum(function ($line) {
+            if ($line instanceof CreditNoteLine) {
                 return $line->getLineExtensionAmount();
             }
         });
     }
     public function getTaxExclusiveAmountFromLines()
     {
-        return $this->invoiceLine->sum(function ($line) {
-            if ($line instanceof InvoiceLine) {
+        return $this->creditNoteLine->sum(function ($line) {
+            if ($line instanceof CreditNoteLine) {
                 return $line->getTaxExclusiveAmount();
             }
         });
     }
     public function getTaxInclusiveAmountFromLines()
     {
-        return $this->invoiceLine->sum(function ($line) {
-            if ($line instanceof InvoiceLine) {
+        return $this->creditNoteLine->sum(function ($line) {
+            if ($line instanceof CreditNoteLine) {
                 return $line->getTaxInclusiveAmount();
             }
         });
     }
     public function getAllowanceTotalAmountFromLines()
     {
-        return $this->invoiceLine->sum(function ($line) {
-            if ($line instanceof InvoiceLine) {
+        return $this->creditNoteLine->sum(function ($line) {
+            if ($line instanceof CreditNoteLine) {
                 return $line->getAllowanceTotalAmount();
             }
         });
     }
     public function getChargeTotalAmountFromLines()
     {
-        return $this->invoiceLine->sum(function ($line) {
-            if ($line instanceof InvoiceLine) {
+        return $this->creditNoteLine->sum(function ($line) {
+            if ($line instanceof CreditNoteLine) {
                 return $line->getChargeTotalAmount();
             }
         });
     }
     public function getPayableAmountFromLines()
     {
-        return $this->invoiceLine->sum(function ($line) {
-            if ($line instanceof InvoiceLine) {
+        return $this->creditNoteLine->sum(function ($line) {
+            if ($line instanceof CreditNoteLine) {
                 return $line->getPayableAmount();
             }
         });

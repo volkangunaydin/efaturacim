@@ -115,8 +115,8 @@ class LegalMonetaryTotal extends UblDataType
         // LegalMonetaryTotal is essential and should at least have a payable amount.
         return is_null($this->payableAmount);
     }
-    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)   {
-        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);
+    public function loadFromArray($arr, $depth, $isDebug, $dieOnDebug, &$debugArray)   {
+        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug, $debugArray);
     }
     public function toDOMElement(DOMDocument $document): ?DOMElement
     {

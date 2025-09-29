@@ -30,8 +30,9 @@ class ShipmentStage extends UblDataType
         }
         if (in_array($k, ['DriverPerson', 'driverPerson', 'DRIVERPERSON'])) {
             if (is_array($v)) {
+                $debugArray = array();
                 $this->driverPerson = new UblDataTypeList(DriverPerson::class);
-                $this->driverPerson->loadFromArray($v);
+                $this->driverPerson->loadFromArray($v,0,false,false,$debugArray);
             } else {
                 $this->driverPerson = $v;
             }

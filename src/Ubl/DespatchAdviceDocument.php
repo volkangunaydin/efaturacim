@@ -22,6 +22,7 @@ use Efaturacim\Util\Ubl\Objects\UblDataTypeListForDespatchLine;
 use Efaturacim\Util\Ubl\Objects\UBLExtensions;
 use Efaturacim\Util\Ubl\Objects\WithholdingTaxTotal;
 use Efaturacim\Util\Utils\Array\ArrayUtil;
+use Efaturacim\Util\Utils\CastUtil;
 use Efaturacim\Util\Utils\Options;
 use Efaturacim\Util\Utils\String\StrUtil;
 use Efaturacim\Util\Utils\Xml\XmlToArray;
@@ -308,7 +309,12 @@ class DespatchAdviceDocument extends UblDocument
     {
         $arr = XmlToArray::xmlStringToArray($xmlString, false);
         if ($arr && is_array($arr) && key_exists("DespatchAdvice", $arr)) {
-            $this->loadFromArray($arr["DespatchAdvice"], 0, $debug);
+            $dieOnDebug = $this->options->getAs(array("debug_this_array","debug_document","die_on_debug"),false,CastUtil::$DATA_BOOL);
+            $debugArray = array();
+            $this->loadFromArray($arr["DespatchAdvice"], 0, $debug,false,$debugArray);
+            if($dieOnDebug){
+                \Vulcan\V::dump($debugArray);
+            }            
             //\Vulcan\V::dump(StrSerialize::serializeBase64($arr["Invoice"]["InvoiceLine"][0]));
         }
         //\Vulcan\V::dump($arr["Invoice"]["AccountingCustomerParty"]["Party"]);
@@ -378,5 +384,14 @@ class DespatchAdviceDocument extends UblDocument
             }
         }
         return $arr;
+    }
+    public function getDocNo(){
+        return $this->id;
+    }
+    public function getSenderTaxNumber(){
+        return $this->despatchSupplierParty->getVknOrTckn();
+    }
+    public function getDeliveryTaxNumber(){
+        return $this->deliveryCustomerParty->getVknOrTckn();
     }
 }

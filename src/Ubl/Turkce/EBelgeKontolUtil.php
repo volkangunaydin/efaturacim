@@ -51,7 +51,14 @@ class EBelgeKontolUtil{
         $r = new SimpleResult();
         if($ubl && $ubl instanceof DespatchAdviceDocument){
             $r->setIsOk(true);
-            $r->addSuccess("Ubl geçerli.");
+            $r->setAttribute("belge_turu","eirsaliye");
+            $r->setAttribute("belge_no",$ubl->getDocNo());
+            $r->setAttribute("belge_tarihi",$ubl->getIssueDate());
+            $r->setAttribute("belge_saati",$ubl->getIssueTime());
+            $r->setAttribute("belge_doviz_kodu",$ubl->getDocumentCurrencyCode());
+            $r->setAttribute("belge_profili",$ubl->getProfileId());
+            $r->setAttribute("gonderen_vkn",$ubl->getSenderTaxNumber());
+            $r->setAttribute("alici_vkn",$ubl->getDeliveryTaxNumber());                        
         }
         return $r;
     }

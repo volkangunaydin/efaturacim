@@ -27,10 +27,10 @@ class ShipmentDelivery extends UblDataType
         $this->despatch = new Despatch();
     }
     
-    public function loadFromArray($arr, $depth = 0, $isDebug = false, $dieOnDebug = true)
+    public function loadFromArray($arr, $depth, $isDebug, $dieOnDebug, &$debugArray)
     {
         //\Vulcan\V::dump($arr);
-        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug);
+        return parent::loadFromArray($arr, $depth, $isDebug, $dieOnDebug, $debugArray);
     }
     
     public function setPropertyFromOptions($k, $v, $options)
