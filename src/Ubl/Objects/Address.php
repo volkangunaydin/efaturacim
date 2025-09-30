@@ -75,6 +75,7 @@ class Address extends UblDataType
         $this->appendElement($document, $element, 'cbc:ID', $this->id);
         $this->appendElement($document, $element, 'cbc:StreetName', $this->streetName);
         $this->appendElement($document, $element, 'cbc:BuildingName', $this->buildingName);
+        $this->appendElement($document, $element, 'cbc:BuildingNumber', $this->buildingNumber);
         $this->appendElement($document, $element, 'cbc:CitySubdivisionName', $this->citySubdivisionName);
         $this->appendElement($document, $element, 'cbc:CityName', $this->cityName);
         $this->appendElement($document, $element, 'cbc:PostalZone', $this->postalZone);
