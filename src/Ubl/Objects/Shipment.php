@@ -59,8 +59,13 @@ class Shipment extends UblDataType
                 $this->transportHandlingUnit = new UblDataTypeList(TransportHandlingUnit::class);
                 $debugArray = array();
                 $this->transportHandlingUnit->loadFromArray($v, 0, false, false, $debugArray);
-            } else {
+            } elseif ($v instanceof UblDataTypeList) {
                 $this->transportHandlingUnit = $v;
+            } else {
+                // Scalar veya desteklenmeyen tip geldiğinde atama yapma (tip hatasını engelle)
+                if (is_null($this->transportHandlingUnit)) {
+                    $this->transportHandlingUnit = new UblDataTypeList(TransportHandlingUnit::class);
+                }
             }
             return true;
         }
