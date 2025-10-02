@@ -4,4 +4,5 @@ namespace Data\Database;
 class ColumnDefinition{
   
 }
+
 ?>
