@@ -121,6 +121,7 @@ class NumberUtil{
     }
     public static function isNumberString($str){
         if(is_null($str)){ return false; }
+        if(is_array($str)){ return false; } // Array kontrolü eklendi
         if(is_int($str) || is_numeric($str) ){ return true; }
         return preg_match('/^[\d,.]+$/', "".$str) === 1;
     }
