@@ -22,6 +22,7 @@ class DataTableUsage{
         $s .= self::getDemoHtmlForServerSideDataTable($doc,$urlData);
         return $s;
     }
+    
     public static function showSampleSearchForm(&$doc){
         $s = '';
         $form = BootstrapForm::newForm();
