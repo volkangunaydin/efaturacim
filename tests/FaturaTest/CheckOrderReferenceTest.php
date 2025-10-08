@@ -14,7 +14,6 @@ class CheckOrderReferenceTest extends TestCase
     {
         $this->assertEquals($expected, NumberUtil::coalesce(...$args));
     }
-
     public static function coalesceProvider(): array
     {
         return [
