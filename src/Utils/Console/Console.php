@@ -49,11 +49,11 @@ class Console
         'white' => '0;37',
         'default' => '0',
     ];
-    public static $defaultBarLength = 50;
+    public static $defaultBarLength = 120;
     /**
      * Print a message to the console with optional color.
      */
-    public static function print(string $message, ?string $color = null): void
+    public static function print($message, ?string $color = null): void
     {
         $output = self::colorize($message, $color);
         echo $output . PHP_EOL;
@@ -72,12 +72,12 @@ class Console
         }
         return ''.$icon;
     }
-    public static function printSuccess(string $message, ?string $icon = null): void    
+    public static function printSuccess($message, ?string $icon = null): void    
     {
         $iconStr = self::getIconStr($icon);
         self::print($iconStr.$message, self::COLOR_GREEN);
     }
-    public static function printError(string $message, ?string $icon = null): void
+    public static function printError($message, ?string $icon = null): void
     {
         $iconStr = self::getIconStr($icon);
         self::print($iconStr.$message, self::COLOR_RED);
@@ -86,7 +86,7 @@ class Console
     /**
      * Print a message without newline with optional color.
      */
-    public static function printInline(string $message, ?string $color = null): void
+    public static function printInline($message, ?string $color = null): void
     {
         $output = self::colorize($message, $color);
         echo $output;
@@ -730,7 +730,10 @@ class Console
     {
         self::print('ℹ ' . $message, self::COLOR_CYAN);
     }
-    public static function printResult($result,$title=null,$icon=null,$printAttributes=false,$width=80){
+    public static function printResult($result,$title=null,$icon=null,$printAttributes=false,$width=null){
+        if(is_null($width)){
+            $width = self::$defaultBarLength;
+        }
         if($result instanceof SimpleResult || $result instanceof VResult){
             
             if($printAttributes && count($result->attributes)>0){
@@ -771,6 +774,204 @@ class Console
             }
             
         }    
+    }
+    public static function execWithDirectOutput($command,$showCommand=true,$usePassThru=false){
+        if($showCommand){
+            self::print("Executing command: ".$command);
+        }
+        if($usePassThru){
+            return self::execWithPassthru($command);
+        }
+        // Use passthru for simple commands that don't need interaction
+        if (strpos($command, 'composer') !== false) {
+            return self::execWithPassthru($command);
+        }
+        
+        // Open a process and get pipes for stdin, stdout, and stderr
+        $descriptorspec = array(
+            0 => array("pipe", "r"),  // stdin
+            1 => array("pipe", "w"),  // stdout
+            2 => array("pipe", "w")   // stderr
+        );
+        
+        // Add environment variables to prevent interactive prompts
+        $env = $_ENV;
+        $env['COMPOSER_NO_INTERACTION'] = '1';
+        $env['COMPOSER_DISABLE_XDEBUG_WARN'] = '1';
+        $env['COMPOSER_ALLOW_SUPERUSER'] = '1';
+        
+        $process = proc_open($command, $descriptorspec, $pipes, null, $env);
+        
+        if (is_resource($process)) {
+            // Close stdin as we don't need to send input
+            fclose($pipes[0]);
+            
+            // Read output in real-time
+            $stdout = $pipes[1];
+            $stderr = $pipes[2];
+            
+            // Set streams to non-blocking mode
+            stream_set_blocking($stdout, false);
+            stream_set_blocking($stderr, false);
+            
+            $output = '';
+            $error = '';
+            
+            // Read from both stdout and stderr
+            while (true) {
+                $read = array($stdout, $stderr);
+                $write = null;
+                $except = null;
+                
+                // Check if any stream has data available
+                $streams = stream_select($read, $write, $except, 0, 200000); // 200ms timeout
+                
+                if ($streams === false) {
+                    break;
+                }
+                
+                // Read from stdout
+                if (in_array($stdout, $read)) {
+                    $data = fread($stdout, 8192);
+                    if ($data !== false && $data !== '') {
+                        $output .= $data;
+                        echo $data; // Direct output to console
+                        flush();
+                    }
+                }
+                
+                // Read from stderr
+                if (in_array($stderr, $read)) {
+                    $data = fread($stderr, 8192);
+                    if ($data !== false && $data !== '') {
+                        $error .= $data;
+                        // Output stderr in red color or with error prefix
+                        echo "\033[31m" . $data . "\033[0m"; // Red color for errors
+                        flush();
+                    }
+                }
+                
+                // Check if process has terminated
+                $status = proc_get_status($process);
+                if (!$status['running']) {
+                    break;
+                }
+                
+                // Small delay to prevent excessive CPU usage
+                usleep(10000); // 10ms
+            }
+            
+            // Close pipes
+            fclose($stdout);
+            fclose($stderr);
+            
+            // Get the exit code
+            $exitCode = proc_close($process);
+            
+            // Return array with output, error, and exit code
+            return array(
+                'output' => $output,
+                'error' => $error,
+                'exit_code' => $exitCode,
+                'success' => $exitCode === 0
+            );
+        } else {
+            // Failed to start process
+            self::print("Failed to execute command: ".$command, "red");
+            return array(
+                'output' => '',
+                'error' => 'Failed to start process',
+                'exit_code' => -1,
+                'success' => false
+            );
+        }
+    }
+    
+    /**
+     * Execute command using passthru for better compatibility with interactive commands
+     */
+    private static function execWithPassthru($command) {
+        // Add non-interactive flags for composer
+        if (strpos($command, 'composer') !== false && strpos($command, '--no-interaction') === false) {
+            $command .= ' --no-interaction';
+        }
+        
+        self::print("Using passthru for: " . $command);
+        
+        // Capture output using output buffering
+        ob_start();
+        $exitCode = 0;
+        
+        // Use passthru which handles real-time output better
+        passthru($command, $exitCode);
+        
+        $output = ob_get_contents();
+        ob_end_clean();
+        
+        return array(
+            'output' => $output,
+            'error' => '',
+            'exit_code' => $exitCode,
+            'success' => $exitCode === 0
+        );
+    }
+    public static function getPhpExe(){
+        // Check if running on console/CLI
+        if (php_sapi_name() === 'cli' || PHP_SAPI === 'cli') {
+            // PHP_BINARY contains the path to the PHP executable
+            if (defined('PHP_BINARY') && !empty(PHP_BINARY)) {
+                return PHP_BINARY;
+            }
+            
+            // Fallback: try to get from $_SERVER
+            if (isset($_SERVER['_']) && !empty($_SERVER['_'])) {
+                return $_SERVER['_'];
+            }
+        }
+        
+        // Default fallback
+        return 'php';
+    }
+    public static function ask($question,$default=null){   
+        // Display the question with default value
+        $prompt = $question;
+        if ($default !== null) {
+            $prompt .= " (" . $default . ")";
+        }
+        $prompt .= ": ";
+        
+        echo $prompt;
+        flush(); // Force output to display
+        
+        // Ensure STDIN is in blocking mode
+        if (defined('STDIN')) {
+            stream_set_blocking(STDIN, true);
+        }
+        
+        $input = '';
+        
+        // Read input - simple approach that works on PowerShell
+        if (defined('STDIN')) {
+            $input = fgets(STDIN);
+        } elseif (function_exists('readline')) {
+            $input = readline();
+        } else {
+            // Last resort - open stdin stream
+            $handle = fopen('php://stdin', 'r');
+            $input = fgets($handle);
+            fclose($handle);
+        }
+        
+        // Clean the input - remove newlines, carriage returns, and trim
+        if ($input !== false && $input !== null) {
+            $input = str_replace(["\r", "\n"], '', "".$input);
+            $input = trim($input);
+        } else {
+            $input = '';
+        }
+        
+        // Return default if input is empty, otherwise return the input
+        return ($input === '' || $input === null) ? $default : $input;
     }
 }
 ?>
