@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils\Html\PrettyPrint;
 
 use Efaturacim\Util\Utils\Array\AssocArray;
+use Efaturacim\Util\Utils\Html\Bootstrap\BootstrapDocument;
 use Efaturacim\Util\Utils\Html\HtmlComponent;
 use Efaturacim\Util\Utils\Html\HtmlDocument;
 use Efaturacim\Util\Utils\Html\HtmlTag;
@@ -147,6 +148,15 @@ class PrettyPrint extends HtmlComponent{
         }     
         $s = '<pre>'.$this->tag->setContent(htmlentities($this->code,ENT_QUOTES,'UTF-8'))->toHtml().'</pre>';
         return $s;
+    }
+    public static function showAsPhp($code){
+        return self::showAsCode($code,"php");
+    }
+    public static function showAsCode($code,$type="php"){
+        $d = new BootstrapDocument(array());
+        $s = (new static())->setCode($code,$type)->toHtmlAsString($d);
+        $d->addBodyContent($s);        
+        return $d->show();
     }
 }   
 ?>

@@ -33,8 +33,8 @@ class CastUtil{
                 if(is_bool($value)){ return $value; }
                 if(is_numeric($value)){ return $value>0 ? true : false; }
                 $valAsVar = strtolower($value);                              
-                if(in_array($valAsVar, array("true","evet","yes","e","y"))){ return true; }
-                if(in_array($valAsVar, array("false","hayir","hayır","no","h","n"))){ return false; }
+                if(in_array($valAsVar, array("true","evet","yes","e","y","on"))){ return true; }
+                if(in_array($valAsVar, array("false","hayir","hayır","no","h","n","off"))){ return false; }
                 return $defVal;
             }else if($type==self::$DATA_NUMBER){         
                 if(!is_null(value: $typeOptions) && is_numeric($value) && is_int($typeOptions)){

@@ -68,5 +68,28 @@ class IO_Util{
         }
         return $r;
     }
+    public static function ensureDir($path){
+        if(!file_exists($path)){
+            mkdir($path,0777,true);
+        }
+    }
+    public static function readFileAsArray($path){
+        if($path && file_exists($path)){
+            $lines = file($path);
+            // Remove newline and carriage return characters from each line
+            return array_map(function($line) {
+                return rtrim($line, "\r\n");
+            }, $lines);
+        }
+        return array();
+    }
+    public static function readFileLines($path,$startLine,$endLine){
+        $r = array();
+        if($path && file_exists($path)){
+            $lines = self::readFileAsArray($path);
+            $r = array_slice($lines,$startLine,$endLine-$startLine);
+        }
+        return $r;
+    }
 }
 ?>

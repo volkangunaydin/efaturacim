@@ -25,6 +25,7 @@ class SimpleResult{
         public function addInfo($str){ return $this->addMessage($str,"info"); }
         public function addSuccess($str){ return $this->addMessage($str,"success"); }
         public function addWarn($str){ return $this->addMessage($str,"warning"); }
+        public function addInfo($str){ return $this->addMessage($str,"info"); }
         public function addMessage($str,$type,$key=null){
             if(is_null($key)){ $this->messages[] = array("text"=>$str,"type"=>$type,"t"=>date("Y-m-d H:i:s")); }else{ $this->messages[$key] = array("text"=>$str,"type"=>$type,"t"=>date("Y-m-d H:i:s")); }        
             return $this; 
