@@ -23,6 +23,7 @@ class SimpleResult{
         }    
         public function addError($str){ return $this->addMessage($str,"error"); }
         public function addInfo($str){ return $this->addMessage($str,"info"); }
+        
         public function addSuccess($str){ return $this->addMessage($str,"success"); }
         public function addWarn($str){ return $this->addMessage($str,"warning"); }
         public function addMessage($str,$type,$key=null){
