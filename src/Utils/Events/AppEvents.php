@@ -22,6 +22,7 @@ class AppEvents{
         $e = self::hasEvent($nameOfEventOrArray);        
         return !is_null($e) && strlen("".$e)>0;
     }
+    
     public static function fire($nameOfEventOrArray,$paramsAsArray=null){
         $e = self::hasEvent($nameOfEventOrArray);
         if(!is_null($e) && strlen("".$e)>0 && is_callable(self::$events[$e])){
