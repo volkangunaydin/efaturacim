@@ -61,4 +61,5 @@ class CastUtil{
             return self::getAs($str,false,self::$DATA_BOOL);
         }        
 }
+
 ?>
