@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 class EfaturaXmlTest extends TestCase{
     
     public function testXmlBRK2025000000052()    {
+        
         $efatura = EFaturaBelgesi::fromXmlFile(EFaturacimLibUtil::getTestPath("xml_data/efatura/BRK2025000000052.xml"));
         $this->assertSame("BRK2025000000052",$efatura->getBelgeNo());
         $this->assertSame(false,$efatura->getCopyIndicator());

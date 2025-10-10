@@ -11,6 +11,7 @@ class DocumentReference extends UblDataType
 {
     public ?string $id = null;
     public ?string $issueDate = null;
+    
 
     public function __construct($options = null)
     {

@@ -27,7 +27,9 @@ class TransportHandlingUnit extends UblDataType
 
     public function isEmpty(): bool
     {
-        return is_null($this->actualPackage) && is_null($this->transportEquipment) || $this->transportEquipment->isEmpty();
+        $actualPackageIsEmpty = is_null($this->actualPackage) || $this->actualPackage->isEmpty();
+        $transportEquipmentIsEmpty = is_null($this->transportEquipment) || $this->transportEquipment->isEmpty();
+        return $actualPackageIsEmpty && $transportEquipmentIsEmpty;
     }
 
     public function toDOMElement(DOMDocument $document): ?DOMElement

@@ -21,6 +21,7 @@ class EFaturacimRestApiClient{
         }else if(is_bool($isTest) && $isTest===true){
             self::$BASE_API_URL = "https://eservistest.orkestra.com.tr/";
         }
+        
     }
     
     public static function getDefaultBearerFromSession(){
