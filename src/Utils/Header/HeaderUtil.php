@@ -2,6 +2,7 @@
 
 namespace Efaturacim\Util\Utils\Header;
 
+use Efaturacim\Util\Utils\CastUtil;
 use Efaturacim\Util\Utils\IO\IO_Util;
 use Efaturacim\Util\Utils\IO\MimeTypes;
 use Efaturacim\Util\Utils\Options;
@@ -97,4 +98,25 @@ class HeaderUtil
         
         die("");
     }
+    public static function downloadHeader($fileName=null,$fileSize=0){
+        $fileSize = CastUtil::asInt($fileSize);
+        if(StrUtil::isEmpty($fileName)){
+            $fileName = "download.bin";
+        }
+        $mimeType = "application/octet-stream";
+        $a = MimeTypes::getMimeType($fileName);
+        if(strlen("".$a)>0){
+            $mimeType = "".$a;
+        }
+
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private",false);
+        header("Content-Type: {$mimeType}");
+        header("Content-Disposition: attachment; filename=\"{$fileName}\"");
+        header("Content-Transfer-Encoding: binary");
+        if($fileSize > 0){
+            header("Content-Length: {$fileSize}");
+         }            
+    }    
 }

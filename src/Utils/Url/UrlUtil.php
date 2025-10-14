@@ -1,5 +1,8 @@
 <?php
 namespace Efaturacim\Util\Utils\Url;
+
+use Efaturacim\Util\Utils\SimpleResult;
+
 class UrlUtil{
     protected static $__isSSL = null;
     protected static $__baseHost = null;
@@ -43,6 +46,48 @@ class UrlUtil{
         $host  = self::getBaseHost();        
         return ($isSsl ? 'https://' : 'http://') . $host."/";
     }
-
+    public static function isValid($s){
+        $res = self::getUrlAsResult($s);
+        return $res;
+    }
+    public static function getUrlAsResult($org){
+        $r = new SimpleResult();
+        $s = "".$org."";
+        $r->setAttribute("org_str", "".$org);
+        $r->setAttribute("protocol", "");
+        $r->setAttribute("domain", "");
+        $p = "";
+        if(is_string($s) & strlen($s)>0){
+            $a = strtolower("".substr($s, 0,8));
+            $b = strtolower("".substr($s, 0,7));
+            if($a=="https://"){
+                $p = "https";                    
+                $s = substr($s, 8);
+            }else if($b=="https://"){
+                $p = "http";
+                $s = substr($s, 7);
+            }   
+            if($p && strlen("".$p)>0){
+                $r->setAttribute("protocol", "https");
+                $pathStrPos = strpos($s, "/",0);                    
+                if($pathStrPos!==false && $pathStrPos>0){                        
+                    $r->setAttribute("domain", substr($s, 0,$pathStrPos));                        
+                    $s = substr($s, $pathStrPos);                        
+                    $r->setAttribute("path", $s);
+                }else{
+                    $pathStrPos = strpos($s, ".",0);
+                    if($pathStrPos!==false && $pathStrPos>0){
+                        $r->setAttribute("domain", $s);
+                        $s = "";
+                    }
+                }
+            }                
+            $r->setAttribute("remain", "".$s);
+        }
+        if(strlen("".$r->attributes["domain"])>0 && strlen("".$r->attributes["protocol"])>0){
+            $r->setIsOk(true);
+        }            
+        return $r;
+    }    
 }
 ?>
