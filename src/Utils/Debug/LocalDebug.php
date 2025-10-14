@@ -1,15 +1,15 @@
 <?php
 namespace Efaturacim\Util\Utils\Debug;
 
+use Efaturacim\Util\Utils\Laravel\LV;
 use Efaturacim\Util\Utils\Network\IpUtil;
 use Efaturacim\Util\Utils\Sms\SmsAdapter;
 
 class LocalDebug{
     public static function debug(){
         if(IpUtil::isLocalhostOrDev()){
-            $sms = SmsAdapter::newAdapter();
-            $r = $sms->send("Test SMS @ ".date("Y-m-d H:i:s"),"5355554979");
-            dd($r);
+            $db = LV::getDB()->selectSingle("SELECT * FROM b4b_users WHERE reference>0");
+            dd($db);
         }
         die("LocalDebug");
     }

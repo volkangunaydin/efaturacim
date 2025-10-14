@@ -2,9 +2,12 @@
 namespace Efaturacim\Util\Utils\Laravel;
 
 use Exception;
+use Vulcan\Base\Database\DatabaseConnection;
+use Vulcan\Base\Database\MySQL\MySqlDbClient;
 
 class LV{
     protected static $__isLaravel = null;
+    protected static $__db = array();
     public static function env(){
         return \Vulcan\V::env();
     }
@@ -85,6 +88,37 @@ class LV{
         }
         
         return false;
+    }    
+    public static function getDB($key=null,$resumeOnError=true){    
+        if(is_null($key)){ $key = "default"; }
+        $laravelKey = $key;
+        if(key_exists($key,self::$__db)){
+            return self::$__db[$key];
+        }
+        if(LV::isLaravel()){            
+            $dbArray = \Illuminate\Support\Facades\Config::get('database.connections.'.$key);      
+            if($dbArray && is_string($dbArray) && strlen("".$dbArray)>0){                
+                $laravelKey = $dbArray;
+                $dbArray = \Illuminate\Support\Facades\Config::get('database.connections.'.$dbArray);                
+            }
+            if(is_null($dbArray) && $key=="default"){                
+                $laravelKey = "mysql";
+                $dbArray = \Illuminate\Support\Facades\Config::get('database.connections.mysql');
+            }            
+            if(is_array($dbArray) && count($dbArray)>0){
+                try {
+                    $connection = \Illuminate\Support\Facades\DB::connection($laravelKey);
+                    $pdo = $connection->getPdo();                    
+                    self::$__db[$key] = new MySqlDbClient($key,@$dbArray["username"],@$dbArray["password"],@$dbArray["host"].(@$dbArray["port"]>0 ? ":".@$dbArray["port"] : ""),@$dbArray["database"],$resumeOnError,$pdo) ;
+                } catch (Exception $e) {
+                    //throw $th;
+                }
+            }
+        }
+        if(key_exists($key,self::$__db)){
+            return self::$__db[$key];
+        }
+        return null;
     }
 }
 ?>
