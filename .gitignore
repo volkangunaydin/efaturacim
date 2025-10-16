@@ -1,3 +1,4 @@
 /vendor/
 /private/
 .phpunit.result.cache
+.env

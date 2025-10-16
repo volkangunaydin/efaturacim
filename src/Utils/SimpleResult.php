@@ -46,6 +46,9 @@ class SimpleResult{
                 if($mergeAttr){ foreach ($res2->attributes as $k=>$v){ $this->attributes[$k] = $v; } }
                 if($mergeList){ foreach ($res2->list as $k=>$v){ $this->list[$k] = $v; } }            
             }
-        }            
+          }            
+        public static function newResult($isok=false){
+            return new self($isok);
+        }
 }
 ?>

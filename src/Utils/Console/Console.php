@@ -730,6 +730,9 @@ class Console
     {
         self::print('ℹ ' . $message, self::COLOR_CYAN);
     }
+    public static function newline(){
+        self::print('');
+    }
     public static function printResult($result,$title=null,$icon=null,$printAttributes=false,$width=null){
         if(is_null($width)){
             $width = self::$defaultBarLength;
@@ -972,6 +975,9 @@ class Console
         
         // Return default if input is empty, otherwise return the input
         return ($input === '' || $input === null) ? $default : $input;
+    }
+    public static function stdout($message){
+        fwrite(STDOUT, $message . PHP_EOL);
     }
 }
 ?>
