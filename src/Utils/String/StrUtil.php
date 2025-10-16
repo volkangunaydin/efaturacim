@@ -265,7 +265,7 @@ class StrUtil{
             if ($str==""){ return ""; }
             if(is_array($str)){ $r = array();foreach ($str as $k=>$v){ $r[$k]  = self::toUpperEng($v); } return $r; }
             return strtoupper(self::removeTurkishChars($str));
-        }        
+        }                
         public static function toVarName($str,$defVal=null,$typeOptions=null){
             $strVar = $str;
             if(Options::ensureParam($typeOptions) && $typeOptions instanceof Options){    

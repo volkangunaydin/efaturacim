@@ -8,8 +8,8 @@ use Vulcan\Base\Database\MySQL\MySqlDbClient;
 class LV{
     protected static $__isLaravel = null;
     protected static $__db = array();
-    public static function env(){
-        return \Vulcan\V::env();
+    public static function env($name,$default=null){
+        return \env($name,$default);
     }
     public static function isLaravel(){
         if(!is_null(self::$__isLaravel) && is_bool(self::$__isLaravel)){ return self::$__isLaravel; }
@@ -119,6 +119,14 @@ class LV{
             return self::$__db[$key];
         }
         return null;
+    }
+    public static function configArray($name,$key=null){
+        if(is_null($key)){ $key = "default"; }
+        $r =  \Illuminate\Support\Facades\Config::get(''.$name.'.'.$key);
+        if(is_array($r)){
+            return $r;
+        }
+        return array();
     }
 }
 ?>
