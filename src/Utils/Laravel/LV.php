@@ -128,5 +128,11 @@ class LV{
         }
         return array();
     }
+    public static function view($viewName,$data=[]){
+        if(self::isLaravel()){
+            return view($viewName,$data);
+        }
+        return "";
+    }
 }
 ?>
