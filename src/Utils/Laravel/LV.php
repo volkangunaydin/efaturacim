@@ -4,10 +4,16 @@ namespace Efaturacim\Util\Utils\Laravel;
 use Exception;
 use Vulcan\Base\Database\DatabaseConnection;
 use Vulcan\Base\Database\MySQL\MySqlDbClient;
+use Vulcan\Orkestra\SmartClient\OrkestraSmartClient;
 
 class LV{
     protected static $__isLaravel = null;
     protected static $__db = array();
+    /**
+     * @var OrkestraSmartClient
+     */
+    protected static $__smartClient = null;
+    protected static $__isVEnabled = false;
     public static function env($name,$default=null){
         return \env($name,$default);
     }
@@ -17,6 +23,9 @@ class LV{
         return self::$__isLaravel;
     }
     protected static function __checkIfIsLaravel(){        
+        if(class_exists('Vulcan\V')){
+            self::$__isVEnabled = true;
+        }
         // Method 1: Check for Laravel helper functions
         if (function_exists('base_path') && function_exists('app')) {
             self::$__isLaravel = true;
@@ -89,14 +98,23 @@ class LV{
         
         return false;
     }    
+    /**
+     * @return MySqlDbClient
+     */
+    public static function getDBForOrkestra(){
+        return self::getDB("orkestra");
+    }
+    /**
+     * @return MySqlDbClient
+     */
     public static function getDB($key=null,$resumeOnError=true){    
         if(is_null($key)){ $key = "default"; }
-        $laravelKey = $key;
+        $laravelKey = $key;        
         if(key_exists($key,self::$__db)){
             return self::$__db[$key];
         }
         if(LV::isLaravel()){            
-            $dbArray = \Illuminate\Support\Facades\Config::get('database.connections.'.$key);      
+            $dbArray = \Illuminate\Support\Facades\Config::get('database.connections.'.$key);                  
             if($dbArray && is_string($dbArray) && strlen("".$dbArray)>0){                
                 $laravelKey = $dbArray;
                 $dbArray = \Illuminate\Support\Facades\Config::get('database.connections.'.$dbArray);                
@@ -107,9 +125,13 @@ class LV{
             }            
             if(is_array($dbArray) && count($dbArray)>0){
                 try {
+                    $arr = array("user"=>@$dbArray["username"],"pass"=>@$dbArray["password"],"server"=>@$dbArray["host"].":".@$dbArray["port"],"db"=>@$dbArray["database"]);
+                    \Vulcan\V::setEnv("db:".$key,$arr);
                     $connection = \Illuminate\Support\Facades\DB::connection($laravelKey);
-                    $pdo = $connection->getPdo();                    
-                    self::$__db[$key] = new MySqlDbClient($key,@$dbArray["username"],@$dbArray["password"],@$dbArray["host"].(@$dbArray["port"]>0 ? ":".@$dbArray["port"] : ""),@$dbArray["database"],$resumeOnError,$pdo) ;
+                    $pdo = $connection->getPdo();                                        
+                    $tmp = DatabaseConnection::getDatabaseWithInit($key,$pdo,true,false);
+                    $arr["pdo"]       = &$pdo;                    
+                    self::$__db[$key] = DatabaseConnection::getDatabaseWithInit($key,$arr,true);                    
                 } catch (Exception $e) {
                     //throw $th;
                 }
@@ -127,6 +149,41 @@ class LV{
             return $r;
         }
         return array();
+    }
+    public static function view($viewName,$data=[]){
+        if(self::isLaravel()){
+            return view($viewName,$data);
+        }
+        return "";
+    }
+    /**
+     * @return OrkestraSmartClient
+     */
+    public static function getSmartClientForOrkestra(){
+        if(is_null(self::$__smartClient)){
+            $dbOrkestra = self::getDBForOrkestra();
+            if($dbOrkestra instanceof MySqlDbClient){                
+                $dbB4B       = LV::getDB();                        
+                self::$__smartClient = new OrkestraSmartClient($dbOrkestra->dbKey);
+                if($dbB4B instanceof MySqlDbClient){
+                    self::$__smartClient->setDbKeyForB4B($dbB4B->dbKey);
+                    $orkestraConfig = self::configArray("orkestra","default");
+                    if(is_array($orkestraConfig) && count($orkestraConfig)>0 && key_exists("period",$orkestraConfig)){
+                        self::$__smartClient->selectPeriod($orkestraConfig["period"]);
+                        self::$__smartClient->options->setValue("period_reference",$orkestraConfig["period"]);
+                        self::$__smartClient->options->setValue("orkestra_user",$orkestraConfig["user"]);
+                        self::$__smartClient->options->setValue("orkestra_pass",$orkestraConfig["pass"]);
+                        self::$__smartClient->options->setValue("orkestra_host",$orkestraConfig["host"]);
+                        self::$__smartClient->options->setValue("orkestra_port",$orkestraConfig["port"]);
+                    }
+                    //\Vulcan\V::dump($orkestraConfig);
+                }
+            }                        
+        }
+        return self::$__smartClient;
+    }
+    public static function throwException($message,$code=500){
+        throw new Exception($message,$code);
     }
 }
 ?>

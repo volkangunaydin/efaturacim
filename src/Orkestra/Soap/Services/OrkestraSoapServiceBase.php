@@ -284,5 +284,18 @@ class OrkestraSoapServiceBase{
         }
         return $r;
     }
+    public function loginRequiredFailed($tryLogin=true){
+        $sessionId = $this->getSessionId();
+        if(StrUtil::isEmpty($sessionId)){
+            if($tryLogin){
+                $r = $this->login();
+                if($r->isOK()){
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 }
 ?>

@@ -13,6 +13,10 @@ class OrkestraFactoryWebService extends OrkestraSoapServiceBase{
     public function checkUserNameAndPassword($user,$pass,$getDetails=true){
         $r = new OrkestraSoapResult();
         if(StrUtil::notEmpty($user) && StrUtil::notEmpty($pass)){
+            if($this->loginRequiredFailed()){
+                $r->addError("Bu servisi kullanabilmek için önce giriş yapınız.");
+                return $r;
+            }
             $xml       = ValidateUserPass::xml($user,$pass);
             $resCurl   = $this->curlExec(null,"validateUserPass",$xml,null,true,null,true,null,null);
             $validated = $resCurl->getStringInBetweenTags("Validated");
@@ -21,6 +25,22 @@ class OrkestraFactoryWebService extends OrkestraSoapServiceBase{
                 $r->addSuccess("Kullanıcı adı ve şifre doğru.");
                 $r->setAttribute("userName",$user);
                 $r->setAttribute("userPass",$pass);
+                if($getDetails){                    
+                    $user = $this->newGetPageList("user")->addFields("reference","userName","name","surname","status")->filterByStringEquals("userName",$user)->first();
+                    if($user && count($user) > 0){
+                        if(@$user["status"] >0){
+                            $r->addError("Kullanıcı aktif değil.");
+                            $r->setIsOk(false);
+                            return $r;
+                        }
+                        foreach($user as $k=>$v){
+                            $r->setAttribute($k,$v);
+                        }
+                    }else{
+                        $r->addError("Kullanıcı bulunamadı.");
+                        $r->setIsOk(false);
+                    }
+                }
             }else{
                 $r->addError("Kullanıcı adı veya şifre yanlış.");
             }
