@@ -10,6 +10,8 @@ use Efaturacim\Util\Utils\Laravel\LV_Route;
 use Efaturacim\Util\Utils\Network\IpUtil;
 use Efaturacim\Util\Utils\Results\ResultUtil;
 use Efaturacim\Util\Utils\Sms\SmsAdapter;
+use Vulcan\Orkestra\SmartClient\OrkestraSmartClient;
+use Vulcan\Projects\Orkestra\DbSelect\Cari\SelectCari;
 
 class LocalDebug{
     public static function debug(){                
@@ -27,6 +29,8 @@ class LocalDebug{
                 return self::handleUpgrade(false,true);
             }else if($route->getPart(1)=="test"){
                 return self::handleTest();
+            }else if($route->getPart(1)=="orkestra"){
+                return self::handleOrkestra();
             }else{
                 return self::handleDefault();
             }
@@ -50,6 +54,21 @@ class LocalDebug{
         $s .= Alert::warning("B4B Veritabanı Upgrade İşlemi Başlıyor");
         $res = SmartModelUtil::doMigrationForLaravel(true,$createFiles,$initData,false);
         $s  .= ResultUtil::getResultMessagesAsHtml($res);
+        return $s;
+    }
+    public static function handleOrkestra(){
+        $s = Alert::warning("Orkestra Test İşlemi Başlıyor");
+        $smartClient = LV::getSmartClientForOrkestra();        
+        if($smartClient instanceof OrkestraSmartClient){                        
+            $cariQuery = SelectCari::newObject($smartClient,"mutabakat");
+            // $cariQuery->filterByTedarikci();  $cariQuery->filterByMusteri();
+            $cariQuery->filterByTarihtekiBorc("2025-05-31",1000,1000000,1000,10000000);
+            $cariQuery->filterBySmartCode("h");
+            //$cariQuery->selectFieldsByTarihtekiBakiye("2025-05-31",false);
+            $cariQuery->debug(false,100);
+        }else{
+            $s .= Alert::danger("Orkestra Veritabanı Bağlantısı Başarısız");
+        }        
         return $s;
     }
 }
