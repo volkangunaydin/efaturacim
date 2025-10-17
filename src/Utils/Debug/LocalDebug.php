@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils\Debug;
 
 use Efaturacim\B4B\Models\Mutabakat\MutabakatDonemi;
+use Efaturacim\B4B\Models\User\B4B_User;
 use Efaturacim\B4B\SmartModels\Base\SmartModelUtil;
 use Efaturacim\Util\Orkestra\Soap\OrkestraSoapClient;
 use Efaturacim\Util\Utils\Html\Bootstrap\Alert;
@@ -38,9 +39,13 @@ class LocalDebug{
     }
     public static function handleTest(){
         $s = Alert::warning("B4B Test İşlemi Başlıyor");
-        $mutabakatDonemi = MutabakatDonemi::find(1);
-        $totalRecords = $mutabakatDonemi->toplamKayit; 
-        $s .= Alert::success("Toplam Kayıt: ".$totalRecords);
+        $mutabakatDonemi = MutabakatDonemi::find(1);        
+        $s .= Alert::success("Dönemdeki Toplam Kayıt Sayısı: ".$mutabakatDonemi->toplamKayit." [ Kabul: ".$mutabakatDonemi->kabulSayisi." Red: ".$mutabakatDonemi->redSayisi."  Cevaplanmamis : ".$mutabakatDonemi->cevaplanmamisSayisi."]");
+
+        $user = B4B_User::find(1);
+        $s .= Alert::success("Kullanıcı: ".$user->displayName."<br/>Admin: ".($user->isAdmin?"Evet":"Hayır"));
+
+        //LV::throwException("Test Exception");
         return $s;
     }
     public static function handleDefault(){

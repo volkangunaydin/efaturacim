@@ -182,5 +182,8 @@ class LV{
         }
         return self::$__smartClient;
     }
+    public static function throwException($message,$code=500){
+        throw new Exception($message,$code);
+    }
 }
 ?>
