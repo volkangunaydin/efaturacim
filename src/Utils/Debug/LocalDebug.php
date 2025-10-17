@@ -1,6 +1,7 @@
 <?php
 namespace Efaturacim\Util\Utils\Debug;
 
+use Efaturacim\B4B\Models\Mutabakat\MutabakatDonemi;
 use Efaturacim\B4B\SmartModels\Base\SmartModelUtil;
 use Efaturacim\Util\Orkestra\Soap\OrkestraSoapClient;
 use Efaturacim\Util\Utils\Html\Bootstrap\Alert;
@@ -21,11 +22,22 @@ class LocalDebug{
             }else if($route->getPart(1)=="upgrade"  || $route->getPart(1)=="database"){                
                 return self::handleUpgrade();                
             }else if($route->getPart(1)=="fullupgrade"){
-                return self::handleUpgrade(true);                
+                return self::handleUpgrade(true);      
+            }else if($route->getPart(1)=="init"){
+                return self::handleUpgrade(false,true);
+            }else if($route->getPart(1)=="test"){
+                return self::handleTest();
             }else{
                 return self::handleDefault();
             }
         }                
+    }
+    public static function handleTest(){
+        $s = Alert::warning("B4B Test İşlemi Başlıyor");
+        $mutabakatDonemi = MutabakatDonemi::find(1);
+        $totalRecords = $mutabakatDonemi->toplamKayit; 
+        $s .= Alert::success("Toplam Kayıt: ".$totalRecords);
+        return $s;
     }
     public static function handleDefault(){
         return "";
@@ -33,10 +45,10 @@ class LocalDebug{
     public static function handleUrl(){
         
     }
-    public static function handleUpgrade($createFiles=false){        
+    public static function handleUpgrade($createFiles=false,$initData=false){        
         $s = '';
         $s .= Alert::warning("B4B Veritabanı Upgrade İşlemi Başlıyor");
-        $res = SmartModelUtil::doMigrationForLaravel(true,$createFiles,false,false);
+        $res = SmartModelUtil::doMigrationForLaravel(true,$createFiles,$initData,false);
         $s  .= ResultUtil::getResultMessagesAsHtml($res);
         return $s;
     }
