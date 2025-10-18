@@ -7,6 +7,7 @@ use Vulcan\Base\Database\MySQL\MySqlDbClient;
 use Vulcan\Orkestra\SmartClient\OrkestraSmartClient;
 
 class LV{
+    public static $DEBUG = false;
     protected static $__isLaravel = null;
     protected static $__db = array();
     /**
@@ -14,12 +15,20 @@ class LV{
      */
     protected static $__smartClient = null;
     protected static $__isVEnabled = false;
+    public static function boot(){
+        if(!class_exists('lv')){
+            require_once __DIR__ . '/lv_util.php';
+        }
+    }
     public static function env($name,$default=null){
         return \env($name,$default);
     }
     public static function isLaravel(){
         if(!is_null(self::$__isLaravel) && is_bool(self::$__isLaravel)){ return self::$__isLaravel; }
         self::$__isLaravel = self::__checkIfIsLaravel();
+        if(self::$__isLaravel){
+            require_once __DIR__ . '/lv_util.php';
+        }
         return self::$__isLaravel;
     }
     protected static function __checkIfIsLaravel(){        
@@ -185,5 +194,18 @@ class LV{
     public static function throwException($message,$code=500){
         throw new Exception($message,$code);
     }
+    public static function log($message,$level='info'){
+        if($level=='info'){
+            \Log::info($message);
+        }elseif($level=='error'){
+            \Log::error($message);
+        }elseif($level=='warning'){
+            \Log::warning($message);
+        }elseif($level=='debug'){
+            \Log::debug($message);
+        }else{
+            \Log::info($message);
+        }   
+    }         
 }
 ?>

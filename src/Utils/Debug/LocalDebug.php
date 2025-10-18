@@ -26,7 +26,7 @@ class LocalDebug{
                 return self::handleUpgrade();                
             }else if($route->getPart(1)=="fullupgrade"){
                 return self::handleUpgrade(true);      
-            }else if($route->getPart(1)=="init"){
+            }else if($route->getPart(1)=="init"){                
                 return self::handleUpgrade(false,true);
             }else if($route->getPart(1)=="test"){
                 return self::handleTest();
@@ -34,7 +34,7 @@ class LocalDebug{
                 return self::handleOrkestra();
             }else{
                 return self::handleDefault();
-            }
+            }            
         }                
     }
     public static function handleTest(){

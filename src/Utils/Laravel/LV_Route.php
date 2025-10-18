@@ -35,6 +35,7 @@ class LV_Route{
      * @return static     
     */
     public static function getCurrentRoute(){
+        if(!class_exists('lv')){LV::boot();}
         if(is_null(self::$currentRoute)){
             self::$currentRoute = new static();
         }
