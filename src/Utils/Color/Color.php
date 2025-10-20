@@ -4,6 +4,7 @@ class Color{
     protected $org;
     protected $rgba   = array(0,0,0,100);            
     protected $_isok  = false;
+    
     public static $NAMED_COLORS = array(
         // Standard CSS Named Colors
         'aliceblue' => 'F0F8FF'

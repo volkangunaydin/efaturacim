@@ -11,4 +11,5 @@ class AccountingCustomerParty extends UblDataTypeForPartyContainer
         $this->setDefaultTagNameIfNotSet("cac:AccountingCustomerParty");
         parent::initMe();
     }
+    
 }
