@@ -15,7 +15,7 @@ use Vulcan\Orkestra\SmartClient\OrkestraSmartClient;
 use Vulcan\Projects\Orkestra\DbSelect\Cari\SelectCari;
 
 class LocalDebug{
-    public static function debug(){                
+    public static function debug(){                                
         $route = LV_Route::getCurrentRoute();        
         if(!$route->isGet()){
             die("GET haricinde diğer istek tipleri desteklenmiyor.");
@@ -56,7 +56,7 @@ class LocalDebug{
     }
     public static function handleUpgrade($createFiles=false,$initData=false){        
         $s = '';
-        $s .= Alert::warning("B4B Veritabanı Upgrade İşlemi Başlıyor");
+        $s   .= Alert::warning("B4B Veritabanı Upgrade İşlemi Başlıyor");
         $res = SmartModelUtil::doMigrationForLaravel(true,$createFiles,$initData,false);
         $s  .= ResultUtil::getResultMessagesAsHtml($res);
         return $s;

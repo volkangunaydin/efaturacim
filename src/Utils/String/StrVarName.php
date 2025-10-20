@@ -1,10 +1,10 @@
 <?php
-namespace Vulcan\Base\Util\StringUtil{
+namespace Efaturacim\Util\Utils\String;
 
     use Efaturacim\Util\Utils\CastUtil;
     use Efaturacim\Util\Utils\Options;
 
-    class StringUtilForVarname{
+    class StrVarName{
         public static  function removeTurkishChars($str){ 
             if(is_array($str)){ 
                 $res = array(); 
@@ -142,5 +142,4 @@ namespace Vulcan\Base\Util\StringUtil{
             return str_replace($search,$replace,$str);
         }
     }
-}
 ?>

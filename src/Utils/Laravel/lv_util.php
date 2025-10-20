@@ -1,34 +1,17 @@
 <?php
+
+use Efaturacim\Util\Utils\Laravel\LV as LaravelLV;
+
 class lv{
-    public static function route($routeName,$defaultValue=null){
-        try {
-            // Try to use Laravel's route() helper
-            if (function_exists('route')) {
-                return route($routeName);
-            }            
-            // Try to use Laravel's URL facade
-            if (class_exists('Illuminate\Support\Facades\URL')) {
-                return \Illuminate\Support\Facades\URL::route($routeName);
-            }
-            
-            // Try to use Laravel's Route facade
-            if (class_exists('Illuminate\Support\Facades\Route')) {
-                $route = \Illuminate\Support\Facades\Route::getRoutes()->getByName($routeName);
-                if ($route) {
-                    return $route->uri();
-                }
-            }            
-        } catch (\Exception $e) {
-            // Laravel route() failed, use fallback
-        }
-        return $defaultValue;
-    }
-    public static function getBaseUrl(){
-        $isSSL = false;
-        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
-            $isSSL = true;
-        }
-        return ($isSSL ? "https://" : "http://").$_SERVER['HTTP_HOST'];
+    public static function __callStatic($method, $arguments) {
+        if(!class_exists(LaravelLV::class)){
+            require_once __DIR__ . '/LV.php';
+        }        
+        // Check if the static method exists on LV class
+        if(method_exists(LaravelLV::class, $method)){
+            return LaravelLV::$method(...$arguments);
+        }        
+        return LaravelLV::callSmart($method, $arguments);        
     }
 }
 ?>

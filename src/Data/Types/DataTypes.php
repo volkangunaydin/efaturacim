@@ -1,5 +1,5 @@
 <?php
-namespace Data\Types;
+namespace Efaturacim\Util\Data\Types;
 
 class DataTypes{
     public static  $DATA_STRING    = "string";

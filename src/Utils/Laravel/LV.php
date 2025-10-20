@@ -1,6 +1,7 @@
 <?php
 namespace Efaturacim\Util\Utils\Laravel;
 
+use Efaturacim\Util\Utils\Laravel\Util\LaravelFolderCheck;
 use Exception;
 use Vulcan\Base\Database\DatabaseConnection;
 use Vulcan\Base\Database\MySQL\MySqlDbClient;
@@ -71,41 +72,8 @@ class LV{
         return false;
     }
     
-    /**
-     * Check if current directory is a Laravel project
-     */
     public static function isLaravelProject($path = null){
-        if ($path === null) {
-            $path = getcwd();
-        }
-        
-        // Check for artisan file (Laravel's command-line interface)
-        if (!file_exists($path . '/artisan')) {
-            return false;
-        }
-        
-        // Check composer.json for Laravel framework dependency
-        $composerFile = $path . '/composer.json';
-        if (file_exists($composerFile)) {
-            $composer = json_decode(file_get_contents($composerFile), true);
-            if (isset($composer['require']['laravel/framework'])) {
-                return true;
-            }
-        }
-        
-        // Check for bootstrap/app.php (Laravel 11+)
-        if (file_exists($path . '/bootstrap/app.php')) {
-            return true;
-        }
-        
-        // Check for app/ directory and typical Laravel structure
-        if (file_exists($path . '/app') && 
-            file_exists($path . '/config') && 
-            file_exists($path . '/routes')) {
-            return true;
-        }
-        
-        return false;
+        return LaravelFolderCheck::isLaravelProject($path);   
     }    
     /**
      * @return MySqlDbClient
@@ -206,6 +174,115 @@ class LV{
         }else{
             \Log::info($message);
         }   
-    }         
+    }
+    public static function getBaseUrl(){
+        $isSSL = false;
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
+            $isSSL = true;
+        }
+        return ($isSSL ? "https://" : "http://").$_SERVER['HTTP_HOST'];
+    }
+    public static function error($message){
+        throw new \Exception($message);
+    }    
+    public static function flash($key=null,$defaultValue=null){
+        if(class_exists('Illuminate\Support\Facades\Session')){
+            return \Illuminate\Support\Facades\Session::flash($key,$defaultValue);
+        }
+        return null;
+    }
+    public static function route($routeName=null,$defaultValue=null,$arguments=null){
+        try {
+            if (function_exists('route')) {
+                return route($routeName,$arguments);
+            }            
+            // Try to use Laravel's URL facade
+            if (class_exists('Illuminate\Support\Facades\URL')) {
+                return \Illuminate\Support\Facades\URL::route($routeName,$arguments);
+            }
+            
+            // Try to use Laravel's Route facade
+            if (class_exists('Illuminate\Support\Facades\Route')) {
+                $route = \Illuminate\Support\Facades\Route::getRoutes()->getByName($routeName);
+                if ($route) {
+                    return $route->uri();
+                }
+            }            
+        } catch (\Exception $e) {
+            // Laravel route() failed, use fallback
+        }
+        return $defaultValue;
+    }
+    public static function callSmart($method,$arguments=null){
+
+        // Try to call Laravel helper functions
+        if (function_exists($method)) {
+            return call_user_func_array($method, $arguments);
+        }        
+        // Try to call Laravel facade methods
+        if (class_exists('Illuminate\Support\Facades\URL')) {
+            $facadeMap = [
+                'url' => ['Illuminate\Support\Facades\URL', 'to'],
+                'asset' => ['Illuminate\Support\Facades\URL', 'asset'],
+                'route' => ['Illuminate\Support\Facades\URL', 'route'],
+                'action' => ['Illuminate\Support\Facades\URL', 'action'],
+                'secure' => ['Illuminate\Support\Facades\URL', 'secure'],
+            ];
+            
+            if (isset($facadeMap[$method])) {
+                return call_user_func_array($facadeMap[$method], $arguments);
+            }
+        }
+        
+        // Try to call other Laravel facades
+        $facadeMethods = [
+            'config' => ['Illuminate\Support\Facades\Config', 'get'],
+            'trans' => ['Illuminate\Support\Facades\Lang', 'get'],
+            'app' => ['Illuminate\Support\Facades\App', 'make'],
+            'request' => ['Illuminate\Support\Facades\Request', 'instance'],
+            'response' => ['Illuminate\Support\Facades\Response', 'make'],
+            'redirect' => ['Illuminate\Support\Facades\Redirect', 'to'],
+            'back' => ['Illuminate\Support\Facades\Redirect', 'back'],
+            'session' => ['Illuminate\Support\Facades\Session', 'get'],
+            'cookie' => ['Illuminate\Support\Facades\Cookie', 'get'],
+            'cache' => ['Illuminate\Support\Facades\Cache', 'get'],
+            'auth' => ['Illuminate\Support\Facades\Auth', 'user'],
+            'user' => ['Illuminate\Support\Facades\Auth', 'user'],
+            'guest' => ['Illuminate\Support\Facades\Auth', 'guest'],
+            'check' => ['Illuminate\Support\Facades\Auth', 'check'],
+            'attempt' => ['Illuminate\Support\Facades\Auth', 'attempt'],
+            'login' => ['Illuminate\Support\Facades\Auth', 'login'],
+            'logout' => ['Illuminate\Support\Facades\Auth', 'logout'],
+            'hash' => ['Illuminate\Support\Facades\Hash', 'make'],
+            'bcrypt' => ['Illuminate\Support\Facades\Hash', 'make'],
+            'validator' => ['Illuminate\Support\Facades\Validator', 'make'],
+            'validate' => ['Illuminate\Support\Facades\Validator', 'make'],
+            'file' => ['Illuminate\Support\Facades\File', 'get'],
+            'storage' => ['Illuminate\Support\Facades\Storage', 'disk'],
+            'db' => ['Illuminate\Support\Facades\DB', 'table'],
+        ];
+        
+        if (isset($facadeMethods[$method])) {
+            $facadeClass = $facadeMethods[$method][0];
+            $facadeMethod = $facadeMethods[$method][1];
+            
+            if (class_exists($facadeClass)) {
+                return call_user_func_array([$facadeClass, $facadeMethod], $arguments);
+            }
+        }
+        return null;
+    }
+    public static function isPost(){
+        if(@$_SERVER["REQUEST_METHOD"]=="POST"){
+            return true;
+        }
+        return false;
+    }
+    /**
+     * @return LV_Route
+     */
+    public static function getCurrentRoute(){
+        return LV_Route::getCurrentRoute();
+    }
 }
 ?>
