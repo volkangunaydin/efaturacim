@@ -170,8 +170,7 @@ class OrkestraSoapServiceBase{
         $sessionId = $this->getSessionId();
         if(StrUtil::isEmpty($sessionId)){
             if($tryLogin){
-                $r= $this->login();
-                dd($r);
+                $r= $this->login();                
             }
             $sessionId = $this->getSessionId();
             if(StrUtil::notEmpty($sessionId)){

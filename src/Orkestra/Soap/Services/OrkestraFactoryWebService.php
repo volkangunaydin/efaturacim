@@ -2,6 +2,8 @@
 
 namespace Efaturacim\Util\Orkestra\Soap\Services;
 
+use Efaturacim\B4B\Laravel\Select\B4B_User_Auth_Query;
+use Efaturacim\B4B\Models\User\B4B_User_Auth;
 use Efaturacim\Util\Orkestra\Soap\Result\OrkestraSoapResult;
 use Efaturacim\Util\Orkestra\Soap\Util\OrkestraGetPage;
 use Efaturacim\Util\Orkestra\XML\ValidateUserPass;
@@ -24,10 +26,12 @@ class OrkestraFactoryWebService extends OrkestraSoapServiceBase{
                 $r->setIsOk(true);
                 $r->addSuccess("Kullanıcı adı ve şifre doğru.");
                 $r->setAttribute("userName",$user);
-                $r->setAttribute("userPass",$pass);
+                $r->setAttribute("userPass",$pass);                
+                $r->value = 0;
                 if($getDetails){                    
                     $user = $this->newGetPageList("user")->addFields("reference","userName","name","surname","status")->filterByStringEquals("userName",$user)->first();
                     if($user && count($user) > 0){
+                        $r->value = @$user["reference"];
                         if(@$user["status"] >0){
                             $r->addError("Kullanıcı aktif değil.");
                             $r->setIsOk(false);
