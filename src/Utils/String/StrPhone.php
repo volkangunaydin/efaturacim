@@ -160,13 +160,17 @@ namespace Efaturacim\Util\Utils\String{
         protected static function __getPhoneNumbersAsArray(&$arr,$phoneNumbers,$depth=0){
             if($depth>100){ return; }
             if(is_array($phoneNumbers)){
-                foreach ($phoneNumbers as $v){
-                    
-                    self::__getPhoneNumbersAsArray($arr, $v,$depth+1);
-                    
+                foreach ($phoneNumbers as $v){                    
+                    self::__getPhoneNumbersAsArray($arr, $v,$depth+1);                    
                 }
-            }else if (is_string($phoneNumbers) || is_int($phoneNumbers)){
-                $tokens = self::tokenize($phoneNumbers,"std");                
+            }else if (is_string($phoneNumbers) || is_int($phoneNumbers)){                                
+                $resPhone = self::getResult($phoneNumbers);
+                if($resPhone->isOK()){         
+                    $arr[] = $resPhone->attributes["cell"];                               
+                    return;
+                }
+                $phoneNumbers = preg_replace("/[^0-9 ,;]/", "", "".$phoneNumbers);
+                $tokens = self::tokenize($phoneNumbers,"std",10,20);                                                                                
                 if($tokens && count($tokens)>1){
                     foreach ($tokens as $kk=>$vv){
                         $r = self::getResult("".$vv);
@@ -188,12 +192,29 @@ namespace Efaturacim\Util\Utils\String{
                 }                                
             }
         }
-        
-        protected static function tokenize($str, $type = "std"){
+                
+        protected static function tokenize($str, $type = "std",$minLength=0,$maxLength=0){
+            $res = array($str);
             if($type == "std"){
-                return preg_split('/[\s,;|]+/', $str, -1, PREG_SPLIT_NO_EMPTY);
+                $res =  preg_split('/[\s,;|]+/', $str, -1, PREG_SPLIT_NO_EMPTY);
+            }else if($type == "comma"){
+                $res =  preg_split('/[,;|]+/', $str, -1, PREG_SPLIT_NO_EMPTY);
             }
-            return array($str);
+            if($minLength>0 && $maxLength>0 && count($res)>0){                
+                $res2 = [];
+                $s = '';
+                foreach ($res as $v){       
+                    //echo "=> ".$v." => ".$s.$v." => ".strlen("".$s.$v)." => ".$minLength." => ".$maxLength." <br/>";                                  
+                    if(strlen("".$s.$v)>=$minLength && strlen("".$s.$v)<=$maxLength){
+                        $res2[] = $s.$v;
+                        $s = '';
+                    }else if(strlen("".$v)<$minLength){
+                        $s .= "".$v;
+                    }
+                }
+                $res = $res2;
+            }
+            return $res;
         }
         
         public static function getPhoneNumbersAsArray($phoneNumbers,$extra=null){
@@ -202,10 +223,15 @@ namespace Efaturacim\Util\Utils\String{
             if(!is_null($extra)){ self::__getPhoneNumbersAsArray($arr, $extra); }
             return $arr;
         }
-        public static function getPhoneNumberAsKey($phoneNumber){
+        public static function getPhoneNumberAsKey($phoneNumber,$key=null){
             if(!is_null($phoneNumber) && self::notEmptyString($phoneNumber)){
                 $r = self::getResult($phoneNumber);
-                if($r->isOK()){ return "".$r->attributes["cell"]; }
+                if($r->isOK()){ 
+                    if($key && strlen("".$key)>0 && key_exists($key, $r->attributes)){
+                        return "".$r->attributes[$key];
+                    }
+                    return "".$r->attributes["cell"]; 
+                }
             }
             return "";
         }

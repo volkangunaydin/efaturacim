@@ -2,6 +2,8 @@
 namespace Efaturacim\Util\Utils\Laravel;
 
 use Efaturacim\Util\Utils\Laravel\Util\LaravelFolderCheck;
+use Efaturacim\Util\Utils\Results\ResultUtil;
+use Efaturacim\Util\Utils\SimpleResult;
 use Exception;
 use Vulcan\Base\Database\DatabaseConnection;
 use Vulcan\Base\Database\MySQL\MySqlDbClient;
@@ -283,6 +285,28 @@ class LV{
      */
     public static function getCurrentRoute(){
         return LV_Route::getCurrentRoute();
+    }
+    public static function json($data=null,$statusCode=null,$template=null,$headers=[]){
+        if($data && $data instanceof SimpleResult){
+             if($template=="sweetalert"){
+                $data = array("success"=>$data->isOK(),"message"=>ResultUtil::showResultAsHtml($data));
+             }else{
+                $data = array("success"=>$data->isOK(),"message"=>$data->getMessages());
+             }   
+        }
+        if(is_null($statusCode)){
+            if(is_array($data)){
+                if(key_exists("success",$data) || key_exists("isSuccess",$data) || key_exists("isOK",$data)){
+                    $statusCode = 200;
+                }else{
+                    $statusCode = 400;
+                }
+            }
+        }
+        if(!is_array($headers)){
+            $headers = [];
+        }
+        return response()->json($data, $statusCode,$headers,JSON_UNESCAPED_UNICODE);
     }
 }
 ?>

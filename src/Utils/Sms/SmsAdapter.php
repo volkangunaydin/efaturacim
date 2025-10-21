@@ -131,7 +131,7 @@ class SmsAdapter{
      * @return VResult
      */
     public function send($message,$phoneNumbers){
-        $res = new SimpleResult();
+        $res = new SimpleResult();        
         if(!is_null($this->forcedSendValue) && is_bool($this->forcedSendValue)){
             $res->setIsOk($this->forcedSendValue);
             $res->value = 1;
@@ -140,6 +140,7 @@ class SmsAdapter{
         $res->setAttribute("msg", $message);
         $res->setAttribute("org_phone", $phoneNumbers);
         $phoneNumbersAsarray = StrPhone::getPhoneNumbersAsArray($phoneNumbers);
+        //dd($message,$phoneNumbersAsarray,$phoneNumbers);
         if($this->optionTextEscapeType=="none"){
             $this->optionEnableTurkishChars = true;
         }            
@@ -216,6 +217,9 @@ class SmsAdapter{
             if(LV::isLaravel()){            
                 if(is_null($key)){ $key = "default"; }
                 $conf = \Illuminate\Support\Facades\Config::get('sms.'.$key);                
+                if(is_string($conf) && StrUtil::notEmpty($conf)){
+                    $conf = \Illuminate\Support\Facades\Config::get('sms.'.$conf);
+                }
             }    
         }        
         if(ArrayUtil::notEmpty($conf) && key_exists("adapter",$conf)){
