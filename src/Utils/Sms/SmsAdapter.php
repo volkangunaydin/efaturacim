@@ -222,6 +222,8 @@ class SmsAdapter{
             $type = StrUtil::toLowerEng(@$conf["adapter"]);
             if($type=="netgsm"){
                 return new NetGsmSms(null,$conf);
+            }else if($type=="ankaratoplusms"){
+                return new AnkaraSms(null,$conf);
             }else if(in_array("".$type,array("+","positive"))){
                 return new SmsAdapterForPositiveDebug();
             }else if(in_array("".$type,array("-","negative"))){
