@@ -11,6 +11,7 @@ use Efaturacim\Util\Utils\Laravel\LV_Route;
 use Efaturacim\Util\Utils\Network\IpUtil;
 use Efaturacim\Util\Utils\Results\ResultUtil;
 use Efaturacim\Util\Utils\Sms\SmsAdapter;
+use Illuminate\Support\Facades\Auth;
 use Vulcan\Orkestra\SmartClient\OrkestraSmartClient;
 use Vulcan\Projects\Orkestra\DbSelect\Cari\SelectCari;
 
@@ -33,6 +34,8 @@ class LocalDebug{
                 return self::handleTest();
             }else if($route->getPart(1)=="orkestra"){
                 return self::handleOrkestra();
+            }else if($route->getPart(1)=="perms"){
+                return self::handlePerms();
             }else{
                 return self::handleDefault();
             }            
@@ -75,6 +78,17 @@ class LocalDebug{
         }else{
             $s .= Alert::danger("Orkestra Veritabanı Bağlantısı Başarısız");
         }        
+        return $s;
+    }
+    public static function handlePerms(){
+        $s = Alert::warning("Kullanıcı İzinleri Test İşlemi Başlıyor");
+        $user = Auth::user();
+        if($user && $user->reference>0){
+            $s .= Alert::success("Kullanıcı: ".$user->displayName."[ Ref : ".$user->reference." ]");
+            $isAdmin = $user->isAdmin();
+        }else{
+            $s .= Alert::danger("Kullanıcı Bulunamadı");
+        }
         return $s;
     }
 }
