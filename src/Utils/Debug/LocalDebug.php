@@ -71,8 +71,8 @@ class LocalDebug{
         if($smartClient instanceof OrkestraSmartClient){                        
             $cariQuery = SelectCari::newObject($smartClient,"mutabakat");
             // $cariQuery->filterByTedarikci();  $cariQuery->filterByMusteri();
-            $cariQuery->filterByTarihtekiBorc("2025-05-31",1000,1000000,1000,10000000);
-            $cariQuery->filterBySmartCode("h");
+            //$cariQuery->filterByTarihtekiBorc("2025-05-31",1000,1000000,1000,10000000);
+            $cariQuery->filterBySmartCode("AYVALIK");
             //$cariQuery->selectFieldsByTarihtekiBakiye("2025-05-31",false);
             $cariQuery->debug(false,100);
         }else{
