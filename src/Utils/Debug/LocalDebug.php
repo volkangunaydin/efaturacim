@@ -72,9 +72,10 @@ class LocalDebug{
             $cariQuery = SelectCari::newObject($smartClient,"mutabakat");
             // $cariQuery->filterByTedarikci();  $cariQuery->filterByMusteri();
             //$cariQuery->filterByTarihtekiBorc("2025-05-31",1000,1000000,1000,10000000);
-            $cariQuery->filterBySmartCode("AYVALIK");
+           // $cariQuery->filterBySmartCode("AYVALIK");
             //$cariQuery->selectFieldsByTarihtekiBakiye("2025-05-31",false);
-            $cariQuery->debug(false,100);
+            $cariQuery->joinMutabakatDonemi(3);
+            $cariQuery->debug(false,1000);
         }else{
             $s .= Alert::danger("Orkestra Veritabanı Bağlantısı Başarısız");
         }        
