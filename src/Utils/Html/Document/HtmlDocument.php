@@ -73,7 +73,7 @@ class HtmlDocument{
         return $this;
     }
     public function addEndJsFile($url,$key="default",$override=false){
-        if(key_exists($key,$this->endJsFiles) && $override){
+        if(key_exists($key,$this->endJsFiles) && !$override){
             return $this;
         }
         $this->endJsFiles[$key] = '<script src="'.$url.'"></script>';
