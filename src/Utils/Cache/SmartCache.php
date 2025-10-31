@@ -1,5 +1,5 @@
 <?php
-namespace Vulcan\Base\Cache;
+namespace Efaturacim\Util\Utils\Cache;
 
 use Efaturacim\Util\Utils\CastUtil;
 use Exception;
@@ -33,6 +33,15 @@ class SmartCache{
             }
         }
         return self::$defaultMode;
+    }
+
+    public static function getKeyForContext($key,$context=null){
+        if(!is_null($context) && strlen($context)>0){
+            if($context=="session"){
+                return $key."@@".session()->getId();
+            }
+        }
+        return $key;
     }
     public static function getCacheEngine(&$cacheEngine){
         if(is_null($cacheEngine) || $cacheEngine==""){            
