@@ -24,7 +24,7 @@ class SmsAdapter{
     protected $urlPost  = "";
     protected $urlXml   = "";
     protected $options  = null;      
-    protected    $optionTextEscapeType = "upper";
+    protected    $optionTextEscapeType = "lower";
     protected    $optionEnableTurkishChars = false;
     protected    $optionSplitMessages = false;
     protected    $adapterType = "";

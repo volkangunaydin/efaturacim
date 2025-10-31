@@ -242,7 +242,9 @@ class CreditNoteDocument extends UblDocument
             return "accountingSupplierParty";
         } else if (in_array($k, ["alici", "musteri"])) {
             return "accountingCustomerParty";
-        } else if (in_array($k, ["notlar", "notes"])) {
+        } else if (in_array($k, ["notlar"])) {
+            // "notes" alias'ını kaldırdık çünkü setPropertyFromOptions'da zaten "notes" kontrolü var
+            // Eğer alias yaparsak 2 kere işleniyor
             return "note";
         }
         return null;
@@ -280,9 +282,6 @@ class CreditNoteDocument extends UblDocument
                     $this->creditNoteLine->add(CreditNoteLine::newLine($vv), null, null, $this->getContextArray());
                 }
             }
-            return true;
-        } else if (in_array($k, ["note", "notes"]) && StrUtil::notEmpty($v)) {
-            $this->note->add(Note::newNote($v));
             return true;
         }
         //\Vulcan\V::dump(array($k,$v,$options));
