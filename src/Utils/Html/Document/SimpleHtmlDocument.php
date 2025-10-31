@@ -3,7 +3,7 @@ namespace Efaturacim\Util\Utils\Html\Document;
 
 use Efaturacim\Util\Utils\Options;
 
-class HtmlDocument{
+class SimpleHtmlDocument{
     /** */
     protected $options = null;
     protected $bodyContents = [];    

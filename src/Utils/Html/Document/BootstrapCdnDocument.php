@@ -1,6 +1,6 @@
 <?php
 namespace Efaturacim\Util\Utils\Html\Document;
-class BootstrapDocument extends HtmlDocument{
+class BootstrapCdnDocument extends SimpleHtmlDocument{
     public function __construct($options=null){
         parent::__construct($options);
     }

@@ -1,5 +1,8 @@
 <?php
 namespace Efaturacim\Util\Utils\Laravel\Doc;
+
+use Illuminate\Support\Facades\DB;
+
 class LV_Doc{
     protected static $INSTANCE = null;
     protected static $params   = [];
@@ -18,6 +21,8 @@ class LV_Doc{
             self::$params[$args[1]] = $args[2];
         }else if($action=="get" && count($args)>=3){
             return "=> ".@$args[1];
+        }else if($action=="require_js" && count($args)>=2){
+            return "required=>".@$args[2];
         }else if($action=="debug"){
             return \Vulcan\V::dump(self::getDebugArray());
         }
@@ -77,6 +82,13 @@ class LV_Doc{
         }
         
         return $parts;
+    }
+    public static function debugStart(){
+        DB::enableQueryLog();
+    }
+    public static function debugEnd(){
+        $queries = DB::getQueryLog();
+        dd($queries);
     }
 }
 

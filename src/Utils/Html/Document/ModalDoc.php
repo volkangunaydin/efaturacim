@@ -5,7 +5,7 @@ use Efaturacim\Util\Utils\Html\Bootstrap\Alert;
 
 class ModalDoc{
     public static function alert($content,$title=null,$type="error",$options=null){
-        $d = new BootstrapDocument($options);
+        $d = new BootstrapCdnDocument($options);
         $s = Alert::alert($type,$content,array("title"=>$title));
         $d->setBodyContent($s);
         return $d->show();
