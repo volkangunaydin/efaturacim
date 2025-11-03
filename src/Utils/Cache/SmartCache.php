@@ -1,7 +1,9 @@
 <?php
 namespace Efaturacim\Util\Utils\Cache;
 
+use Efaturacim\B4B\Models\B4B\B4B_CachedData;
 use Efaturacim\Util\Utils\CastUtil;
+use Efaturacim\Util\Utils\String\StrContains;
 use Exception;
 
 
@@ -14,7 +16,7 @@ class SmartCache{
     public  static $redisTimeout    = 0.5; // Connection timeout in seconds
     public  static $defaultTimeout  = 600;
     protected static $redisInstance = null;
-    protected static $MEMORY_CACHE  = [];
+    public    static $MEMORY_CACHE  = [];
     public static function setMode($mode="memory"){
         return self::$defaultMode = $mode;        
     }
@@ -143,6 +145,8 @@ class SmartCache{
                     try { self::$redisInstance->del("__preparing@".self::$prefix."@".$key);} catch (Exception $e) {}                
                 }                
             }
+        }else{
+            $rawString = $rawStringOrObject;
         }        
         $timeout = $timeout >= 0 ? $timeout : self::$defaultTimeout;
         $stringToSend = serialize(array("time"=>time(),"timeout"=>$timeout,"data"=>$rawString));          
@@ -231,5 +235,62 @@ class SmartCache{
             header("Content-Type: ".$mimeType);
             @readfile($cacheFile);
         }
+    }
+    public static function removeAllWith($prefix,$suffix){        
+        if(is_null($prefix) && is_null($suffix)){            
+            return;
+        }
+        if(true){
+            foreach(self::$MEMORY_CACHE as $key=>$value){
+                if(strpos($key,$prefix)===0 && strpos($key,$suffix)===strlen($key)-strlen($suffix)){
+                    unset(self::$MEMORY_CACHE[$key]);
+                }
+            }
+            self::getCacheEngine($cacheEngine);                    
+            if($cacheEngine === "redis"){
+                if(self::$redisInstance){
+                    $it=null;
+                    $allKeys = [];                    
+                    $pattern = self::$prefix.'@*';                    
+                    if($prefix && strlen("".$prefix)>0 && $suffix && strlen("".$suffix)>0){
+                        $pattern = self::$prefix."@".$prefix."*";
+                    }else if($prefix && strlen("".$prefix)>0){
+                        $pattern = self::$prefix."@".$prefix."*";
+                    }else if($suffix && strlen("".$suffix)>0){
+                        //$pattern = self::$prefix."@*".$suffix;
+                    }                    
+                    while ($keys = self::$redisInstance->scan($it, $pattern, 1000)) {                        
+                        $allKeys = array_merge($allKeys, $keys);
+                    }             
+                    if($suffix && strlen("".$suffix)>0){
+                        foreach($allKeys as $k=>$key){
+                            if(StrContains::endsWith($key,$suffix) || StrContains::contains($key,$suffix."_")){
+                                // TODO: Delete key                                
+                            }else{                        
+                                unset($allKeys[$k]);
+                            }
+                        }
+                    }
+                    foreach($allKeys as $key){
+                        try {
+                            self::$redisInstance->del($key);
+                        } catch (\Throwable $th) {
+                            //throw $th;
+                        }
+                    }
+                }
+            }else{
+                $q = B4B_CachedData::query();                
+                if($prefix && strlen($prefix)>0){
+                    $q->where('key','like',$prefix."%");
+                }
+            }
+        }
+    }
+    public static function getKeyForContext($key,$context=null){
+        if(!is_null($context) && strlen($context)>0){
+            // TODO: Implement context for key
+        }
+        return $key;
     }
 }
