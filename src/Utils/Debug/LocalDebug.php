@@ -61,7 +61,7 @@ class LocalDebug{
     public static function handleUpgrade($createFiles=false,$initData=false){        
         $s = '';
         $s   .= Alert::warning("B4B Veritabanı Upgrade İşlemi Başlıyor");
-        $res = SmartModelUtil::doMigrationForLaravel(true,$createFiles,$initData,false);
+        $res = SmartModelUtil::doMigrationForLaravel(true,$createFiles,$initData,false,true);
         $s  .= ResultUtil::getResultMessagesAsHtml($res);
         return $s;
     }

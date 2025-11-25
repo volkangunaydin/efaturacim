@@ -287,10 +287,5 @@ class SmartCache{
             }
         }
     }
-    public static function getKeyForContext($key,$context=null){
-        if(!is_null($context) && strlen($context)>0){
-            // TODO: Implement context for key
-        }
-        return $key;
-    }
+
 }

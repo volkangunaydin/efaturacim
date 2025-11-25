@@ -138,7 +138,7 @@ class LV{
     /**
      * @return OrkestraSmartClient
      */
-    public static function getSmartClientForOrkestra(){
+    public static function getSmartClientForOrkestra($periodRef=null){
         if(is_null(self::$__smartClient)){
             $dbOrkestra = self::getDBForOrkestra();
             if($dbOrkestra instanceof MySqlDbClient){                
@@ -148,7 +148,14 @@ class LV{
                     self::$__smartClient->setDbKeyForB4B($dbB4B->dbKey);
                     $orkestraConfig = self::configArray("orkestra","default");
                     if(is_array($orkestraConfig) && count($orkestraConfig)>0 && key_exists("period",$orkestraConfig)){
-                        self::$__smartClient->selectPeriod($orkestraConfig["period"]);
+                        $periodRef = $orkestraConfig["period"];
+                        if(function_exists('session')){
+                            $periodRefFromSession = session()->get('orkestra_period_ref');
+                            if($periodRefFromSession && $periodRefFromSession>0){
+                                $periodRef = $periodRefFromSession;
+                            }
+                        }                        
+                        self::$__smartClient->selectPeriod($periodRef);
                         self::$__smartClient->options->setValue("period_reference",$orkestraConfig["period"]);
                         self::$__smartClient->options->setValue("orkestra_user",$orkestraConfig["user"]);
                         self::$__smartClient->options->setValue("orkestra_pass",$orkestraConfig["pass"]);
@@ -158,6 +165,9 @@ class LV{
                     //\Vulcan\V::dump($orkestraConfig);
                 }
             }                        
+        }
+        if(!is_null($periodRef) && self::$__smartClient instanceof OrkestraSmartClient && $periodRef!=self::$__smartClient->getOrkestraPeriodRef()){
+            self::$__smartClient->selectPeriod($periodRef);
         }
         return self::$__smartClient;
     }
