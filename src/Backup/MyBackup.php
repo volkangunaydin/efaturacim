@@ -3,6 +3,7 @@
 namespace Efaturacim\Util\Backup;
 
 use Efaturacim\Util\Utils\Console\Console;
+use Efaturacim\Util\Utils\Options;
 use Exception;
 
 class MyBackup
@@ -10,10 +11,13 @@ class MyBackup
     private $config;
     private $configFile;
 
-    public function __construct(string $configFile)
+    public function __construct(?string $configFile = null)
     {
-        $this->configFile = $configFile;
-        $this->loadConfig();
+        $this->config = ['name' => 'Unknown', 'jobs' => []];
+        if ($configFile) {
+            $this->configFile = $configFile;
+            $this->loadConfig();
+        }
     }
 
     public static function backupWithConfig(string $configFile): void
@@ -37,6 +41,55 @@ class MyBackup
 
         if (!isset($this->config['jobs']) || !is_array($this->config['jobs'])) {
             throw new Exception("Invalid config structure: 'jobs' array is missing.");
+        }
+    }
+
+    public function setName(string $name): self
+    {
+        $this->config['name'] = $name;
+        return $this;
+    }
+
+    public function addJob(array $job): self
+    {
+        $this->config['jobs'][] = $job;
+        return $this;
+    }
+
+    public function addMySqlDump(string $host, string $user, string $password, string $database, string $path, array $options = []): self
+    {
+        $job = [
+            'type' => 'mysqldump',
+            'host' => $host,
+            'user' => $user,
+            'password' => $password,
+            'database' => $database,
+            'path' => $path,
+        ];
+
+        $job = array_merge($job, $options);
+
+        return $this->addJob($job);
+    }
+
+    public function addRsync(string $local, string $remote, array $options = []): self
+    {
+        $job = [
+            'type' => 'rsync',
+            'local' => $local,
+            'remote' => $remote,
+        ];
+
+        $job = array_merge($job, $options);
+
+        return $this->addJob($job);
+    }
+
+    public function saveConfig(string $jsonPath): void
+    {
+        $json = json_encode($this->config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if (file_put_contents($jsonPath, $json) === false) {
+            throw new Exception("Failed to save config to: " . $jsonPath);
         }
     }
 
@@ -71,17 +124,29 @@ class MyBackup
 
     private function runMysqlDump(array $job): void
     {
-        $required = ['host', 'user', 'database', 'path'];
-        $this->validateJob($job, $required);
+        $options = new Options($job);
 
-        $host = $job['host'];
-        $port = $job['port'] ?? 3306;
-        $user = $job['user'];
-        $password = $job['password'] ?? '';
-        $database = $job['database'];
-        $path = rtrim($job['path'], '/');
-        $format = $job['format'] ?? '{database}_{date}.sql.gz';
-        $ignoreTables = $job['ignore_tables'] ?? [];
+        if (!$options->hasKey(['host', 'hostname'])) {
+            throw new Exception("Missing required field: host");
+        }
+        if (!$options->hasKey(['user', 'username', 'user_name'])) {
+            throw new Exception("Missing required field: user");
+        }
+        if (!$options->hasKey(['database', 'db', 'dbname'])) {
+            throw new Exception("Missing required field: database");
+        }
+        if (!$options->hasKey(['path', 'dir', 'directory'])) {
+            throw new Exception("Missing required field: path");
+        }
+
+        $host = $options->getAs(['host', 'hostname'], 'localhost');
+        $port = $options->getAsInt(['port'], 3306);
+        $user = $options->getAs(['user', 'username', 'user_name'], '');
+        $password = $options->getAs(['password', 'pass', 'pwd'], '');
+        $database = $options->getAs(['database', 'db', 'dbname'], '');
+        $path = rtrim($options->getAs(['path', 'dir', 'directory'], ''), '/');
+        $format = $options->getAs(['format', 'filename_format'], '{database}_{date}.sql.gz');
+        $ignoreTables = $options->getAs(['ignore_tables', 'exclude_tables'], []);
 
         if (!is_dir($path)) {
             if (!mkdir($path, 0755, true)) {
@@ -89,8 +154,9 @@ class MyBackup
             }
         }
 
-        $date = date('Y-m-d_H-i-s');
-        $filename = str_replace(['{database}', '{date}'], [$database, $date], $format);
+        $date = date('Y-m-d');
+        $dateTime = date('Y-m-d_H-i-s');
+        $filename = str_replace(['{database}', '{date}', "{datetime}"], [$database, $date, $dateTime], $format);
         $outputFile = $path . DIRECTORY_SEPARATOR . $filename;
 
         $command = "mysqldump -h " . escapeshellarg($host) . " -P " . escapeshellarg($port) . " -u " . escapeshellarg($user);
@@ -101,8 +167,18 @@ class MyBackup
 
         $command .= " " . escapeshellarg($database);
 
-        foreach ($ignoreTables as $table) {
-            $command .= " --ignore-table=" . escapeshellarg($database . "." . $table);
+        if ($options->getAsBool(['complete_insert', 'complete-insert'], true)) {
+            $command .= " --complete-insert";
+        }
+
+        if ($options->getAsBool(['insert_ignore', 'insert-ignore'], false)) {
+            $command .= " --insert-ignore";
+        }
+
+        if (is_array($ignoreTables)) {
+            foreach ($ignoreTables as $table) {
+                $command .= " --ignore-table=" . escapeshellarg($database . "." . $table);
+            }
         }
 
         // Check if output file ends with .gz
@@ -123,14 +199,20 @@ class MyBackup
 
     private function runRsync(array $job): void
     {
-        $required = ['local', 'remote'];
-        $this->validateJob($job, $required);
+        $options = new Options($job);
 
-        $local = $job['local'];
-        $remote = $job['remote'];
+        if (!$options->hasKey(['local', 'source', 'src'])) {
+            throw new Exception("Missing required field: local");
+        }
+        if (!$options->hasKey(['remote', 'dest', 'destination'])) {
+            throw new Exception("Missing required field: remote");
+        }
+
+        $local = $options->getAs(['local', 'source', 'src'], '');
+        $remote = $options->getAs(['remote', 'dest', 'destination'], '');
 
         // Ensure local path ends with / if it's a directory sync, rsync behavior depends on it
-        // But user provided config should be respected. 
+        // But user provided config should be respected.
         // Usually for backup syncing folder content: /source/ /dest/
 
         $command = "rsync -avz " . escapeshellarg($local) . " " . escapeshellarg($remote);
@@ -141,10 +223,6 @@ class MyBackup
 
     private function validateJob(array $job, array $requiredFields): void
     {
-        foreach ($requiredFields as $field) {
-            if (!isset($job[$field])) {
-                throw new Exception("Missing required field in job: " . $field);
-            }
-        }
+        // Deprecated in favor of Options class validation inside run methods
     }
 }

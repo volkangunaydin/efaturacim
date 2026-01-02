@@ -1,4 +1,5 @@
 <?php
+
 namespace Efaturacim\Util\Utils\IO;
 
 use Efaturacim\Util\Utils\Options;
@@ -6,90 +7,120 @@ use Efaturacim\Util\Utils\SimpleResult;
 use Efaturacim\Util\Utils\String\StrBase64;
 
 
-class IO_Util{
-    public static function readFileAsString($path,$options=null){
+class IO_Util
+{
+    public static function readFileAsString($path, $options = null)
+    {
         return self::readFile($path, $options)->value;
     }
-    public static function readFile($path,$options){
+    public static function readFile($path, $options)
+    {
         $r = new SimpleResult();
         Options::ensureParam($options);
-        if($path && file_exists($path) && is_file($path)){
+        if ($path && file_exists($path) && is_file($path)) {
             $r->setIsOk(true);
             $r->value = file_get_contents($path);
         }
-        if($options instanceof Options){
-            if($options->getAsBool(array("return_as_string","as_string"))){
+        if ($options instanceof Options) {
+            if ($options->getAsBool(array("return_as_string", "as_string"))) {
                 return $r->value;
             }
         }
         return $r;
-    }        
-    public static function readFileAsBase64EncodedString($path,$options=null){
-        return StrBase64::encode(self::readFileAsString($path,$options));
     }
-    public static function getSafePath($path,$isFile=true){
-        if($path && file_exists($path) && is_dir($path)){
-            $path = "".$path;
-        }else if($isFile){
+    public static function readFileAsBase64EncodedString($path, $options = null)
+    {
+        return StrBase64::encode(self::readFileAsString($path, $options));
+    }
+    public static function getSafePath($path, $isFile = true)
+    {
+        if ($path && file_exists($path) && is_dir($path)) {
+            $path = "" . $path;
+        } else if ($isFile) {
             $path = dirname($path);
         }
-        $path = str_replace("\\","/",$path);
-        $path = str_replace("//","/",$path);
-        if(substr("".$path,-1) !== "/"){
+        $path = str_replace("\\", "/", $path);
+        $path = str_replace("//", "/", $path);
+        if (substr("" . $path, -1) !== "/") {
             $path .= "/";
         }
         return $path;
-    }   
-    public static function getExtensionFromName($name,$toLower=false,$canBeExtension=true){
-        return FileExtensions::getExtensionFromName($name,$toLower,$canBeExtension);
-    }   
-    public static function file_exists($path){
+    }
+    public static function getExtensionFromName($name, $toLower = false, $canBeExtension = true)
+    {
+        return FileExtensions::getExtensionFromName($name, $toLower, $canBeExtension);
+    }
+    public static function file_exists($path)
+    {
         return file_exists($path);
     }
-    public static function is_writable($path){
+    public static function is_writable($path)
+    {
         return file_exists($path) && is_writable($path);
     }
-    public static function writeFileAsString($path,$content){
-        return file_put_contents($path,$content);
+    public static function writeFileAsString($path, $content)
+    {
+        return file_put_contents($path, $content);
     }
-    public static function writeTextFile($path,$content){
-        return file_put_contents($path,$content);
+    public static function writeTextFile($path, $content)
+    {
+        return file_put_contents($path, $content);
     }
-    public static function deleteFile($path){
-        $r = new SimpleResult();        
-        if(file_exists($path)){
+    public static function deleteFile($path)
+    {
+        $r = new SimpleResult();
+        if (file_exists($path)) {
             $a  = unlink($path);
             $r->setIsOk($a);
-            if($a){
+            if ($a) {
                 $r->value = true;
-            }else{
+            } else {
                 $r->addError("Dosya silinemedi");
             }
         }
         return $r;
     }
-    public static function ensureDir($path){
-        if(!file_exists($path)){
-            mkdir($path,0777,true);
+    public static function ensureDir($path)
+    {
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
         }
     }
-    public static function readFileAsArray($path){
-        if($path && file_exists($path)){
+    public static function readFileAsArray($path)
+    {
+        if ($path && file_exists($path)) {
             $lines = file($path);
             // Remove newline and carriage return characters from each line
-            return array_map(function($line) {
+            return array_map(function ($line) {
                 return rtrim($line, "\r\n");
             }, $lines);
         }
         return array();
     }
-    public static function readFileLines($path,$startLine,$endLine){
+    public static function readFileLinesWithFullRead($path, $startLine, $endLine)
+    {
         $r = array();
-        if($path && file_exists($path)){
+        if ($path && file_exists($path)) {
             $lines = self::readFileAsArray($path);
-            $r = array_slice($lines,$startLine,$endLine-$startLine);
+            $r = array_slice($lines, $startLine, $endLine - $startLine);
+        }
+        return $r;
+    }
+    public static function readFileLines($path, $startLine, $endLine)
+    {
+        $r = array();
+        if ($path && file_exists($path)) {
+            try {
+                $file = new \SplFileObject($path);
+                $file->seek($startLine);
+                while (!$file->eof() && $file->key() < $endLine) {
+                    $r[] = rtrim($file->current(), "\r\n");
+                    $file->next();
+                }
+            } catch (\Throwable $th) {
+                // ignore
+            }
         }
         return $r;
     }
 }
-?>
