@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Orkestra\Soap;
 
 use Efaturacim\Util\Orkestra\Soap\Services\OrkestraFactoryWebService;
+use Efaturacim\Util\Orkestra\Soap\Util\OrkestraSoapDelete;
 
 class OrkestraSoapClient{
     /** @var OrkestraFactoryWebService */
@@ -28,6 +29,9 @@ class OrkestraSoapClient{
      */
     public static function getFactoryWithRedis($options=null){
         return self::getFactory($options)->useRedisCache();
+    }
+    public static function delete($smartClient, $ref=null,$nesneAdi=null,$userRef=null){
+        return OrkestraSoapDelete::delete($smartClient, $ref, $nesneAdi, $userRef);
     }
 }
 ?>
