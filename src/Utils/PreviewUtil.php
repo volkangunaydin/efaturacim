@@ -2,6 +2,7 @@
 namespace Efaturacim\Util\Utils;
 
 use DOMDocument;
+use Vulcan\Base\Util\Preview\PreviewUtil as VulcanPreviewUtil;
 
 class PreviewUtil{
     public static function showAsHtml($html,$options=null){
@@ -168,6 +169,10 @@ HTML;
             return self::showAsHtml($s);
         }
         return $s;
+    }
+
+    public static function previewOnModal($content,$title=null,$type="auto"){
+        return VulcanPreviewUtil::previewOnModal($content, $title, $type);
     }
     
 }
